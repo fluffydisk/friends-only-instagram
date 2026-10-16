@@ -66,6 +66,15 @@ This build used a disposable personal signing key. Separate clean builds use
 different keys unless stable signing secrets are configured; their APK hashes
 and certificates differ. The original Meta signature cannot sign our output.
 
+The full [GitHub Actions manual APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38962328897)
+also passed on source commit `07096ab`, including all 113 Java assertions and 81
+Python tests, original APKM validation, merge, both patches, rebuilding, signing,
+static output checks and APK artifact upload. Its artifact is
+[`friends-only-personal-test-apk-9`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38962328897/artifacts/12073995063).
+That independently signed CI output has its own checksum/certificate in the
+run's `native-patch-reports-9` artifact; the workspace checksum above refers only
+to the workspace build. Neither successful build establishes device behavior.
+
 ## Not run
 
 No emulator or physical Android device is attached to this cloud environment.

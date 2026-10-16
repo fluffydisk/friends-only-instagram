@@ -12,6 +12,18 @@ successfully and a personally signed APK was produced and statically verified.
 Running it on a phone remains unverified. See [VERIFICATION.md](VERIFICATION.md) for the latest recorded result;
 a successful bundle build alone does not establish Instagram compatibility.
 
+## Download the first native test APK
+
+The [successful APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38962328897)
+produced [friends-only-personal-test-apk-9](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38962328897/artifacts/12073995063).
+Open that artifact link in a browser while signed into GitHub, download the ZIP,
+and extract `friends-only-personal.apk`. The artifact is retained for 7 days.
+This is the native patched app, separate from the WebView workflow's APK.
+
+Read the installation/signature notes below before replacing an installed app.
+Installation, launch, login and account features have not been tested on a device.
+Its launcher still uses Instagram's name/icon; Home long-press opens our settings.
+
 ## Initial scope
 
 Two Friends Only patches are included:

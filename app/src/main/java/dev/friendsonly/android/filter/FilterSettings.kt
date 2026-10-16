@@ -12,12 +12,22 @@ class FilterSettings(context: Context) {
         get() = preferences.getBoolean("explore", true)
         set(value) { preferences.edit().putBoolean("explore", value).apply() }
     var hideSuggestions: Boolean
-        get() = preferences.getBoolean("suggestions", false)
+        get() = preferences.getBoolean("suggestions", true)
         set(value) { preferences.edit().putBoolean("suggestions", value).apply() }
+    var hideDistractions: Boolean
+        get() = preferences.getBoolean("distractions", true)
+        set(value) { preferences.edit().putBoolean("distractions", value).apply() }
+    var minimalAppearance: Boolean
+        get() = preferences.getBoolean("appearance", true)
+        set(value) { preferences.edit().putBoolean("appearance", value).apply() }
 
-    fun asJson(): String = JSONObject()
+    fun asJson(darkMode: Boolean, styleSheet: String): String = JSONObject()
         .put("hideReels", hideReels)
         .put("hideExplore", hideExplore)
         .put("hideSuggestions", hideSuggestions)
+        .put("hideDistractions", hideDistractions)
+        .put("minimalAppearance", minimalAppearance)
+        .put("darkMode", darkMode)
+        .put("styleSheet", styleSheet)
         .toString()
 }

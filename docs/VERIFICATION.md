@@ -1,5 +1,58 @@
 # Verification record
 
+## 0.2.0 minimalist redesign — 16 October 2026, Europe/Berlin
+
+The user reported that the earlier MVP works on their phone. That is a useful
+baseline, not a recorded per-feature pass for this redesign. The 0.2.0 native
+shell and local styles have not been run on a physical device or emulator in
+this environment. No Instagram account data was accessed during development.
+
+The redesign keeps the existing WebView/cookie/navigation integration. It adds
+native light/dark chrome and Turkish labels, local Home/Direct CSS, reversible
+global-navigation filtering, narrow English/Turkish recommendation headings,
+and an original-layout recovery action. The settings dialog is tracked and
+dismissed during Activity destruction. New defaults respect stored preferences.
+
+| Check | Actual result |
+| --- | --- |
+| Clean npm dependency install and offline filter/style fixtures | Passed; 40/40 fixtures |
+| `testDebugUnitTest` | Passed; 5/5 JVM navigation tests |
+| `lintDebug` | Passed; zero errors, one expected API33 manifest-attribute warning |
+| `assembleDebug` and `apksigner verify` | Passed; signed version0.2.0/code2 APK, INTERNET only |
+| Packaged `filters.js` and `focus.css` | Both byte-identical to final sources |
+| Targeted independent review | Dialog lifecycle and recycled-navigation restoration fixes confirmed |
+
+The fixtures cover appearance toggles/theme changes, all-switch restoration,
+navigation signatures and role changes, Turkish/English headings, untouched
+auth/viewer routes, normal media, group controls, and message composers.
+They use constructed local DOMs, not an authenticated Instagram snapshot.
+GitHub workflow status should be checked on the corresponding pull request;
+a successful earlier build does not verify this version.
+
+Local APK: `app/build/outputs/apk/debug/app-debug.apk`, 881,955 bytes.
+Delivery copy: `friends-only-0.2.0-debug.apk`.
+
+```text
+APK SHA-256:
+3e76219d6a7c73110d69a4b8fc491e53262bffad90e2ee63d68a007b2aef11b6
+filters.js SHA-256:
+b06b4799b40af4b61e1ee23273d6755204b16d842c8c2186cd3fa5bff58edc76
+focus.css SHA-256:
+1655a7d6485b5e286c680a03aaf1f6e9e182e76111c4203471e93c9445e99cd6
+```
+
+These checks used the same pinned JDK17/Gradle8.11.1/AGP8.9.2/Kotlin2.1.20/
+SDK35 toolchain as the original delivery. No new permissions, backend, runtime
+library dependencies, analytics, or private API calls were added.
+
+No emulator image or Android device is available. This environment has no KVM
+acceleration. Real WebView rendering, keyboard/insets, dialog rotation, Stories,
+ordinary videos, Direct/groups, and current Instagram DOM matching still need
+the [device checklist](DEVICE_TESTING.md). Offline fixtures do not replace those
+checks.
+
+## 0.1.0 original delivery
+
 Date: **2026-10-16 UTC**. This record distinguishes compiler/fixture evidence
 from account and device behavior. No physical Android device or emulator was
 available, and no Instagram credentials were entered.

@@ -1,8 +1,12 @@
 <resources>
     <style name="Theme.FriendsOnly" parent="Theme.FriendsOnly.Base" />
     <style name="Theme.FriendsOnly.Base" parent="android:style/Theme.Material.NoActionBar">
-        <item name="android:fontFamily">sans</item>
-        <item name="android:colorAccent">#95CDB0</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:colorAccent">@color/focus_accent</item>
+        <item name="android:colorBackground">@color/focus_background</item>
+        <item name="android:windowBackground">@color/focus_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>
     </style>

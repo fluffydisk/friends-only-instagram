@@ -7,6 +7,7 @@ import java.util.Locale
 object NavigationPolicy {
     const val HOME = "https://www.instagram.com/"
     const val MESSAGES = "https://www.instagram.com/direct/inbox/"
+    const val ACCOUNT = "https://www.instagram.com/accounts/edit/"
 
     enum class Destination { INSTAGRAM, BROWSER, BLOCKED }
 

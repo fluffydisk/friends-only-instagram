@@ -1,15 +1,24 @@
-/* Friends Only: local, reversible UI filtering. No bridge, I/O, or account data storage. */
+/* Friends Only: local, reversible presentation. No bridge, I/O, or account data storage. */
 (function () {
   "use strict";
 
   if (window.FriendsOnlyFilters) return;
 
   var MARKER = "data-friends-only-filtered";
+  var APPEARANCE = "data-friends-only-appearance";
   var STYLE_ID = "friends-only-filter-style";
+  var APPEARANCE_STYLE_ID = "friends-only-appearance-style";
+  var NAV_SELECTOR = "nav, [role='navigation']";
+  var CONTENT_SELECTOR = "article, [role='article'], [role='dialog']";
   var FLUSH_DELAY_MS = 120;
   var MAX_PENDING_ROOTS = 32;
-  var options = { hideReels: true, hideExplore: true, hideSuggestions: false };
+  var options = {
+    hideReels: true, hideExplore: true, hideSuggestions: true,
+    hideDistractions: true, minimalAppearance: true, darkMode: false, styleSheet: ""
+  };
   var originals = new Map();
+  var appearanceRoot = null;
+  var originalAppearance = null;
   var pending = new Set();
   var fullScan = false;
   var observer = null;
@@ -36,14 +45,58 @@
     return window.location.pathname === "/";
   }
 
-  function ensureStyle() {
-    if (document.getElementById(STYLE_ID)) return;
+  function appearanceRoute() {
+    // Viewers, profiles, account settings, and authentication retain site styling.
+    return homeRoute() || /^\/direct(?:\/|$)/.test(window.location.pathname);
+  }
+
+  function removeStyle(id) {
+    var style = document.getElementById(id);
+    if (style) style.remove();
+  }
+
+  function ensureStyle(id, css) {
     var parent = document.head || document.documentElement;
     if (!parent) return; // An early host injection can precede documentElement.
-    var style = document.createElement("style");
-    style.id = STYLE_ID;
-    style.textContent = "[" + MARKER + "] { display: none !important; }";
-    parent.appendChild(style);
+    var style = document.getElementById(id);
+    if (!style) {
+      style = document.createElement("style");
+      style.id = id;
+      style.textContent = css;
+      parent.appendChild(style);
+    } else if (style.textContent !== css) {
+      style.textContent = css;
+    }
+  }
+
+  function restoreAppearance() {
+    if (appearanceRoot) {
+      if (originalAppearance === null) appearanceRoot.removeAttribute(APPEARANCE);
+      else appearanceRoot.setAttribute(APPEARANCE, originalAppearance);
+    }
+    appearanceRoot = null;
+    originalAppearance = null;
+    removeStyle(APPEARANCE_STYLE_ID);
+  }
+
+  function syncStyles() {
+    if (!authenticationRoute() && (options.hideReels || options.hideExplore ||
+        options.hideSuggestions || options.hideDistractions || options.minimalAppearance)) {
+      ensureStyle(STYLE_ID, "[" + MARKER + "] { display: none !important; }");
+    } else {
+      removeStyle(STYLE_ID);
+    }
+    if (!options.minimalAppearance || !appearanceRoute() || !options.styleSheet || !document.documentElement) {
+      restoreAppearance();
+      return;
+    }
+    if (appearanceRoot !== document.documentElement) {
+      restoreAppearance();
+      appearanceRoot = document.documentElement;
+      originalAppearance = appearanceRoot.getAttribute(APPEARANCE);
+    }
+    appearanceRoot.setAttribute(APPEARANCE, options.darkMode ? "dark" : "light");
+    ensureStyle(APPEARANCE_STYLE_ID, options.styleSheet);
   }
 
   function hide(element, reason) {
@@ -72,34 +125,75 @@
     return icon ? icon.getAttribute("aria-label").trim().toLowerCase() : "";
   }
 
-  function navigationReason(anchor) {
-    if (!anchor.hasAttribute("href")) return null;
-    var url = instagramUrl(anchor.getAttribute("href"));
-    if (!url || anchor.querySelector("img, picture, video, audio")) return null;
-    var destination;
-    if (/^\/reels\/?$/.test(url.pathname) && options.hideReels) destination = "reels";
-    else if (/^\/explore\/?$/.test(url.pathname) && options.hideExplore) destination = "explore";
-    else return null;
-
-    // A link within content or a dialog is never assumed to be navigation.
-    if (anchor.closest("article, [role='article'], [role='dialog']")) return null;
-    if (anchor.closest("nav, [role='navigation'], header")) return destination + "-navigation";
-    if (homeRoute() && navigationLabel(anchor) === destination) return destination + "-navigation";
-    return null;
-  }
-
   function isProfileLink(anchor) {
     var url = instagramUrl(anchor.getAttribute("href"));
     if (!url || !/^\/[A-Za-z0-9_.]+\/$/.test(url.pathname)) return false;
-    return !/^\/(accounts|direct|explore|reels|stories|about|legal|p|reel)\/$/.test(url.pathname);
+    return !/^\/(accounts|direct|explore|reels|stories|about|legal|p|reel|shop|shopping)\/$/.test(url.pathname);
+  }
+
+  function coreDestination(url) {
+    // A Following menu link such as /?variant=following must remain usable.
+    if (url.pathname === "/" && !url.search && !url.hash) return "home";
+    if (/^\/direct(?:\/inbox)?\/?$/.test(url.pathname) && !url.search && !url.hash) return "messages";
+    if (/^\/reels\/?$/.test(url.pathname)) return "reels";
+    if (/^\/explore\/?$/.test(url.pathname)) return "explore";
+    return null;
+  }
+
+  function coherentGlobalNavigation(nav, cache) {
+    if (!nav || nav.closest(CONTENT_SELECTOR + ", form")) return false;
+    if (cache.has(nav)) return cache.get(nav);
+    var links = Array.from(nav.querySelectorAll("a[href]"));
+    var destinations = new Set();
+    // A small primary-navigation group must contain all three independent
+    // signals. Never classify a conversation header or a Following menu by label.
+    if (links.length <= 20) {
+      links.forEach(function (anchor) {
+        if (anchor.closest(CONTENT_SELECTOR) || anchor.querySelector("video, audio")) return;
+        var url = instagramUrl(anchor.getAttribute("href"));
+        if (url) destinations.add(coreDestination(url));
+      });
+    }
+    var result = destinations.has("home") && destinations.has("messages") &&
+      (destinations.has("reels") || destinations.has("explore"));
+    cache.set(nav, result);
+    return result;
+  }
+
+  function navigationReason(anchor, cache) {
+    if (!anchor.hasAttribute("href") || anchor.closest(CONTENT_SELECTOR)) return null;
+    var url = instagramUrl(anchor.getAttribute("href"));
+    if (!url) return null;
+    var nav = anchor.closest(NAV_SELECTOR);
+    var scope = nav || anchor.closest("header");
+    var media = anchor.querySelector("img, picture, video, audio");
+    var destination = coreDestination(url);
+    if (!media) {
+      if ((destination === "reels" && options.hideReels) || (destination === "explore" && options.hideExplore)) {
+        if (scope || (homeRoute() && navigationLabel(anchor) === destination)) return destination + "-navigation";
+      }
+      if (options.hideDistractions && scope &&
+          /^\/(create\/select|accounts\/activity|shop|shopping|explore\/people)\/?$/.test(url.pathname)) {
+        return "discovery-navigation";
+      }
+    }
+    if (!options.minimalAppearance || !appearanceRoute() || !coherentGlobalNavigation(nav, cache)) return null;
+    if (!media && (destination === "home" || destination === "messages")) return "duplicate-navigation";
+    // Only explicitly labelled own-profile entries in an identified global nav
+    // are redundant with the native account button. Author/story avatars remain.
+    if (!anchor.querySelector("video, audio") && isProfileLink(anchor) &&
+        /^(profile|your profile|profil|profilin)$/.test(navigationLabel(anchor))) {
+      return "duplicate-profile-navigation";
+    }
+    return null;
   }
 
   function explicitRecommendation(article) {
-    // This deliberately narrow, opt-in rule is not a followed-account detector.
+    // This deliberately narrow rule is not a followed-account detector.
     // The label must precede a separate author header in a single-post article.
     var heading = article.firstElementChild;
     if (!heading || !heading.matches("h1, h2, h3, h4, h5, h6, [role='heading']")) return false;
-    if (!/^(Suggested posts|Suggested for you)$/i.test(heading.textContent.trim())) return false;
+    if (!/^(Suggested posts|Suggested for you|Önerilen gönderiler|Senin için önerilenler|Senin için öneriler)$/i.test(heading.textContent.trim())) return false;
     var authorHeader = heading.nextElementSibling;
     if (!authorHeader || authorHeader.tagName !== "HEADER") return false;
     if (!Array.from(authorHeader.querySelectorAll("a[href]")).some(isProfileLink)) return false;
@@ -121,15 +215,35 @@
 
   function apply(root) {
     if (authenticationRoute()) return;
+    var navCache = new Map();
     var anchors = candidates(root, "a");
     if (root.nodeType === 1) {
       var parentAnchor = root.parentElement && root.parentElement.closest("a");
       if (parentAnchor && !anchors.includes(parentAnchor)) anchors.push(parentAnchor);
     }
     anchors.forEach(function (anchor) {
-      var reason = navigationReason(anchor);
+      var reason = navigationReason(anchor, navCache);
       if (reason) hide(anchor, reason);
       else restore(anchor);
+    });
+    var navs = candidates(root, NAV_SELECTOR);
+    navs.forEach(function (nav) {
+      // Remove the now-empty wrapper only when every link was identified and
+      // no independent controls/media would be removed with it. Unknown groups
+      // and controls remain intact, including Following menus and composers.
+      var links = Array.from(nav.querySelectorAll("a[href]"));
+      var protectedContent = nav.querySelector("button, input, textarea, select, [contenteditable='true'], [role='button'], video, audio, article, [role='article'], [role='dialog']") ||
+        Array.from(nav.querySelectorAll("img, picture")).some(function (media) {
+          var owner = media.closest("a");
+          return !owner || !originals.has(owner);
+        });
+      if (options.minimalAppearance && appearanceRoute() && !protectedContent &&
+          coherentGlobalNavigation(nav, navCache) && links.length &&
+          links.every(function (anchor) { return originals.has(anchor); })) {
+        hide(nav, "duplicate-navigation-group");
+      } else {
+        restore(nav);
+      }
     });
     // Never inspect post headings on Direct, Stories, profiles, or auth pages.
     if (!options.hideSuggestions || !homeRoute()) return;
@@ -147,15 +261,16 @@
   function flush() {
     timer = null;
     if (!active) return;
-    ensureStyle();
     if (route !== window.location.pathname) {
       route = window.location.pathname;
       restoreAll();
       fullScan = true;
       observe();
     }
+    syncStyles();
     Array.from(originals.keys()).forEach(function (element) {
-      if (!element.isConnected) restore(element);
+      if (!element.isConnected || (element.getAttribute(MARKER) === "duplicate-navigation-group" &&
+          !element.matches(NAV_SELECTOR))) restore(element);
     });
     var roots = Array.from(pending);
     pending.clear();
@@ -171,6 +286,9 @@
 
   function queue(root) {
     if (!fullScan && root && root.nodeType === 1) {
+      // A navigation's signature can change when a sibling link appears or is
+      // removed. Re-evaluate that small group, never a generic page container.
+      root = root.closest(NAV_SELECTOR) || root;
       if (pending.size < MAX_PENDING_ROOTS) pending.add(root);
       else {
         pending.clear();
@@ -182,24 +300,36 @@
     if (timer === null) timer = window.setTimeout(flush, FLUSH_DELAY_MS);
   }
 
+  function routeChanged() {
+    if (!active) return;
+    fullScan = true;
+    queue(null);
+  }
+
+  function ownedStyle(node) {
+    return node && node.nodeType === 1 && (node.id === STYLE_ID || node.id === APPEARANCE_STYLE_ID);
+  }
+
   function observe() {
     if (!observer) {
       observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
+          if (ownedStyle(mutation.target)) return;
           if (mutation.type === "characterData") {
             if (options.hideSuggestions && homeRoute()) queue(mutation.target.parentElement);
           } else if (mutation.type === "attributes") {
             queue(mutation.target);
           } else {
             mutation.addedNodes.forEach(function (node) {
+              if (ownedStyle(node)) return;
               if (node.nodeType === 1) queue(node);
               else if (options.hideSuggestions && homeRoute()) queue(mutation.target);
             });
-            if (mutation.removedNodes.length) {
+            if (Array.from(mutation.removedNodes).some(function (node) { return !ownedStyle(node); })) {
               // Re-evaluate the content owner, not an entire body for every
               // removed post or chat item. A null root still schedules cleanup.
               var target = mutation.target;
-              var owner = target.nodeType === 1 ? target.closest("a") : null;
+              var owner = target.nodeType === 1 ? target.closest("a, " + NAV_SELECTOR) : null;
               if (!owner && target.nodeType === 1 && options.hideSuggestions && homeRoute()) {
                 owner = target.closest("article, [role='article']");
               }
@@ -210,6 +340,7 @@
       });
     }
     // Our style/marker writes are not observed, preventing feedback loops.
+    observer.disconnect();
     observer.observe(document, {
       subtree: true,
       childList: true,
@@ -221,17 +352,23 @@
 
   function configure(next) {
     next = next || {};
-    ["hideReels", "hideExplore", "hideSuggestions"].forEach(function (key) {
+    ["hideReels", "hideExplore", "hideSuggestions", "hideDistractions", "minimalAppearance", "darkMode"].forEach(function (key) {
       if (typeof next[key] === "boolean") options[key] = next[key];
     });
+    if (typeof next.styleSheet === "string") options.styleSheet = next.styleSheet;
+    if (!active) {
+      window.addEventListener("popstate", routeChanged);
+      window.addEventListener("hashchange", routeChanged);
+    }
     active = true;
     route = window.location.pathname;
+    if (observer) observer.disconnect();
     if (timer !== null) window.clearTimeout(timer);
     timer = null;
     pending.clear();
     fullScan = false;
     restoreAll();
-    ensureStyle();
+    syncStyles();
     apply(document);
     observe();
   }
@@ -240,14 +377,16 @@
     active = false;
     if (observer) observer.disconnect();
     observer = null;
+    window.removeEventListener("popstate", routeChanged);
+    window.removeEventListener("hashchange", routeChanged);
     if (timer !== null) window.clearTimeout(timer);
     timer = null;
     pending.clear();
     fullScan = false;
     restoreAll();
-    var style = document.getElementById(STYLE_ID);
-    if (style) style.remove();
+    restoreAppearance();
+    removeStyle(STYLE_ID);
   }
 
-  window.FriendsOnlyFilters = Object.freeze({ version: 1, configure: configure, disconnect: disconnect });
+  window.FriendsOnlyFilters = Object.freeze({ version: 2, configure: configure, disconnect: disconnect });
 }());

@@ -62,6 +62,9 @@ under `runtime/`; build/application tools are under `scripts/`.
 
 1. Open the repository’s **Actions → Native patches** workflow, defined in
    [native-patches.yml](../.github/workflows/native-patches.yml).
+   While the workflow exists only on the feature branch, use its automatic push
+   or PR run. GitHub's manual **Run workflow** button becomes available after
+   the workflow is present on the default branch.
 2. Choose **Run workflow** on the desired branch. Leave APK inputs empty for a
    bundle-only build. Pushes to `main` and pull requests also build the bundle
    and run its checks; they do not fetch an Instagram APK.

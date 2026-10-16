@@ -1,4 +1,16 @@
-# Friends Only · Android MVP 0.1.0
+# Friends Only
+
+**Current direction: native Instagram APK patches (0.3.0 alpha).** The new
+[native-patches project](native-patches/README.md) compiles local native UI and
+discovery filters into a patch bundle. It preserves Instagram's native client;
+it requires a compatible original APK and independent signer verification.
+No patched Instagram APK or phone compatibility is claimed without that input
+and testing. The cloud workflow builds the patch bundle without an APK.
+
+The WebView implementation below is retained as an earlier working approach
+and fallback. Its APK is a separate product from the native patch experiment.
+
+## Earlier WebView app · Android MVP 0.1.0
 
 A small native Android shell around Instagram’s own website, with Home and
 Messages navigation and conservative local interface filters. No backend, paid

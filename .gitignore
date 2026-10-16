@@ -11,3 +11,14 @@ tools/filter-tests/node_modules/
 captures/
 .externalNativeBuild/
 .cxx/
+
+# Native patch inputs, downloaded tools, personal APKs and signing material.
+native-patches/.tools/
+native-patches/private/
+native-patches/reports/
+*.apk
+*.apkm
+*.apks
+*.xapk
+*.p12
+__pycache__/

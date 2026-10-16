@@ -1,0 +1,140 @@
+name: Native patches
+
+on:
+  push:
+    branches: [main, feature/native-apk-patches]
+    paths:
+      - 'native-patches/**'
+      - '.github/workflows/native-patches.yml'
+  pull_request:
+    paths:
+      - 'native-patches/**'
+      - '.github/workflows/native-patches.yml'
+  workflow_dispatch:
+    inputs:
+      base_apk_url:
+        description: 'Optional original standalone APK HTTPS URL (public input; no tokens)'
+        required: false
+        type: string
+      base_sha256:
+        description: 'Original APK file SHA-256 (required when URL is given)'
+        required: false
+        type: string
+      base_signer_sha256:
+        description: 'Independently trusted original certificate SHA-256'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-patches-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: android-actions/setup-android@v3
+      - name: Install pinned Android tools
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build native bundle and run checks
+        run: python3 native-patches/scripts/build.py --check
+      - name: Upload patch bundle (not an APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: friends-only-native-patches-${{ github.run_number }}
+          path: native-patches/build/friends-only.mpp
+          if-no-files-found: error
+          retention-days: 30
+      - name: Validate optional manual inputs
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          BASE_APK_URL: ${{ inputs.base_apk_url }}
+          BASE_SHA256: ${{ inputs.base_sha256 }}
+          BASE_SIGNER_SHA256: ${{ inputs.base_signer_sha256 }}
+        shell: python
+        run: |
+          import os, re, urllib.parse
+          fields = [os.environ[name] for name in ('BASE_APK_URL', 'BASE_SHA256', 'BASE_SIGNER_SHA256')]
+          if any(fields):
+              if not all(fields):
+                  raise SystemExit('Supply all three APK inputs or leave all empty.')
+              url = urllib.parse.urlsplit(fields[0])
+              if url.scheme != 'https' or not url.hostname or url.username or url.password or url.fragment:
+                  raise SystemExit('Use a credential-free HTTPS URL without a fragment.')
+              for value in fields[1:]:
+                  if not re.fullmatch(r'[0-9A-Fa-f]{64}', value):
+                      raise SystemExit('Expected SHA-256 inputs: 64 hexadecimal digits.')
+      - name: Download manually supplied original APK
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        env:
+          BASE_APK_URL: ${{ inputs.base_apk_url }}
+          BASE_APK_PATH: ${{ runner.temp }}/friends-only-input/original.apk
+        run: python3 native-patches/scripts/download.py --url "$BASE_APK_URL" --output "$BASE_APK_PATH"
+      - name: Prepare optional stable personal signing key
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        env:
+          KEYSTORE_B64: ${{ secrets.FRIENDS_ONLY_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.FRIENDS_ONLY_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.FRIENDS_ONLY_KEY_ALIAS }}
+        shell: python
+        run: |
+          import base64, os, pathlib
+          values = [os.environ[name] for name in ('KEYSTORE_B64', 'KEYSTORE_PASSWORD', 'KEY_ALIAS')]
+          if any(values):
+              if not all(values):
+                  raise SystemExit('Set all three signing secrets or none.')
+              path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'friends-only-signing.p12'
+              path.write_bytes(base64.b64decode(values[0], validate=True))
+              path.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'], 'a') as target:
+                  target.write('FRIENDS_ONLY_KEYSTORE_PATH=' + str(path) + '\n')
+      - name: Apply, align, sign and statically verify personal APK
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        env:
+          BASE_APK_PATH: ${{ runner.temp }}/friends-only-input/original.apk
+          BASE_SHA256: ${{ inputs.base_sha256 }}
+          BASE_SIGNER_SHA256: ${{ inputs.base_signer_sha256 }}
+          FRIENDS_ONLY_KEYSTORE_PASSWORD: ${{ secrets.FRIENDS_ONLY_KEYSTORE_PASSWORD }}
+          FRIENDS_ONLY_KEY_ALIAS: ${{ secrets.FRIENDS_ONLY_KEY_ALIAS }}
+        run: >-
+          python3 native-patches/scripts/apply.py
+          --apk "$BASE_APK_PATH" --sha256 "$BASE_SHA256" --signer-sha256 "$BASE_SIGNER_SHA256"
+          --patch-bundle native-patches/build/friends-only.mpp
+          --output native-patches/build/friends-only-personal.apk
+          --report native-patches/reports/apply-report.json
+      - name: Upload successful personal APK
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: friends-only-personal-test-apk-${{ github.run_number }}
+          path: native-patches/build/friends-only-personal.apk
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload check reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-patch-reports-${{ github.run_number }}
+          path: native-patches/reports/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Remove original APK and personal signing material
+        if: always()
+        shell: python
+        run: |
+          import os, pathlib, shutil
+          temporary = pathlib.Path(os.environ['RUNNER_TEMP'])
+          shutil.rmtree(temporary / 'friends-only-input', ignore_errors=True)
+          (temporary / 'friends-only-signing.p12').unlink(missing_ok=True)

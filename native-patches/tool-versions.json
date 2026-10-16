@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "jdk_major": 21,
+  "android": {
+    "compile_sdk": 35,
+    "build_tools": "35.0.0",
+    "min_sdk": 23
+  },
+  "instagram": {
+    "package_name": "com.instagram.android",
+    "supported_version": "451.0.0.20.80"
+  },
+  "kotlin": {
+    "version": "2.4.21",
+    "url": "https://github.com/JetBrains/kotlin/releases/download/v2.4.21/kotlin-compiler-2.4.21.zip",
+    "sha256": "7cc140e76daf416a0424a5557f99afd7ca89ebd463ea1101261e3e01c33e75cd"
+  },
+  "morphe": {
+    "desktop_version": "1.18.1",
+    "patcher_version": "1.15.1",
+    "url": "https://github.com/MorpheApp/morphe-desktop/releases/download/v1.18.1/morphe-desktop-1.18.1-all.jar",
+    "sha256": "1b506ab5f03d16a2f65026d5e0e1910d01fc1e2152f21eaeb44ed2f30856597b"
+  }
+}

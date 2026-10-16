@@ -49,6 +49,16 @@
     "extension_present": true,
     "manifest_namespace_order": "valid"
   },
+  "github_actions": {
+    "run_id": 38968571288,
+    "run_number": 17,
+    "commit": "5864c32ef06aed67905344c2b6583f8393765ef1",
+    "conclusion": "success",
+    "apk_artifact_id": 12075512879,
+    "apk_artifact_name": "friends-only-personal-test-apk-17",
+    "reports_artifact_id": 12075084547,
+    "emulator_installation": "not_requested"
+  },
   "checks": {
     "python_tests": 115,
     "java_policy_assertions": 113,

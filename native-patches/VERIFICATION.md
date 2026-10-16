@@ -21,7 +21,8 @@ Passed:
   version in their compatibility metadata.
 - 113 standalone Java policy assertions covering protected feed/Story/Direct
   routes, ordinary media, endpoint boundaries, unknown hosts and filter toggles.
-- 81 Python tests covering APK/APKM validation, merge audits and patch-result handling. Validator
+- 115 Python tests covering APK/APKM validation, merge audits, version-code edits,
+  namespace/ZIP headers and patch-result handling. Validator
   Android-tool responses are mocked; archive integrity cases use test fixtures.
   These tests do not validate a real Instagram signature or installation.
 - Workflow YAML and embedded Python parsed locally; `git diff --check` passed.
@@ -80,13 +81,14 @@ to the workspace build. Neither successful build establishes device behavior.
 After the first APK delivery, the user reported **App nicht installiert** on
 their Samsung S24+ with **Android 17 / One UI 9**, after removing the original
 Instagram and with no other profile copy reported. Installation on that device
-is a known reported failure. The generic screenshot does not identify the
-PackageInstaller failure code; it has not been reproduced in cloud.
+is a known reported failure. The initial generic screenshot did not identify the
+PackageInstaller failure code; the diagnostics result below established a
+version downgrade. It has not been reproduced in cloud.
 
 The separate install-diagnostics app requests a normal user-confirmed installation
 and displays Android's exact error. Its clean local build, six unit tests and
-lint check passed. Current Python tooling has 101 passing tests, including 20
-namespace normalization cases. A real unsigned fixture had two namespace END
+lint check passed. Namespace normalization has 20 regression cases among the
+current 115 Python tests. A real unsigned fixture had two namespace END
 chunks reordered; all other 31,599 payloads remained identical. This packaging
 fix is not established as the Samsung install failure's cause.
 
@@ -112,6 +114,16 @@ handle. All 115 Python tests and 113 Java policy assertions passed.
 See [alpha.2 evidence](evidence/native-alpha2-2026-10-16.json) for its exact
 workspace checksum, version-code edit and payload audit. That checksum is for
 the workspace build; independently signed CI builds have their own report.
+
+The [alpha.2 GitHub Actions build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288)
+also passed on commit `5864c32ef06aed67905344c2b6583f8393765ef1`, including all
+115 Python tests and 113 Java assertions, validation/merge of the supplied APKM,
+both patches, version code **385806736**, rebuilding, signing and static output
+checks. Download its
+[`friends-only-personal-test-apk-17`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288/artifacts/12075512879)
+artifact and extract `friends-only-personal.apk`. Its independently signed
+checksum/certificate is recorded in that run's `native-patch-reports-17` artifact.
+
 The corrected candidate still requires a new phone installation attempt; a
 version-code correction is not proof that signature, policy or runtime checks
 will also succeed.
@@ -122,7 +134,10 @@ No emulator or physical Android device is attached to this cloud environment.
 Cold launch and all account behavior remain **unverified**. The attempted
 software Android 35 emulator did not reach PackageManager readiness before the
 cloud memory limit; it produced no APK installation result. A hosted Android 35
-installation check is now configured for manual native APK builds.
+installation check is available as an explicit opt-in for manual native APK
+builds. Its first hosted attempt failed while downloading the system image,
+before any APK installation. The successful alpha.2 run did not request this
+optional check and makes no emulator installation claim.
 
 Login, challenges, native library loading, Home/Stories, ordinary video posts,
 Direct sending, groups, filter behavior and settings must be tested on the

@@ -5,9 +5,11 @@
 discovery filters into a patch bundle. It preserves Instagram's native client;
 it requires a compatible original APK and independent signer verification.
 The supplied APKM was validated and a signed native test APK was produced.
-The first phone install failed on Android 17 / One UI 9; account features remain
+The first phone install failed on Android 17 / One UI 9 with a confirmed version
+downgrade error. The [alpha.2 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288/artifacts/12075512879)
+uses a higher version code and awaits another phone test; account features remain
 unverified. A separate [installation diagnostics tool](install-diagnostics/README.md)
-now captures the exact Android error. See the module's
+captures Android's exact result. See the module's
 [evidence](native-patches/VERIFICATION.md). The cloud workflow builds the patch
 bundle by default and can apply it to a manually supplied APK or APKM.
 

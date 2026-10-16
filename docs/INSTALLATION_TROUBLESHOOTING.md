@@ -25,7 +25,11 @@ Version `0.3.0-alpha.2` assigns our personally rebuilt variant version code
 integer is edited on the unsigned output before alignment/signing; Android's
 normal version and signature rules still apply. A later signature or policy
 error could still be reported, so the corrected candidate needs another phone
-test. Use the newly downloaded APK in the diagnostic tool, not the old file.
+test. Download the
+[corrected alpha.2 artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288/artifacts/12075512879),
+extract `friends-only-personal.apk`, and select that newly downloaded file in the
+diagnostic tool, rather than the old file. Its cloud build and static checks
+passed; the second phone result is pending.
 
 ## Get the exact error without a computer
 

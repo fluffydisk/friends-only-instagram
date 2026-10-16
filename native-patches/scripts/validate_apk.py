@@ -237,9 +237,29 @@ def inspect_signer(output: str, expected_digest: str) -> dict:
         output,
         flags=re.MULTILINE,
     )
-    if len(certificates) != 1:
-        raise ValidationError("Exactly one APK signer certificate is required.")
-    actual = normalize_digest(certificates[0], "APK signer certificate SHA-256", allow_colons=True)
+    rotation = re.findall(
+        r"^Signer \(minSdkVersion=([0-9]+), maxSdkVersion=([0-9]+)\) certificate SHA-256 digest:\s*([0-9a-fA-F:]+)\s*$",
+        output, flags=re.MULTILINE,
+    )
+    ranges = []
+    if rotation:
+        if certificates:
+            raise ValidationError("Ambiguous APK signer metadata.")
+        for minimum, maximum, digest in rotation:
+            ranges.append({"min_sdk": int(minimum), "max_sdk": int(maximum),
+                           "certificate_sha256": normalize_digest(digest, "APK signer", allow_colons=True)})
+        ranges.sort(key=lambda entry: entry["min_sdk"])
+        if any(entry["min_sdk"] > entry["max_sdk"] for entry in ranges) or any(
+            previous["max_sdk"] >= following["min_sdk"] for previous, following in zip(ranges, ranges[1:])
+        ):
+            raise ValidationError("Ambiguous overlapping APK signer ranges.")
+        # apksigner verifies the cryptographic signing lineage before this
+        # parser runs. Pin the active certificate for the newest platform range.
+        actual = ranges[-1]["certificate_sha256"]
+    else:
+        if len(certificates) != 1:
+            raise ValidationError("Exactly one APK signer certificate is required.")
+        actual = normalize_digest(certificates[0], "APK signer certificate SHA-256", allow_colons=True)
     if not hmac.compare_digest(actual, expected_digest):
         raise ValidationError("The APK signer does not match the separately trusted expected certificate.")
     return {
@@ -247,6 +267,7 @@ def inspect_signer(output: str, expected_digest: str) -> dict:
         "certificate_sha256": actual,
         "trust_source": "user_supplied_expected_digest",
         "official_distribution_independently_verified": False,
+        "platform_signers": ranges,
     }
 
 

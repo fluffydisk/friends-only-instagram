@@ -38,6 +38,22 @@ SIGNER = f"Signer #1 certificate SHA-256 digest: {TEST_CERTIFICATE}\n"
 
 
 class ValidatorTests(unittest.TestCase):
+    def test_verified_rotated_signer_uses_current_platform_certificate(self):
+        output = (f"Signer (minSdkVersion=24, maxSdkVersion=32) certificate SHA-256 digest: {'b' * 64}\n"
+                  f"Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate SHA-256 digest: {TEST_CERTIFICATE}\n"
+                  f"Source Stamp Signer certificate SHA-256 digest: {'c' * 64}\n")
+        report = validator.inspect_signer(output, TEST_CERTIFICATE)
+        self.assertTrue(report['verified'])
+        self.assertEqual(len(report['platform_signers']), 2)
+        with self.assertRaises(validator.ValidationError):
+            validator.inspect_signer(output, 'b' * 64)
+
+    def test_overlapping_rotated_signers_rejected(self):
+        output = (f"Signer (minSdkVersion=24, maxSdkVersion=34) certificate SHA-256 digest: {TEST_CERTIFICATE}\n"
+                  f"Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate SHA-256 digest: {TEST_CERTIFICATE}\n")
+        with self.assertRaises(validator.ValidationError):
+            validator.inspect_signer(output, TEST_CERTIFICATE)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)

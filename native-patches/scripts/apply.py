@@ -16,6 +16,8 @@ import zipfile
 from common import ROOT, VERSIONS, android_paths, bootstrap, java_tool, run, sha256, write_report
 from build import PATCH_NAMES
 from validate_apk import ValidationError, inspect_archive, inspect_manifest, run_command, validate_apk
+from validate_apkm import validate_apkm
+from merge_apkm import merge_verified_splits
 
 
 def validate_patch_result(result: dict) -> None:
@@ -81,18 +83,31 @@ def apply(args: argparse.Namespace) -> dict:
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="friends-only-native-") as workspace:
         work = Path(workspace)
-        snapshot = work / "original.apk"
+        # APKM can be downloaded to an arbitrary filename by CI. Detect its
+        # root APK entry, then let the bounded bundle validator inspect it fully.
+        with zipfile.ZipFile(apk) as uploaded:
+            is_apkm = "base.apk" in uploaded.namelist() and "AndroidManifest.xml" not in uploaded.namelist()
+        snapshot = work / ("original.apkm" if is_apkm else "original.apk")
         shutil.copyfile(apk, snapshot)
-        source = validate_apk(snapshot, args.sha256, args.signer_sha256,
-                              str(android_tools / "aapt"), str(android_tools / "apksigner"))
+        if is_apkm:
+            split_dir = work / "verified-splits"
+            source = validate_apkm(snapshot, args.sha256, args.signer_sha256, split_dir,
+                                   str(android_tools / "aapt"), str(android_tools / "apksigner"))
+            merged = work / "merged-unsigned.apk"
+            source["merge"] = merge_verified_splits(split_dir, merged, android_tools)
+            patch_input = merged
+        else:
+            source = validate_apk(snapshot, args.sha256, args.signer_sha256,
+                                  str(android_tools / "aapt"), str(android_tools / "apksigner"))
+            patch_input = snapshot
         patch_report = work / "engine-result.json"
         unsigned, aligned, signed = [work / name for name in ("unsigned.apk", "aligned.apk", "signed.apk")]
         print("Input identity verified; applying only Friends Only UI/discovery patches...", flush=True)
-        command = [java, "-jar", cli, "patch", "--bytecode-mode=FULL", "--unsigned",
+        command = [java, "-Xmx4g", "-jar", cli, "patch", "--bytecode-mode=FULL", "--unsigned",
                    "--exclusive", "-p", bundle]
         for name in PATCH_NAMES:
             command.extend(["-e", name])
-        command.extend(["-o", unsigned, "-r", patch_report, "-t", work / "patch-work", snapshot])
+        command.extend(["-o", unsigned, "-r", patch_report, "-t", work / "patch-work", patch_input])
         run(command)
         try:
             engine_result = json.loads(patch_report.read_text())
@@ -153,7 +168,7 @@ def main() -> int:
         write_report(args.report, report)
         print("PASS: personal patched APK signed and statically verified. Phone testing remains required.")
         return 0
-    except (ValidationError, ValueError, RuntimeError, OSError, subprocess.CalledProcessError):
+    except (ValidationError, ValueError, RuntimeError, OSError, zipfile.BadZipFile, subprocess.CalledProcessError):
         # Never echo a failed signing invocation/environment, URL, or raw APK data.
         write_report(args.report, {"schema_version": 1, "status": "failed",
                                    "reason": "Input validation, patching, signing or output verification failed.",

@@ -13,12 +13,17 @@ import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 private const val HOOK = "Ldev/friendsonly/patch/runtime/FocusHooks;"
 private const val EXTENSION = "extensions/extension.mpe"
+// Verified against the resources.arsc table in the supported 451 arm64 build.
+// Match both named surfaces so unrelated ViewGroup binders cannot qualify.
+private const val TAB_BAR_RESOURCE = 0x7f0b408d
+private const val TAB_SHADOW_RESOURCE = 0x7f0b408e
 private val INSTAGRAM = Compatibility(
     name = "Instagram",
     packageName = "com.instagram.android",
@@ -35,7 +40,9 @@ private object TabBar : Fingerprint(
     custom = { method, owner ->
         owner.type.startsWith("LX/") &&
             method.implementation?.instructions?.let { code ->
-                code.count { it.opcode == Opcode.IPUT_OBJECT && fieldType(it) == "Landroid/view/ViewGroup;" } == 1 &&
+                code.any { (it as? NarrowLiteralInstruction)?.narrowLiteral == TAB_BAR_RESOURCE } &&
+                    code.any { (it as? NarrowLiteralInstruction)?.narrowLiteral == TAB_SHADOW_RESOURCE } &&
+                    code.count { it.opcode == Opcode.IPUT_OBJECT && fieldType(it) == "Landroid/view/ViewGroup;" } == 1 &&
                     code.any { it.opcode == Opcode.IPUT_OBJECT && fieldType(it) == "Landroid/view/View;" }
             } == true
     },

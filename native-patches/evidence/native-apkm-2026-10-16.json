@@ -1,0 +1,79 @@
+{
+  "date_utc": "2026-10-16",
+  "version": "0.3.0-alpha.1",
+  "source_release": "https://github.com/fluffydisk/friends-only-instagram/releases/tag/instagram-input",
+  "source_sha256": "7f1dc7549a3d970124983935e977447de6d3dee41e7334278d0821b5472089ad",
+  "source_package": {
+    "package": "com.instagram.android",
+    "version_name": "451.0.0.20.80",
+    "version_code": "385709029",
+    "native_abis": [
+      "arm64-v8a"
+    ]
+  },
+  "verified_split_count": 11,
+  "publisher_certificate_reference": {
+    "retrieved_at_utc": "2026-10-16T20:09:53.917405+00:00",
+    "source_url": "https://www.instagram.com/.well-known/assetlinks.json",
+    "final_url": "https://www.instagram.com/.well-known/assetlinks.json",
+    "http_status": 200,
+    "response_sha256": "326ed5d3b901d4ea61ca832f141c24df48cfd8071157fde473ec04faadd8f007",
+    "matching_statements": [
+      {
+        "relation": [
+          "delegate_permission/common.handle_all_urls",
+          "delegate_permission/common.get_login_creds"
+        ],
+        "target": {
+          "namespace": "android_app",
+          "package_name": "com.instagram.android",
+          "sha256_cert_fingerprints": [
+            "5F:3E:50:F4:35:58:3C:9A:E6:26:30:2A:71:F7:34:00:44:08:7A:7E:2C:60:AD:AC:FC:25:42:05:A9:93:E3:05",
+            "3A:10:C5:0C:18:BA:93:75:06:C2:87:5E:90:47:BE:74:F8:FD:8B:86:FA:E2:FF:9F:EA:A5:0A:81:FC:B4:C0:14"
+          ]
+        }
+      }
+    ],
+    "normalized_signer_sha256": [
+      "5f3e50f435583c9ae626302a71f7340044087a7e2c60adacfc254205a993e305",
+      "3a10c50c18ba937506c2875e9047be74f8fd8b86fae2ff9feaa50a81fcb4c014"
+    ]
+  },
+  "merge_payload_audit": {
+    "dex_files_preserved": 23,
+    "native_libraries_preserved": 18,
+    "assets_preserved": 3166
+  },
+  "patches": [
+    "Friends Only native controls",
+    "Friends Only discovery blocking"
+  ],
+  "patch_bundle_sha256": "3e3406fc5d658df22454e29ffd62758c567999eacf4fe0a6157d944ad665c37c",
+  "workspace_output": {
+    "manifest": {
+      "package": "com.instagram.android",
+      "version_name": "451.0.0.20.80",
+      "version_code": "385709029",
+      "native_abis": [
+        "arm64-v8a"
+      ]
+    },
+    "sha256": "bff216eae46dab1a0843d4398d367e68ff3d41cd26a2d52e8df5bffb5fbd6c36",
+    "size_bytes": 256525288,
+    "signer_sha256": "b40501737afcec1575f8c6acf4c9be656eb30b0040ceadcfbcb935b3c19e72d2",
+    "extension_present": true
+  },
+  "signing": "disposable_key_not_preserved",
+  "checks": {
+    "java_policy_assertions": 113,
+    "python_tests": 81,
+    "original_split_signatures": "passed",
+    "merge": "passed",
+    "patching": "passed",
+    "output_signature": "passed",
+    "output_zipalign_16k": "passed",
+    "device_installation": "not_run",
+    "authentication": "not_run",
+    "home_stories_direct_groups": "not_run"
+  }
+}

@@ -4,8 +4,10 @@
 [native-patches project](native-patches/README.md) compiles local native UI and
 discovery filters into a patch bundle. It preserves Instagram's native client;
 it requires a compatible original APK and independent signer verification.
-No patched Instagram APK or phone compatibility is claimed without that input
-and testing. The cloud workflow builds the patch bundle without an APK.
+The supplied APKM was validated and a signed native test APK was produced.
+Phone installation and account features remain unverified; see the module's
+[evidence](native-patches/VERIFICATION.md). The cloud workflow builds the patch
+bundle by default and can apply it to a manually supplied APK or APKM.
 
 The WebView implementation below is retained as an earlier working approach
 and fallback. Its APK is a separate product from the native patch experiment.

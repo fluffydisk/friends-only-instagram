@@ -13,11 +13,11 @@ on:
   workflow_dispatch:
     inputs:
       base_apk_url:
-        description: 'Optional original standalone APK HTTPS URL (public input; no tokens)'
+        description: 'Optional original APK or APKM HTTPS URL (public input; no tokens)'
         required: false
         type: string
       base_sha256:
-        description: 'Original APK file SHA-256 (required when URL is given)'
+        description: 'Original APK/APKM file SHA-256 (required when URL is given)'
         required: false
         type: string
       base_signer_sha256:
@@ -72,14 +72,14 @@ jobs:
           fields = [os.environ[name] for name in ('BASE_APK_URL', 'BASE_SHA256', 'BASE_SIGNER_SHA256')]
           if any(fields):
               if not all(fields):
-                  raise SystemExit('Supply all three APK inputs or leave all empty.')
+                  raise SystemExit('Supply all three APK/APKM inputs or leave all empty.')
               url = urllib.parse.urlsplit(fields[0])
               if url.scheme != 'https' or not url.hostname or url.username or url.password or url.fragment:
                   raise SystemExit('Use a credential-free HTTPS URL without a fragment.')
               for value in fields[1:]:
                   if not re.fullmatch(r'[0-9A-Fa-f]{64}', value):
                       raise SystemExit('Expected SHA-256 inputs: 64 hexadecimal digits.')
-      - name: Download manually supplied original APK
+      - name: Download manually supplied original APK or APKM
         if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
         env:
           BASE_APK_URL: ${{ inputs.base_apk_url }}
@@ -103,7 +103,7 @@ jobs:
               path.chmod(0o600)
               with open(os.environ['GITHUB_ENV'], 'a') as target:
                   target.write('FRIENDS_ONLY_KEYSTORE_PATH=' + str(path) + '\n')
-      - name: Apply, align, sign and statically verify personal APK
+      - name: Validate input, merge if needed, apply and sign personal APK
         if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
         env:
           BASE_APK_PATH: ${{ runner.temp }}/friends-only-input/original.apk
@@ -133,7 +133,7 @@ jobs:
           path: native-patches/reports/
           if-no-files-found: ignore
           retention-days: 30
-      - name: Remove original APK and personal signing material
+      - name: Remove original input and personal signing material
         if: always()
         shell: python
         run: |

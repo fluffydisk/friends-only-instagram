@@ -43,6 +43,20 @@ class PatchResultTest(unittest.TestCase):
                 patched.assert_not_called()
             self.assertEqual(original.read_bytes(), b"original-test-input")
 
+    def test_invalid_zip_produces_safe_failure_report(self):
+        import json
+        import tempfile
+        import zipfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / 'report.json'
+            argv = ['apply.py', '--apk', str(Path(directory) / 'bad.apk'), '--sha256', 'a' * 64,
+                    '--signer-sha256', 'b' * 64, '--patch-bundle', str(Path(directory) / 'own.mpp'),
+                    '--output', str(Path(directory) / 'patched.apk'), '--report', str(report)]
+            with mock.patch.object(sys, 'argv', argv), mock.patch.object(module, 'apply', side_effect=zipfile.BadZipFile()):
+                self.assertEqual(module.main(), 1)
+            self.assertEqual(json.loads(report.read_text())['status'], 'failed')
+
     def test_partial_or_foreign_result_rejected(self):
         changes = [
             {"success": False}, {"success": "true"}, {"failedPatches": [{"name": "broken"}]},

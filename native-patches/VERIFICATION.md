@@ -26,6 +26,10 @@ Passed:
   These tests do not validate a real Instagram signature or installation.
 - Workflow YAML and embedded Python parsed locally; `git diff --check` passed.
 
+The [GitHub Actions native build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38953816945)
+also passed on commit `6314530`, including the same 113 assertions and 37 tests.
+Its `friends-only-native-patches-4` artifact contains the `.mpp` bundle, not an APK.
+
 Javac 21 reports warnings that Java 8 source/target support is obsolete; the
 compilation succeeds. Generated reports are under `native-patches/reports/` and
 are uploaded by the native workflow. Generated binaries and downloaded tools

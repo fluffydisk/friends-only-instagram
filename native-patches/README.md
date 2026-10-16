@@ -35,6 +35,10 @@ the initial proof keeps Instagram’s launcher name/icon and identifies our loca
 settings as **Friends Only**. There is no clone package, updater, analytics,
 credential form, or authentication/integrity bypass.
 
+Instagram's own networking, permissions, tracking and privacy terms remain in
+effect. Our small extension adds no permissions or third-party collection;
+patching the navigation does not remove Instagram's existing data collection.
+
 ## Build only the bundle
 
 The build uses Python 3, **JDK 21**, Android SDK **35 / Build Tools 35.0.0**, and

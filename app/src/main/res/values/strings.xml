@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Friends Only</string>
+    <string name="home">Home</string>
+    <string name="messages">Messages</string>
+    <string name="refresh">Reload page</string>
+    <string name="settings">Filters</string>
+    <string name="retry">Retry</string>
+    <string name="network_error">Instagram could not load. Check your connection and retry.</string>
+    <string name="tls_error">A secure connection to Instagram could not be established.</string>
+    <string name="renderer_error">Web content stopped. Tap Retry to reopen Instagram.</string>
+    <string name="http_error">Instagram returned an error. Try again later.</string>
+    <string name="external_unavailable">No browser is available to open this link.</string>
+    <string name="blocked_link">This link type cannot be opened in Friends Only.</string>
+    <string name="hide_reels">Hide Reels navigation</string>
+    <string name="hide_explore">Hide Explore navigation</string>
+    <string name="hide_suggestions">Hide explicitly labeled suggestions (experimental)</string>
+    <string name="filter_note">Filters depend on Instagram’s website. Suggestions filtering is limited to explicit English headings and may miss recommendations. Ordinary video posts and Stories are preserved. Use Instagram’s Following option in Home if it is available; the feed is not guaranteed to contain only followed accounts.</string>
+    <string name="done">Done</string>
+    <string name="loading">Loading Instagram</string>
+</resources>

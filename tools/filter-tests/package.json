@@ -1,0 +1,15 @@
+{
+  "name": "friends-only-filter-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline DOM fixtures for Friends Only's conservative WebView filters",
+  "scripts": {
+    "test": "node --test filters.test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

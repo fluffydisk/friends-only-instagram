@@ -1,0 +1,49 @@
+/* Local Friends Only theme. Enabled only on Home and Direct by filters.js.
+ * No hidden content, geometry/overflow changes, or authentication/viewer styling.
+ * Instagram uses comma-separated RGB components for these existing variables.
+ */
+html[data-friends-only-appearance="light"] {
+  color-scheme: light;
+  --ig-primary-background: 248, 249, 246;
+  --ig-secondary-background: 239, 242, 235;
+  --ig-elevated-background: 255, 255, 252;
+  --ig-highlight-background: 236, 240, 232;
+  --ig-primary-text: 31, 40, 34;
+  --ig-secondary-text: 104, 113, 106;
+  --ig-separator: 224, 229, 219;
+  --ig-elevated-separator: 224, 229, 219;
+  --ig-stroke: 216, 223, 210;
+  --ig-focus-stroke: 70, 99, 76;
+  --ig-link: 54, 83, 62;
+  --ig-primary-button: 60, 91, 66;
+}
+html[data-friends-only-appearance="dark"] {
+  color-scheme: dark;
+  --ig-primary-background: 20, 25, 22;
+  --ig-secondary-background: 29, 36, 31;
+  --ig-elevated-background: 34, 42, 36;
+  --ig-highlight-background: 42, 51, 44;
+  --ig-primary-text: 230, 235, 226;
+  --ig-secondary-text: 164, 177, 162;
+  --ig-separator: 58, 70, 59;
+  --ig-elevated-separator: 58, 70, 59;
+  --ig-stroke: 65, 79, 66;
+  --ig-focus-stroke: 172, 197, 160;
+  --ig-link: 181, 207, 168;
+  --ig-primary-button: 138, 173, 126;
+}
+html[data-friends-only-appearance] body {
+  background-color: rgb(var(--ig-primary-background));
+  color: rgb(var(--ig-primary-text));
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+html[data-friends-only-appearance] :where(button, input, textarea, select) {
+  font-family: inherit;
+}
+html[data-friends-only-appearance] main article,
+html[data-friends-only-appearance] [role="main"] article {
+  background-color: rgb(var(--ig-elevated-background));
+  border: 1px solid rgb(var(--ig-separator));
+  border-radius: 18px;
+  box-shadow: none;
+}

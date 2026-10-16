@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Friends Only</string>
-    <string name="home">Home</string>
+    <string name="home">Feed</string>
     <string name="messages">Messages</string>
     <string name="refresh">Reload page</string>
-    <string name="settings">Filters</string>
+    <string name="settings">Settings</string>
     <string name="retry">Retry</string>
     <string name="network_error">Instagram could not load. Check your connection and retry.</string>
     <string name="tls_error">A secure connection to Instagram could not be established.</string>
@@ -13,8 +13,25 @@
     <string name="blocked_link">This link type cannot be opened in Friends Only.</string>
     <string name="hide_reels">Hide Reels navigation</string>
     <string name="hide_explore">Hide Explore navigation</string>
-    <string name="hide_suggestions">Hide explicitly labeled suggestions (experimental)</string>
-    <string name="filter_note">Filters depend on Instagram’s website. Suggestions filtering is limited to explicit English headings and may miss recommendations. Ordinary video posts and Stories are preserved. Use Instagram’s Following option in Home if it is available; the feed is not guaranteed to contain only followed accounts.</string>
+    <string name="hide_suggestions">Hide labeled suggestions</string>
     <string name="done">Done</string>
     <string name="loading">Loading Instagram</string>
+    <string name="back">Go back</string>
+    <string name="settings_title">Your space</string>
+    <string name="settings_subtitle">A little less noise. More room for friends.</string>
+    <string name="section_appearance">APPEARANCE</string>
+    <string name="section_focus">KEEP IT FOCUSED</string>
+    <string name="section_account">INSTAGRAM</string>
+    <string name="minimal_appearance">Minimal appearance</string>
+    <string name="minimal_appearance_detail">Calm colors, simpler navigation and less clutter.</string>
+    <string name="hide_reels_detail">Remove shortcuts to the Reels feed.</string>
+    <string name="hide_explore_detail">Remove shortcuts to Explore.</string>
+    <string name="hide_distractions">Hide extra discovery</string>
+    <string name="hide_distractions_detail">Hide creation, activity, shopping and suggested-account shortcuts.</string>
+    <string name="hide_suggestions_detail">Experimental. Hide suggestions only when clearly labeled.</string>
+    <string name="settings_filter_note">Stories, regular video posts and conversations stay available. Instagram can change its layout, so some distractions may remain.</string>
+    <string name="instagram_settings">Instagram settings</string>
+    <string name="instagram_settings_detail">Manage your account on Instagram.</string>
+    <string name="restore_original">Show original layout</string>
+    <string name="restore_original_detail">Turn off appearance changes and content filters.</string>
 </resources>

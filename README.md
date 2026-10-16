@@ -1,19 +1,18 @@
-# Friends Only · Android MVP 0.1.0
+# Friends Only · Android 0.2.0
 
-A small native Android shell around Instagram’s own website, with Home and
-Messages navigation and conservative local interface filters. No backend, paid
-service, recreated feed, dummy conversations, or private Instagram API.
+A minimalist native Android shell around Instagram’s own website, with Feed
+and Messages navigation, its own light/dark appearance, and reversible local
+interface filters. No backend, paid service, recreated feed, dummy conversations,
+or private Instagram API.
 
-**An APK has been compiled in Codex Cloud. Instagram account functionality has
-not been tested on Android.** This is an installable MVP for compatibility
-testing, not a promise that Instagram permits WebView login or that the feed
-contains only followed accounts. See [verification](docs/VERIFICATION.md) for
-the exact evidence and [phone checklist](docs/DEVICE_TESTING.md) before relying
-on the app.
+**The user reports that the earlier MVP works on their phone.** That report is
+not a feature-by-feature test of login, Stories, Direct, or groups. The 0.2.0
+redesign requires its own device check. See [verification](docs/VERIFICATION.md)
+for actual build/account evidence and the [phone checklist](docs/DEVICE_TESTING.md).
 
 ## What is implemented
 
-- **Home** opens `https://www.instagram.com/`. Instagram supplies the real feed,
+- **Feed** opens `https://www.instagram.com/`. Instagram supplies the real feed,
   Stories, interactions, login, and account UI.
 - **Messages** opens `https://www.instagram.com/direct/inbox/`. Instagram supplies
   existing individual and group conversations and its message composer when
@@ -21,10 +20,23 @@ on the app.
 - Exact Reels and Explore navigation destinations are hidden by default, using
   structural rules. Ordinary video posts, individual reel permalinks, and
   Stories are preserved. Filters do not block those URLs if opened another way.
-- **Filters** provides reversible Reels/Explore toggles and an experimental
-  explicit-suggestion filter, **off by default**. That filter uses a narrow
-  English heading/article signature only on Home. Unknown structures remain
-  visible. It cannot determine who you follow.
+- A compact native app bar, settings icon, and Feed/Messages bottom navigation
+  replace the earlier button layout. Reload and Instagram account settings are
+  in Settings. The bottom navigation hides for the keyboard on Android 11+;
+  older versions retain normal window resizing. Native text supports English
+  and Turkish, while Instagram controls its website language.
+- **Minimal appearance**, on by default, applies local colors, typography, and
+  article borders only on Home and Direct. It hides duplicated global navigation
+  only in recognized layouts that preserve necessary controls. Authentication,
+  Stories, and media viewers retain their website appearance.
+- Independent Reels/Explore and **Hide extra discovery** switches target
+  recognized global shortcuts. The experimental suggestion filter defaults on
+  without a saved preference; an explicitly saved off setting remains off. It
+  uses a narrow English/Turkish leading-heading, author-header, media, and
+  post-permalink signature only on Home. Unknown or ambiguous structures remain
+  visible. It cannot determine who you follow and may match no recommendations.
+- All filters and the minimal appearance are reversible. See the
+  [design boundaries](docs/MINIMAL_DESIGN.md).
 - Persistent first-party cookies and website storage, back navigation,
   reload/retry, progress indicator, main-page error banners, renderer recovery,
   Activity state restoration, system insets, and native light/dark themes.
@@ -63,13 +75,13 @@ No local Android Studio, JDK, SDK, or computer build is required.
    WebView/Chrome on the phone first. If Instagram refuses WebView login, stop
    and use its supported browser/app; this client offers no bypass.
 
-If you already received `friends-only-0.1.0-debug.apk` with this delivery, you can
-install it directly using steps 4–5.
+Choose an Actions run containing the version you want to install. The earlier
+`friends-only-0.1.0-debug.apk` does not include the 0.2.0 redesign.
 
 Debug APKs are for personal testing. Separate clean build environments generate
 different debug signing keys. An update may require uninstalling the previous
 build, which clears the app’s local Instagram session and settings. Version
-0.1.0 does not set up a stable release signing key or Play Store publishing.
+0.2.0 does not set up a stable release signing key or Play Store publishing.
 
 ## Build and check from any prepared cloud environment
 
@@ -106,11 +118,13 @@ session used for this delivery has temporary build-tool setup described in
 
 ```text
 app/src/main/java/dev/friendsonly/android/
-  MainActivity.kt                  Native UI, Android lifecycle, back handling
+  MainActivity.kt                  Lifecycle, navigation, settings integration
+  ui/                             Native chrome and settings
   navigation/NavigationPolicy.kt  URL classification and destinations
   web/                            WebView settings and website callbacks
   filter/                         Local preferences and asset injection
 app/src/main/assets/filters.js     Idempotent, reversible DOM filtering
+app/src/main/assets/focus.css      Local minimal appearance
 app/src/test/                      JVM navigation/security tests
 tools/filter-tests/                Offline DOM fixtures and filter contract
 .github/workflows/android.yml      APK build + checks + downloadable artifacts
@@ -127,8 +141,9 @@ current rendered DOM. Disable filters if Instagram changes its interface.
 
 ## Privacy and security
 
-- The only manifest permission is `INTERNET`. No analytics SDK, advertising,
-  backend, third-party collection endpoint, credential form, JavaScript bridge,
+- The only manifest permission is `INTERNET`. Styles/preferences remain local.
+  No analytics SDK, advertising, backend, third-party collection endpoint,
+  credential form, JavaScript bridge,
   request-body interception, or cookie/token/message export is implemented.
 - Instagram receives your login and usage through its own website and applies
   its own tracking, cookies, privacy terms, and content policies. The app’s
@@ -148,9 +163,9 @@ current rendered DOM. Disable filters if Instagram changes its interface.
 
 ## Known limitations and Instagram compatibility
 
-- Authentication, session persistence across process/device restart, Stories,
-  feed interactions, text sending, group chats, and S24+ usability remain
-  **unverified** until tested on a real device with your account.
+- The earlier phone report does not establish individual feature results.
+  Authentication, restart persistence, Stories, feed interactions, text sending,
+  groups, and the redesign’s S24+ usability need recorded device checks.
 - Instagram may refuse WebView authentication, present challenges, rate-limit,
   change its DOM, or omit mobile-web features. External/Facebook authentication
   and cross-site challenges may fail. The website may require opening content
@@ -158,12 +173,16 @@ current rendered DOM. Disable filters if Instagram changes its interface.
 - Reels/Explore selectors are conservative heuristics. They can miss entries
   with unfamiliar markup. Content shared by friends can include reel posts;
   those are intentionally retained. Discovery content can still be reached.
-- The optional suggestions filter has no authenticated live-DOM validation and
-  may match nothing. English labels only; there is no verified friends-only
-  feed, following relationship lookup, or guarantee against recommendations.
-- Native chrome follows Android’s light/dark mode; Instagram controls its own
-  page theme and layout. The keyboard, rotation, media, links, and performance
-  still require device testing. Debug signing and artifact expiry are covered
+- The experimental suggestions filter has no authenticated live-DOM validation
+  and may match nothing. Only narrow English/Turkish labels qualify; there is
+  no verified friends-only feed, following relationship lookup, or guarantee
+  against recommendations.
+- Native chrome follows Android’s light/dark mode. Minimal appearance styles
+  supported Home/Direct structures; Instagram still operates the content and
+  interactions. Unknown navigation layouts remain visible. Disable Minimal
+  appearance independently if a menu, composer, or layout is affected; other
+  filters retain their own settings. The keyboard, rotation, media, links, and
+  performance still require device testing. Debug signing and artifact expiry are covered
   above. See the repository’s Actions page for the current cloud build status;
   local verification does not establish that a GitHub workflow succeeded.
 - This project is independent of Instagram/Meta and uses its own name/icon.
@@ -171,10 +190,11 @@ current rendered DOM. Disable filters if Instagram changes its interface.
   are subject to Instagram’s terms and policies. This project makes no claim
   of approval, continued compatibility, or official affiliation.
 
-## v0.2.0 roadmap
+## After v0.2.0
 
-1. Record real Galaxy S24+ login, Stories, feed, Direct/group, lifecycle, and
-   accessibility results; fix issues supported by device evidence.
+1. Record Galaxy S24+ checks for the redesign, English/Turkish layouts, login,
+   Stories, feed, Direct/groups, keyboard, lifecycle, and accessibility; fix
+   issues supported by device evidence.
 2. Validate current navigation/suggestion signatures against permitted manual
    browsing and add regression fixtures, while preserving ambiguous posts.
 3. Explore Instagram’s officially exposed Following control if available;

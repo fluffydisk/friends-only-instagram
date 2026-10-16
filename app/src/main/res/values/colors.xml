@@ -1,0 +1,9 @@
+<resources>
+    <color name="focus_background">#F8F9F6</color>
+    <color name="focus_surface">#FFFFFF</color>
+    <color name="focus_text">#1D2823</color>
+    <color name="focus_muted">#69776D</color>
+    <color name="focus_accent">#285641</color>
+    <color name="focus_selected">#E5EDE4</color>
+    <color name="focus_divider">#E4E9E1</color>
+</resources>

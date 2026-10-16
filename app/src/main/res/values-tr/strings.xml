@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Friends Only</string>
+    <string name="home">Akış</string>
+    <string name="messages">Mesajlar</string>
+    <string name="refresh">Sayfayı yenile</string>
+    <string name="settings">Ayarlar</string>
+    <string name="retry">Yeniden dene</string>
+    <string name="network_error">Instagram yüklenemedi. Bağlantını kontrol edip yeniden dene.</string>
+    <string name="tls_error">Instagram ile güvenli bağlantı kurulamadı.</string>
+    <string name="renderer_error">Sayfa durdu. Instagram’ı yeniden açmak için Yeniden dene seçeneğine dokun.</string>
+    <string name="http_error">Instagram bir hata döndürdü. Biraz sonra yeniden dene.</string>
+    <string name="external_unavailable">Bu bağlantıyı açacak bir tarayıcı bulunamadı.</string>
+    <string name="blocked_link">Bu bağlantı türü Friends Only içinde açılamıyor.</string>
+    <string name="hide_reels">Reels gezinmesini gizle</string>
+    <string name="hide_explore">Keşfet gezinmesini gizle</string>
+    <string name="hide_suggestions">Etiketli önerileri gizle</string>
+    <string name="done">Tamam</string>
+    <string name="loading">Instagram yükleniyor</string>
+    <string name="back">Geri dön</string>
+    <string name="settings_title">Sana ait alan</string>
+    <string name="settings_subtitle">Daha az karmaşa. Arkadaşlarına daha çok yer.</string>
+    <string name="section_appearance">GÖRÜNÜM</string>
+    <string name="section_focus">DAHA AZ DİKKAT DAĞINIKLIĞI</string>
+    <string name="section_account">INSTAGRAM</string>
+    <string name="minimal_appearance">Minimal görünüm</string>
+    <string name="minimal_appearance_detail">Sakin renkler, sade gezinme ve daha az kalabalık.</string>
+    <string name="hide_reels_detail">Reels akışına giden kısayolları kaldır.</string>
+    <string name="hide_explore_detail">Keşfet’e giden kısayolları kaldır.</string>
+    <string name="hide_distractions">Ek keşif öğelerini gizle</string>
+    <string name="hide_distractions_detail">Oluşturma, bildirim, alışveriş ve kişi önerisi kısayollarını gizle.</string>
+    <string name="hide_suggestions_detail">Deneysel. Yalnızca açıkça etiketlenmiş önerileri gizle.</string>
+    <string name="settings_filter_note">Hikâyeler, normal video gönderileri ve sohbetler kullanılabilir kalır. Instagram tasarımını değiştirebildiği için bazı dikkat dağıtıcı öğeler görünmeye devam edebilir.</string>
+    <string name="instagram_settings">Instagram ayarları</string>
+    <string name="instagram_settings_detail">Hesabını Instagram üzerinden yönet.</string>
+    <string name="restore_original">Orijinal görünümü göster</string>
+    <string name="restore_original_detail">Görünüm değişikliklerini ve içerik filtrelerini kapat.</string>
+</resources>

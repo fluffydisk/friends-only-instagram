@@ -19,6 +19,7 @@ from validate_apk import ValidationError, inspect_archive, inspect_manifest, run
 from validate_apkm import validate_apkm
 from merge_apkm import merge_verified_splits
 from axml import normalize_namespace_order
+from version_code import set_apk_version_code
 
 
 def validate_patch_result(result: dict) -> None:
@@ -73,6 +74,8 @@ def apply(args: argparse.Namespace) -> dict:
         raise ValidationError("Input APK or patch bundle is missing.")
     if output.exists() or output in (apk, bundle):
         raise ValidationError("Choose a new output path; inputs and existing files are never overwritten.")
+    if not 1 <= args.output_version_code <= 2_100_000_000:
+        raise ValidationError("Output version code must be between 1 and 2100000000.")
     _, android_tools = android_paths()
     java = java_tool("java")
     cli, _ = bootstrap()
@@ -121,6 +124,9 @@ def apply(args: argparse.Namespace) -> dict:
             raise ValidationError("Patch engine did not produce a readable result report.") from error
         if not unsigned.is_file():
             raise ValidationError("The engine did not produce an unsigned APK.")
+        # Our independently signed variant has its own monotonic version code.
+        # This changes release metadata before signing, not Android's checks.
+        version_change = set_apk_version_code(unsigned, args.output_version_code)
         # Page alignment preserves modern Android native library loading.
         run([android_tools / "zipalign", "-f", "-P", "16", "4", unsigned, aligned])
         environment = os.environ.copy()
@@ -143,10 +149,13 @@ def apply(args: argparse.Namespace) -> dict:
              "--out", signed, aligned], env=environment)
         run([android_tools / "zipalign", "-c", "-P", "16", "4", signed])
         result = inspect_output(signed, android_tools / "aapt", android_tools / "apksigner")
+        if result["manifest"]["version_code"] != str(args.output_version_code):
+            raise ValidationError("The final version code does not match the requested build metadata.")
         shutil.copyfile(signed, output)
         return {"schema_version": 1, "status": "passed", "kind": "personally_signed_instagram_apk",
                 "input": source, "output": result, "patch_bundle_sha256": sha256(bundle),
                 "patches": PATCH_NAMES, "signing": "user_provided_key" if stable else "disposable_key_not_preserved",
+                "output_version_code_change": version_change,
                 "device_tests": "not_run", "authentication_test": "not_run",
                 "official_instagram_update_compatible": False}
 
@@ -159,6 +168,9 @@ def main() -> int:
     parser.add_argument("--patch-bundle", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--output-version-code", type=int,
+                        default=VERSIONS['friends_only']['output_version_code'],
+                        help="Version code for this personally signed variant; source version checks remain unchanged.")
     args = parser.parse_args()
     # Guard before the failure-report path too: a typo must not destroy inputs.
     protected = {args.apk.resolve(), args.patch_bundle.resolve(), args.output.resolve()}

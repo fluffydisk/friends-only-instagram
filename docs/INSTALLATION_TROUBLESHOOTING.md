@@ -6,6 +6,27 @@ checks, but the user reported **App nicht installiert** on a Samsung S24+ with
 other profile copy. That generic dialog does not contain Android's failure code.
 Installation on that device is failed, not verified successful.
 
+The diagnostics app subsequently returned the exact failure on the phone:
+
+```text
+Status: FAILURE_INVALID (4)
+Legacy status: -25
+INSTALL_FAILED_VERSION_DOWNGRADE: Downgrade detected:
+Update version code 385709029 is older than current 385806735
+```
+
+The tool reported no Instagram package in the current profile and ample free
+storage; Android nevertheless compared the installation to version 385806735.
+The location/origin of that retained version record has not been established.
+No additional profile deletion or application removal is needed to diagnose it.
+
+Version `0.3.0-alpha.2` assigns our personally rebuilt variant version code
+**385806736**, while preserving source validation at **385709029**. The version
+integer is edited on the unsigned output before alignment/signing; Android's
+normal version and signature rules still apply. A later signature or policy
+error could still be reported, so the corrected candidate needs another phone
+test. Use the newly downloaded APK in the diagnostic tool, not the old file.
+
 ## Get the exact error without a computer
 
 The separate [install-diagnostics module](../install-diagnostics/README.md)
@@ -49,5 +70,8 @@ it is **not established as the cause** of the phone's installation rejection.
 
 The cloud has no KVM. A bounded software emulator attempt did not reach a ready
 PackageManager before the memory limit, so it produced no APK installation result.
-The manual native workflow now adds a hosted Android 35 emulator install smoke
-check; that is separate from Android 17 / Samsung testing and performs no login.
+The manual native workflow has an optional hosted emulator install check;
+that is separate from Android 17 / Samsung testing and performs no login.
+Its first run failed downloading the Google system image before an APK install
+could be attempted. A smoke-check failure remains visible; static validation
+and the candidate artifact are independent of that optional infrastructure.

@@ -169,11 +169,11 @@ def normalize_apk_manifest(apk: Path) -> dict:
             descriptor, name = tempfile.mkstemp(prefix=".namespace-", suffix=".apk", dir=path.parent)
             os.close(descriptor)
             temporary = Path(name)
-            with zipfile.ZipFile(temporary, "w", allowZip64=True) as destination:
+            with zipfile.ZipFile(temporary, "w", allowZip64=False) as destination:
                 destination.comment = source.comment
                 for entry in source.infolist():
                     metadata = copy.copy(entry)
-                    with destination.open(metadata, "w", force_zip64=True) as target:
+                    with destination.open(metadata, "w", force_zip64=False) as target:
                         if entry.filename == "AndroidManifest.xml":
                             target.write(normalized)
                         else:

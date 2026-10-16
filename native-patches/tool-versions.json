@@ -1,6 +1,10 @@
 {
   "schema_version": 1,
   "jdk_major": 21,
+  "friends_only": {
+    "version": "0.3.0-alpha.2",
+    "output_version_code": 385806736
+  },
   "android": {
     "compile_sdk": 35,
     "build_tools": "35.0.0",

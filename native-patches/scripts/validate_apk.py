@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import struct
 import subprocess
 import sys
 import tempfile
@@ -130,6 +131,21 @@ def inspect_archive(path: Path) -> dict:
                 if canonical in names:
                     raise ValidationError("The APK contains duplicate ZIP entry paths.")
                 names.add(canonical)
+                # Android APKs require classic local ZIP sizes. Forcing ZIP64
+                # on small streamed entries can pass Python/apksigner checks
+                # while Android's native ZIP reader rejects the header.
+                assert archive.fp is not None
+                archive.fp.seek(entry.header_offset)
+                local = archive.fp.read(30)
+                if len(local) != 30 or local[:4] != b"PK\x03\x04":
+                    raise ValidationError("The APK contains an invalid local ZIP header.")
+                header = struct.unpack("<4s5H3I2H", local)
+                if header[7] == 0xffffffff or header[8] == 0xffffffff:
+                    raise ValidationError("ZIP64 local entry sizes are not supported in Android APKs.")
+                if header[2] != entry.flag_bits or header[3] != entry.compress_type:
+                    raise ValidationError("The APK local and central ZIP headers differ.")
+                if not (header[2] & 8) and (header[6], header[7], header[8]) != (entry.CRC, entry.compress_size, entry.file_size):
+                    raise ValidationError("The APK local entry sizes or checksum differ from its directory.")
                 kind = stat.S_IFMT(entry.external_attr >> 16)
                 if kind not in (0, stat.S_IFREG, stat.S_IFDIR):
                     raise ValidationError("The APK contains a non-regular ZIP entry.")

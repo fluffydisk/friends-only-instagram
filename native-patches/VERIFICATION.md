@@ -1,6 +1,6 @@
 # Native patch evidence · 2026-10-16
 
-This module is an initial native-patching experiment, version `0.3.0-alpha.1`.
+This module is a native-patching experiment, now `0.3.0-alpha.2`.
 It targets only Instagram `451.0.0.20.80`; the upstream project's support claim
 is not evidence that our modified patches match that APK.
 
@@ -91,6 +91,30 @@ chunks reordered; all other 31,599 payloads remained identical. This packaging
 fix is not established as the Samsung install failure's cause.
 
 See [installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
+
+## Alpha.2 version-code correction
+
+The diagnostics tool ran on the phone and returned
+`INSTALL_FAILED_VERSION_DOWNGRADE` / legacy status `-25`: original output
+`385709029` was older than Android's recorded `385806735`.
+
+The source is still verified as Instagram version code **385709029**. After the
+two bytecode patches, the unsigned variant receives its own version code
+**385806736**, before zip alignment and personal signing. Source versionName,
+resources, native libraries and authentication code are unchanged by this
+metadata edit. The parser checks a unique root Android integer field and refuses
+ambiguous/major-version or already signed inputs.
+
+The corrected APK was built in cloud and passed package/version/arm64, namespace,
+signature and 16 KiB alignment checks. ZIP rewrites use classic local headers;
+a regression check rejects ZIP64 local sizes that Android's native reader cannot
+handle. All 115 Python tests and 113 Java policy assertions passed.
+See [alpha.2 evidence](evidence/native-alpha2-2026-10-16.json) for its exact
+workspace checksum, version-code edit and payload audit. That checksum is for
+the workspace build; independently signed CI builds have their own report.
+The corrected candidate still requires a new phone installation attempt; a
+version-code correction is not proof that signature, policy or runtime checks
+will also succeed.
 
 ## Still not verified
 

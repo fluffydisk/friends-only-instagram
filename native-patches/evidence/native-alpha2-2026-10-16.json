@@ -1,0 +1,58 @@
+{
+  "version": "0.3.0-alpha.2",
+  "date_utc": "2026-10-16",
+  "known_device_error": "INSTALL_FAILED_VERSION_DOWNGRADE",
+  "rejected_output_version_code": 385709029,
+  "device_reported_current_version_code": 385806735,
+  "new_output_version_code": 385806736,
+  "source_sha256": "7f1dc7549a3d970124983935e977447de6d3dee41e7334278d0821b5472089ad",
+  "source_manifest": {
+    "package": "com.instagram.android",
+    "version_name": "451.0.0.20.80",
+    "version_code": "385709029",
+    "native_abis": [
+      "arm64-v8a"
+    ]
+  },
+  "version_code_change": {
+    "status": "updated",
+    "version_code_before": 385709029,
+    "version_code_after": 385806736,
+    "manifest_sha256_before": "759bbec8aaa501ba48203ac6b743616f40d0ab6e7b37a2476ddbb401e11d9d33",
+    "manifest_sha256_after": "8c93f878ebb431dff9f0b8a233b4392ccf5b3d8be08f86e3d378e52269f59e4d",
+    "entries_preserved": 31597
+  },
+  "manifest_normalization": {
+    "status": "normalized",
+    "namespace_end_chunks_reordered": 2,
+    "manifest_sha256_before": "6e71ae4dca9e989551a0777e0733ec1fd9699af121aca4e90da6e83d8c1a5351",
+    "manifest_sha256_after": "759bbec8aaa501ba48203ac6b743616f40d0ab6e7b37a2476ddbb401e11d9d33",
+    "entries_preserved": 31600
+  },
+  "merge_payload_audit": {
+    "dex_files_preserved": 23,
+    "native_libraries_preserved": 18,
+    "assets_preserved": 3166
+  },
+  "workspace_output": {
+    "manifest": {
+      "package": "com.instagram.android",
+      "version_name": "451.0.0.20.80",
+      "version_code": "385806736",
+      "native_abis": [
+        "arm64-v8a"
+      ]
+    },
+    "sha256": "129ff0bce55e1908f8c8fb65469c88ecf15d720fe6b60d1190a87058b318b63d",
+    "size_bytes": 252658664,
+    "signer_sha256": "2ca8c73dc67624ffff5cdf8589126f17aecd1d1b7ec8e3ba753c84e7939db2c5",
+    "extension_present": true,
+    "manifest_namespace_order": "valid"
+  },
+  "checks": {
+    "python_tests": 115,
+    "java_policy_assertions": 113,
+    "native_apk_build_and_static_verification": "passed",
+    "physical_installation_of_alpha2": "pending"
+  }
+}

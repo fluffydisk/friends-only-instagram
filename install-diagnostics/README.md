@@ -1,5 +1,11 @@
 # Local Android installation diagnostic
 
+[Download the diagnostics APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38965373009/artifacts/12074965587)
+from the successful cloud build. Sign into GitHub, extract the ZIP and install
+`install-diagnostics-debug.apk`. Six unit tests, lint and APK compilation passed.
+The user ran this tool on a Galaxy S24+ with Android 17 / One UI 9 and returned
+the real PackageInstaller `INSTALL_FAILED_VERSION_DOWNGRADE` result.
+
 This small, separate app (`dev.friendsonly.installdiagnostics`) requests an ordinary, user-confirmed Android installation of a selected `com.instagram.android` APK. It captures the real `PackageInstaller` result when Samsung’s file manager shows only “App not installed”. It does not patch APKs, bypass security, silently install apps, use ADB/root, or access an Instagram account. It has no Internet permission, backend or analytics.
 
 1. Install and open **Friends Only Install Test** (Turkish: **Friends Only Kurulum Testi**).

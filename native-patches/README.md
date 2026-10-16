@@ -10,7 +10,9 @@ its 11 inner APKs passed signature and identity validation, and the split merge
 passed a code/library/asset preservation audit. Both native patches were applied
 successfully and a personally signed APK was produced and statically verified.
 The first phone installation was reported to fail on Android 17 / One UI 9;
-the exact system error is still being diagnosed. See
+the diagnostic tool identified `INSTALL_FAILED_VERSION_DOWNGRADE`. The new
+alpha.2 variant uses version code 385806736 instead of source 385709029, above
+the phone's recorded 385806735. The corrected candidate needs a new phone test. See
 [installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md) and
 [VERIFICATION.md](VERIFICATION.md) for the latest recorded result;
 a successful bundle build alone does not establish Instagram compatibility.
@@ -104,6 +106,10 @@ an authorized, accessible, credential-free HTTPS URL. The expected file digest
 is for the whole downloaded file, including the outer container for an APKM.
 The original input and its extracted splits are not uploaded as artifacts. A successful application run uploads
 `friends-only-personal-test-apk-RUN_NUMBER` and an application report.
+This is a statically verified test candidate. `run_install_smoke` defaults off;
+when explicitly enabled, it additionally attempts a hosted emulator installation
+without launching Instagram. Emulator setup or installation failures remain
+visible, and do not turn into a successful installation claim.
 
 The workflow generates a personal signing key unless stable signing secrets
 are configured: `FRIENDS_ONLY_KEYSTORE_B64`, `FRIENDS_ONLY_KEYSTORE_PASSWORD`,

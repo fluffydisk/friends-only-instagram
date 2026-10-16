@@ -45,7 +45,8 @@ def main() -> None:
     kotlin_sources = sorted((ROOT / "patches/src/main/kotlin").rglob("*.kt"))
     run([compiler, "-jvm-target", "21", "-classpath", cli, "-d", patches, *kotlin_sources])
     manifest = ("Manifest-Version: 1.0\nName: Friends Only native patches\n"
-                "Description: Minimal native Instagram interface experiment\nVersion: 0.3.0-alpha.1\n"
+                "Description: Minimal native Instagram interface experiment\n"
+                f"Version: {VERSIONS['friends_only']['version']}\n"
                 f"Patcher-Version: {VERSIONS['morphe']['patcher_version']}\n"
                 "Source: https://github.com/fluffydisk/friends-only-instagram\n"
                 "Author: Friends Only contributors\nLicense: GPL-3.0-only\n\n")
@@ -86,7 +87,7 @@ def main() -> None:
     bundle = final_bundle
     report = {
         "status": "passed", "schema_version": 1, "kind": "patch_bundle_only",
-        "version": "0.3.0-alpha.1", "supported_instagram_version": VERSIONS["instagram"]["supported_version"],
+        "version": VERSIONS['friends_only']['version'], "supported_instagram_version": VERSIONS["instagram"]["supported_version"],
         "bundle": {"file": bundle.name, "sha256": sha256(bundle), "size_bytes": bundle.stat().st_size},
         "checks": checks, "jdk": version,
         "instagram_apk_patched": False, "device_tests": "not_run", "authentication_test": "not_run",

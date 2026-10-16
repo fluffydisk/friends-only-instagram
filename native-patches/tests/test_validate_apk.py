@@ -38,6 +38,14 @@ SIGNER = f"Signer #1 certificate SHA-256 digest: {TEST_CERTIFICATE}\n"
 
 
 class ValidatorTests(unittest.TestCase):
+    def test_forced_zip64_local_headers_rejected(self):
+        with zipfile.ZipFile(self.apk, "w") as archive:
+            for name, data in [('AndroidManifest.xml', b'manifest'), ('classes.dex', b'dex'),
+                               ('lib/arm64-v8a/a.so', b'library')]:
+                with archive.open(name, 'w', force_zip64=True) as output:
+                    output.write(data)
+        with self.assertRaisesRegex(validator.ValidationError, 'ZIP64'):
+            validator.inspect_archive(self.apk)
     def test_verified_rotated_signer_uses_current_platform_certificate(self):
         output = (f"Signer (minSdkVersion=24, maxSdkVersion=32) certificate SHA-256 digest: {'b' * 64}\n"
                   f"Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate SHA-256 digest: {TEST_CERTIFICATE}\n"

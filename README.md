@@ -5,7 +5,9 @@
 discovery filters into a patch bundle. It preserves Instagram's native client;
 it requires a compatible original APK and independent signer verification.
 The supplied APKM was validated and a signed native test APK was produced.
-Phone installation and account features remain unverified; see the module's
+The first phone install failed on Android 17 / One UI 9; account features remain
+unverified. A separate [installation diagnostics tool](install-diagnostics/README.md)
+now captures the exact Android error. See the module's
 [evidence](native-patches/VERIFICATION.md). The cloud workflow builds the patch
 bundle by default and can apply it to a manually supplied APK or APKM.
 

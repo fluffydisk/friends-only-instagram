@@ -8,6 +8,7 @@ import zipfile
 
 from common import TOOLS, VERSIONS, download, java_tool, run, sha256
 from validate_apk import ValidationError, inspect_archive, inspect_manifest, run_command
+from axml import normalize_apk_manifest
 
 
 def payload_inventory(apks: list[Path]) -> tuple[Counter, dict[str, str]]:
@@ -57,6 +58,7 @@ def merge_verified_splits(directory: Path, output: Path, android_tools: Path) ->
     download(VERSIONS["apkeditor"]["url"], tool, VERSIONS["apkeditor"]["sha256"])
     run([java_tool("java"), "-Xmx3g", "-jar", tool, "m", "-validate-modules", "-clean-meta",
          "-i", directory, "-o", output])
+    namespace_report = normalize_apk_manifest(output)
     archive = inspect_archive(output)
     metadata = inspect_manifest(
         run_command([str(android_tools / "aapt"), "dump", "badging", str(output)], "Merged manifest"),
@@ -64,4 +66,5 @@ def merge_verified_splits(directory: Path, output: Path, android_tools: Path) ->
         archive["native_abis"],
     )
     return {"status": "merged_unsigned", "sha256": sha256(output), "manifest": metadata,
-            "payload_audit": audit_payloads(inputs, output), "tool_version": VERSIONS["apkeditor"]["version"]}
+            "payload_audit": audit_payloads(inputs, output), "tool_version": VERSIONS["apkeditor"]["version"],
+            "manifest_namespace_normalization": namespace_report}

@@ -18,6 +18,7 @@ from build import PATCH_NAMES
 from validate_apk import ValidationError, inspect_archive, inspect_manifest, run_command, validate_apk
 from validate_apkm import validate_apkm
 from merge_apkm import merge_verified_splits
+from axml import normalize_namespace_order
 
 
 def validate_patch_result(result: dict) -> None:
@@ -52,6 +53,9 @@ def inspect_output(apk: Path, aapt: Path, apksigner: Path) -> dict:
     # The merged extension descriptor must be present in some DEX. This does not
     # assert Android runtime behavior; device testing is a separate requirement.
     with zipfile.ZipFile(apk) as source:
+        _, namespace_changes = normalize_namespace_order(source.read("AndroidManifest.xml"))
+        if namespace_changes:
+            raise ValidationError("The output manifest has non-nested namespace closing events.")
         extension_present = any(
             b"Ldev/friendsonly/patch/runtime/FocusHooks;" in source.read(entry)
             for entry in source.namelist() if re.fullmatch(r"classes(?:\d+)?\.dex", entry)
@@ -59,7 +63,8 @@ def inspect_output(apk: Path, aapt: Path, apksigner: Path) -> dict:
     if not extension_present:
         raise ValidationError("The signed APK is missing the native extension.")
     return {"manifest": manifest, "sha256": sha256(apk), "size_bytes": apk.stat().st_size,
-            "signer_sha256": digests[0].lower(), "extension_present": True}
+            "signer_sha256": digests[0].lower(), "extension_present": True,
+            "manifest_namespace_order": "valid"}
 
 
 def apply(args: argparse.Namespace) -> dict:

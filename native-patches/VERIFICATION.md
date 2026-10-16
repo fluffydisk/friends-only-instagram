@@ -75,10 +75,30 @@ That independently signed CI output has its own checksum/certificate in the
 run's `native-patch-reports-9` artifact; the workspace checksum above refers only
 to the workspace build. Neither successful build establishes device behavior.
 
-## Not run
+## Device installation report
+
+After the first APK delivery, the user reported **App nicht installiert** on
+their Samsung S24+ with **Android 17 / One UI 9**, after removing the original
+Instagram and with no other profile copy reported. Installation on that device
+is a known reported failure. The generic screenshot does not identify the
+PackageInstaller failure code; it has not been reproduced in cloud.
+
+The separate install-diagnostics app requests a normal user-confirmed installation
+and displays Android's exact error. Its clean local build, six unit tests and
+lint check passed. Current Python tooling has 101 passing tests, including 20
+namespace normalization cases. A real unsigned fixture had two namespace END
+chunks reordered; all other 31,599 payloads remained identical. This packaging
+fix is not established as the Samsung install failure's cause.
+
+See [installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
+
+## Still not verified
 
 No emulator or physical Android device is attached to this cloud environment.
-Installation, cold launch and all device/account behavior remain **unverified**.
+Cold launch and all account behavior remain **unverified**. The attempted
+software Android 35 emulator did not reach PackageManager readiness before the
+cloud memory limit; it produced no APK installation result. A hosted Android 35
+installation check is now configured for manual native APK builds.
 
 Login, challenges, native library loading, Home/Stories, ordinary video posts,
 Direct sending, groups, filter behavior and settings must be tested on the

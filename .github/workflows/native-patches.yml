@@ -117,6 +117,31 @@ jobs:
           --patch-bundle native-patches/build/friends-only.mpp
           --output native-patches/build/friends-only-personal.apk
           --report native-patches/reports/apply-report.json
+      - name: Enable KVM for the optional installation check
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        run: sudo chmod a+rw /dev/kvm
+      - name: Install-only smoke check (API 35 emulator; no app launch)
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        timeout-minutes: 15
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 2
+          ram-size: 2048M
+          disable-linux-hw-accel: false
+          disable-animations: true
+          emulator-boot-timeout: 420
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: |
+            mkdir -p native-patches/reports
+            adb shell getprop ro.build.version.sdk > native-patches/reports/emulator-sdk.txt
+            adb shell getprop ro.build.version.release > native-patches/reports/emulator-android-release.txt
+            adb shell getprop ro.product.cpu.abilist > native-patches/reports/emulator-abis.txt
+            python3 -c "from pathlib import Path; assert Path('native-patches/reports/emulator-sdk.txt').read_text().strip() == '35', 'Expected an API 35 emulator'; assert 'arm64-v8a' in Path('native-patches/reports/emulator-abis.txt').read_text().strip().split(','), 'System image does not advertise arm64-v8a support; install result would not test this APK'"
+            bash -euo pipefail -c 'adb install --no-streaming native-patches/build/friends-only-personal.apk 2>&1 | tee native-patches/reports/emulator-install.txt'
       - name: Upload successful personal APK
         if: success() && github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
         uses: actions/upload-artifact@v4

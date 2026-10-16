@@ -59,6 +59,7 @@ class MergeAuditTests(unittest.TestCase):
             self.apk('merged.apk', {'classes.dex': b'base', 'classes2.dex': b'feature'})
         with mock.patch.object(merge_apkm, 'download'), mock.patch.object(merge_apkm, 'java_tool', return_value='java'), \
              mock.patch.object(merge_apkm, 'run', side_effect=merge_command), \
+             mock.patch.object(merge_apkm, 'normalize_apk_manifest', return_value={'status': 'unchanged'}), \
              mock.patch.object(merge_apkm, 'inspect_archive', return_value={'native_abis': ['arm64-v8a']}), \
              mock.patch.object(merge_apkm, 'run_command', return_value='fixture metadata'), \
              mock.patch.object(merge_apkm, 'inspect_manifest', return_value={'package': 'com.instagram.android'}):

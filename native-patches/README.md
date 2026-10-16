@@ -9,7 +9,10 @@ its build workflow remain separate.
 its 11 inner APKs passed signature and identity validation, and the split merge
 passed a code/library/asset preservation audit. Both native patches were applied
 successfully and a personally signed APK was produced and statically verified.
-Running it on a phone remains unverified. See [VERIFICATION.md](VERIFICATION.md) for the latest recorded result;
+The first phone installation was reported to fail on Android 17 / One UI 9;
+the exact system error is still being diagnosed. See
+[installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md) and
+[VERIFICATION.md](VERIFICATION.md) for the latest recorded result;
 a successful bundle build alone does not establish Instagram compatibility.
 
 ## Download the first native test APK
@@ -21,7 +24,9 @@ and extract `friends-only-personal.apk`. The artifact is retained for 7 days.
 This is the native patched app, separate from the WebView workflow's APK.
 
 Read the installation/signature notes below before replacing an installed app.
-Installation, launch, login and account features have not been tested on a device.
+The user reported this APK fails to install on their Android 17 / One UI 9 phone.
+Launch, login and account features remain unverified; use the separate diagnostics
+tool to retrieve the system installation error instead of repeatedly removing apps.
 Its launcher still uses Instagram's name/icon; Home long-press opens our settings.
 
 ## Initial scope
@@ -196,6 +201,7 @@ filter restores its controls and that unfamiliar layouts remain usable.
 | Split merge audit | Passed for 23 DEX files, 18 native libraries and 3,166 assets; resource/runtime compatibility still unverified |
 | Applying fingerprints to Instagram | Passed: unique tab-bar binder and protected Tigon request entry point |
 | Patched Instagram APK/signature | Produced in cloud; package/signature/extension/16 KiB alignment checks passed |
+| Device installation | User-reported failure on S24+ Android 17 / One UI 9; exact PackageInstaller status pending |
 | Login, feed, Stories, Direct, groups on a phone | Not tested for this prototype |
 
 The earlier WebView app’s phone report is not evidence about these native
@@ -216,7 +222,8 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   doğrulanmış imzalayan sertifika özeti gerekir. Yüklenen APKM’nin 11 APK parçası
   doğrulandı; birleştirmede 23 DEX, 18 native kütüphane ve 3.166 varlık korundu.
   İki yama da uygulandı ve imzalanmış APK üretildi; statik çıktı kontrolleri geçti.
-  Güncel sonuçlar VERIFICATION.md dosyasındadır. Telefon testleri henüz yapılmadı.
+  İlk kurulum Android 17 / One UI 9 cihazında başarısız oldu. Ayrıntılı hata için
+  ayrı kurulum teşhis aracı hazırlandı; giriş ve hesap özellikleri doğrulanmadı.
 - Doğrulanmış çıktı hazır olmadan mevcut Instagram’ı kaldırma. Aynı paket adı
   ve farklı imza nedeniyle resmi uygulamanın üstüne güncelleme kurulamaz;
   kaldırma yerel verileri siler. İlk denemede başlatıcı adı/simgesi Instagram

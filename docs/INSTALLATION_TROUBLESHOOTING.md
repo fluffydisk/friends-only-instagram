@@ -1,81 +1,111 @@
-# Native APK installation failure
+# Native APK installation results
 
-The first native APK passed cloud compilation, signature, alignment and package
-checks, but the user reported **App nicht installiert** on a Samsung S24+ with
-**Android 17 / One UI 9**. They reported removing the original Instagram and no
-other profile copy. That generic dialog does not contain Android's failure code.
-Installation on that device is failed, not verified successful.
-
-The diagnostics app subsequently returned the exact failure on the phone:
+The latest real-phone test identifies a **signing identity conflict**, rather
+than an unknown installation failure. On the Samsung Galaxy S24+ (SM-S926B),
+Android 17 / SDK 37 / One UI 9, the v2 diagnostic helper returned:
 
 ```text
-Status: FAILURE_INVALID (4)
-Legacy status: -25
-INSTALL_FAILED_VERSION_DOWNGRADE: Downgrade detected:
-Update version code 385709029 is older than current 385806735
+Status: FAILURE_CONFLICT (5)
+Legacy status: -7
+INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.instagram.android signatures do not match newer version; ignoring!
 ```
 
-The tool reported no Instagram package in the current profile and ample free
-storage; Android nevertheless compared the installation to version 385806735.
-The location/origin of that retained version record has not been established.
-No additional profile deletion or application removal is needed to diagnose it.
+Android will not accept our personal signing key as an update to Instagram's
+`com.instagram.android` identity. The tool reported no Instagram record visible
+in the current profile, and the user reported removing the official app and no
+other-profile installation. The location/origin of Android's conflicting record
+is unknown. This is not evidence that another profile copy exists.
 
-Version `0.3.0-alpha.2` assigns our personally rebuilt variant version code
-**385806736**, while preserving source validation at **385709029**. The version
-integer is edited on the unsigned output before alignment/signing; Android's
-normal version and signature rules still apply. A later signature or policy
-error could still be reported, so the corrected candidate needs another phone
-test. Download the
-[corrected alpha.2 artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288/artifacts/12075512879),
-extract `friends-only-personal.apk`, and select that newly downloaded file in the
-diagnostic tool, rather than the old file. Its cloud build and static checks
-passed; the second phone result is pending.
+## Alpha.3 uses its own application identity
 
-## Get the exact error without a computer
+Version **0.3.0-alpha.3** builds as **`dev.friendsonly.instagram`**, with the
+**Friends Only** launcher name and our own icon. Its output version code is
+**385806737**. Re-scoped app permissions and provider authorities are intended
+to let it coexist with official Instagram under Android's normal checks.
+There is no signature, authentication or integrity bypass.
 
-The separate [install-diagnostics module](../install-diagnostics/README.md)
-builds **Friends Only Install Test / Friends Only Kurulum Testi**. Its package
-is `dev.friendsonly.installdiagnostics`; it can coexist with both Instagram and
-the earlier WebView app. It has no Internet permission, backend or account access.
+The local bundle build passed 138 Python tests, 113 Java policy assertions and
+26 Kotlin identity assertions. A signed alpha.3 APK was produced locally in cloud
+and passed all static output validators. The [full GitHub APK workflow](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357)
+also succeeded. Alpha.3 installation and launch remain unverified.
 
-1. Download its APK from the **Install diagnostics APK** workflow artifact and
-   extract the ZIP. Install `install-diagnostics-debug.apk`.
-2. Open it and choose the already downloaded `friends-only-personal.apk` using
-   **Choose APK / APK seç**.
-3. Choose **Test installation / Kurulumu test et**. If Android asks, allow this
-   tool to request installations through the normal per-app source setting.
-4. Confirm the normal Android installation dialog, then return to the tool.
-5. Use **Copy result / Sonucu kopyala** and paste the result into this chat.
+1. Download [the alpha.3 `friends-only-personal-test-apk-35` ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+   while signed into GitHub, and extract the new `friends-only-personal.apk`.
+2. Open that APK through the phone's file manager and complete the normal
+   Android confirmation. Allow the selected source to request installation if
+   Android asks. Do not choose the older `friends-only-personal-test-apk-17` file.
+3. Launch **Friends Only**. Test opening before testing account login, then
+   report each feature separately: login, Home, Stories, videos, Direct/groups,
+   and Home long-press filter settings.
 
-The report includes Android/model, free internal storage, the Instagram package
-record visible in the current profile, and Android's status/message/legacy code.
-On newer Android versions it also includes developer-verification failure extras
-when the system provides them. It reads no passwords, chats, tokens or account
-data. Copy/share happen only after pressing the corresponding button.
+**You do not need to remove official Instagram, delete profiles, or reset the
+phone.** Official Instagram can remain installed, or be restored from Play
+Store. Its local account data is separate from the new Friends Only package.
+Instagram may still reject a modified client; successful Android installation
+would not prove login or account functionality.
 
-The test is a real installation request: Android may install the selected APK if
-it accepts it. The tool does not force installation or bypass any system check.
-If the diagnostics APK itself cannot install, report that fact; do not keep
-removing other apps or resetting the phone. The official Instagram can be
-restored through Play Store while investigating this prototype.
+The current v2 diagnostic helper was built specifically for the older
+`com.instagram.android` output. Use normal file-manager installation for
+alpha.3; do not select the new package in that helper.
 
-## What the cloud checks establish
+## Recorded installation history
 
-The first APK has a valid v3 personal signature, arm64-v8a support, min SDK 28,
-target SDK 36, a stored/aligned resources.arsc, and no residual split requirement.
-Compressed native libraries are consistent with extractNativeLibs=true.
-These checks do not establish installation compatibility with One UI 9.
+| Output and tool | Real-phone result |
+| --- | --- |
+| Alpha.1, diagnostic v1 | `FAILURE_INVALID (4)`, legacy `-25`: version `385709029` older than recorded `385806735` |
+| Alpha.2, diagnostic v1 | `FAILURE (1)`, legacy `-110`: `INSTALL_FAILED_INTERNAL_ERROR: Session files in use` |
+| Alpha.2, file manager | About 30 seconds of installation, then generic not-installed dialog; no detailed code |
+| Alpha.2, diagnostic v2 | `FAILURE_CONFLICT (5)`, legacy `-7`: `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, signature mismatch |
+| Alpha.3 | Not yet tested on the phone |
 
-APKEditor also emitted namespace closing chunks in the wrong order. Source now
-normalizes only those adjacent closing events before patching/signing and checks
-the final manifest. The actual merged fixture loses all AAPT namespace warnings
-while retaining every other ZIP payload. This is a confirmed packaging defect;
-it is **not established as the cause** of the phone's installation rejection.
+Alpha.2 raised the output version code to **385806736**, retaining strict source
+validation at **385709029**. The v2 test used the exact alpha.2 CI APK:
+**253,019,230 bytes**, SHA-256
+`cc23681600c92ccf1b83fb55bb9fd2e7f6c263f99b758ff2e0ae9ddcf65a85a3`.
+Session **1936897936** first reported `PENDING_USER_ACTION (-1)` and then the
+final signature conflict, with **confirmation launch count 1**. The final report
+showed **59,754,876,928** free internal bytes. Storage was ample.
 
-The cloud has no KVM. A bounded software emulator attempt did not reach a ready
-PackageManager before the memory limit, so it produced no APK installation result.
-The manual native workflow has an optional hosted emulator install check;
-that is separate from Android 17 / Samsung testing and performs no login.
-Its first run failed downloading the Google system image before an APK install
-could be attempted. A smoke-check failure remains visible; static validation
-and the candidate artifact are independent of that optional infrastructure.
+V1 had a confirmation re-entry path. The v2 helper fixes that path with a
+single persisted active session, one-shot confirmation and explicit
+cancellation. Its 15 tests passed, lint reported zero errors and six warnings,
+and its APK built in [run 39017587861](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39017587861).
+The user installed and ran v2 successfully. This does not establish why the
+independent file-manager install produced its generic error; the v2 result does
+establish a signing conflict for the selected alpha.2 APK.
+
+## Sharing a useful problem report
+
+Include the APK's workflow/run number, Android and One UI versions, exact steps,
+and whether installation, opening, login or a later feature failed. A screenshot
+of Android's dialog is useful; redact account names and messages. Do not send
+passwords, two-factor codes, cookies, tokens or private chats. If a future helper
+supports the new package, its copied result can provide Android's exact error.
+
+The separate [diagnostics module](../install-diagnostics/README.md) has no
+Internet permission, backend or account access. It sends nothing automatically;
+copy/share occur only when the user presses those buttons. Android may install
+a selected APK if it accepts it: the helper uses a real, user-confirmed request
+and cannot force installation.
+
+## What cloud checks establish
+
+The earlier APKs passed signature, package/version/arm64, manifest and 16 KiB
+alignment checks. Compressed native libraries are consistent with
+`extractNativeLibs=true`. A confirmed APKEditor namespace-order defect is
+normalized before patching/signing; that repair was not established as the
+phone rejection's cause.
+
+Cloud installation checks have not produced a PackageInstaller verdict: earlier
+attempts failed on service readiness, emulator data space, and graphics crashes.
+The exact alpha.3 CI APK was copied successfully in
+[run 39019676627](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627),
+after API 37/ARM64, readiness and ample-storage checks passed. Emulator graphics
+crashes before and during installation killed services; ADB returned
+`Broken pipe (32)` / exit 224. The modern SwiftShader renderer did not resolve
+that emulator failure. No APK acceptance/rejection, app launch or login result
+was obtained. [Smoke logs](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627/artifacts/12096526389)
+record that failed infrastructure check. This is separate from the phone's
+exact alpha.2 `-7` result; alpha.3's phone outcome is still unknown.
+See [native verification](../native-patches/VERIFICATION.md) for the evidence
+and limits.

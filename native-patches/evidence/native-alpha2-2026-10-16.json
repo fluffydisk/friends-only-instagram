@@ -1,7 +1,7 @@
 {
   "version": "0.3.0-alpha.2",
   "date_utc": "2026-10-16",
-  "known_device_error": "INSTALL_FAILED_VERSION_DOWNGRADE",
+  "known_device_error": "INSTALL_FAILED_UPDATE_INCOMPATIBLE",
   "rejected_output_version_code": 385709029,
   "device_reported_current_version_code": 385806735,
   "new_output_version_code": 385806736,
@@ -63,6 +63,94 @@
     "python_tests": 115,
     "java_policy_assertions": 113,
     "native_apk_build_and_static_verification": "passed",
-    "physical_installation_of_alpha2": "pending"
+    "physical_installation_of_alpha2": "failed_user_report"
+  },
+  "previous_alpha1_device_error": "INSTALL_FAILED_VERSION_DOWNGRADE",
+  "phone_installation": {
+    "device_model": "samsung SM-S926B",
+    "android": "17",
+    "sdk": 37,
+    "one_ui": "9",
+    "free_internal_bytes": 59559583744,
+    "instagram_visible_in_current_profile": false,
+    "status": 1,
+    "legacy_status": -110,
+    "message": "INSTALL_FAILED_INTERNAL_ERROR: INSTALL_FAILED_INTERNAL_ERROR: Session files in use",
+    "direct_file_manager": {
+      "result": "failed_user_report",
+      "elapsed_seconds_approximate": 30,
+      "exact_system_code": null
+    },
+    "cold_launch_and_account_features": "not_tested",
+    "diagnostics_reentry_proven_cause": false
+  },
+  "independent_api37_attempts": [
+    {
+      "run_id": 38971499479,
+      "result": "infrastructure_failure_before_install",
+      "reason": "Emulator boot property reported complete while input/settings services were missing; action exited before install script.",
+      "apk_sha256": "cc23681600c92ccf1b83fb55bb9fd2e7f6c263f99b758ff2e0ae9ddcf65a85a3",
+      "apk_size_bytes": 253019230,
+      "apk_rebuilt_or_resigned": false
+    },
+    {
+      "run_id": 39017434370,
+      "result": "infrastructure_failure_before_package_installer_result",
+      "reason": "Android services, SDK37 and ARM64 checks passed; ADB APK copy failed with No space left on device in emulator userdata.",
+      "apk_sha256": "cc23681600c92ccf1b83fb55bb9fd2e7f6c263f99b758ff2e0ae9ddcf65a85a3",
+      "apk_rebuilt_or_resigned": false
+    },
+    {
+      "run_id": 39017698457,
+      "result": "infrastructure_failure_before_install",
+      "reason": "8GiB userdata had 7181952KiB free, SDK37/ARM64/services passed, but preflight incorrectly required mount /data instead of Android17 bind mount /data/user/0. Parser subsequently fixed.",
+      "available_data_kib": 7181952,
+      "apk_rebuilt_or_resigned": false
+    },
+    {
+      "run_id": 39018011441,
+      "result": "emulator_graphics_failure_no_package_installer_verdict",
+      "reason": "SurfaceFlinger GPU assertion occurred before and during installation, restarting system_server; ADB returned Broken pipe (32).",
+      "adb_install_attempts": 1,
+      "available_data_bytes": 7354544128,
+      "evidence_artifact_id": 12094864020,
+      "apk_rebuilt_or_resigned": false
+    }
+  ],
+  "diagnostics_v2": {
+    "version_name": "0.2.0",
+    "version_code": 2,
+    "source_commit": "d9cff9b9ac3ac1fb8c21ac987791d0258a3d2637",
+    "run_id": 39017587861,
+    "apk_artifact_id": 12094909613,
+    "apk_artifact_name": "friends-only-install-diagnostics-8",
+    "unit_tests": 15,
+    "unit_tests_lint_apk_build": "passed",
+    "physical_use": "confirmed_on_phone_single_confirmation_and_terminal_signature_conflict",
+    "confirmation_reentry_proven_cause_of_phone_error": false,
+    "test_failures": 0,
+    "test_ignored": 0,
+    "lint_errors": 0,
+    "lint_warnings": 6
+  },
+  "updated_date_utc": "2026-10-17",
+  "phone_installation_v2": {
+    "device_model": "samsung SM-S926B",
+    "android": "17",
+    "sdk": 37,
+    "free_internal_bytes_pending": 59755163648,
+    "free_internal_bytes_final": 59754876928,
+    "instagram_visible_in_current_profile": false,
+    "session_id": 1936897936,
+    "intermediate_status": "PENDING_USER_ACTION (-1)",
+    "final_status": "FAILURE_CONFLICT (5)",
+    "legacy_status": -7,
+    "message": "INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.instagram.android signatures do not match newer version; ignoring!",
+    "phase": "FINISHED",
+    "copied_bytes": 253019230,
+    "source_sha256": "cc23681600c92ccf1b83fb55bb9fd2e7f6c263f99b758ff2e0ae9ddcf65a85a3",
+    "confirmation_launch_count": 1,
+    "origin_of_retained_package_record": "unknown",
+    "cold_launch_and_account_features": "not_tested"
   }
 }

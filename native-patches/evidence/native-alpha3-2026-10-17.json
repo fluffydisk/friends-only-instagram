@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "version": "0.3.0-alpha.3",
+  "date_utc": "2026-10-17",
+  "trigger": {
+    "phone_status": "FAILURE_CONFLICT (5)",
+    "legacy_status": -7,
+    "android_message": "INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.instagram.android signatures do not match newer version; ignoring!",
+    "diagnostic_version": 2,
+    "confirmation_launch_count": 1,
+    "alpha2_source_sha256": "cc23681600c92ccf1b83fb55bb9fd2e7f6c263f99b758ff2e0ae9ddcf65a85a3",
+    "instagram_visible_in_current_profile": false,
+    "retained_record_origin": "unknown"
+  },
+  "source": {
+    "package": "com.instagram.android",
+    "version_name": "451.0.0.20.80",
+    "version_code": 385709029,
+    "apkm_sha256": "7f1dc7549a3d970124983935e977447de6d3dee41e7334278d0821b5472089ad",
+    "publisher_certificate_sha256": "3a10c50c18ba937506c2875e9047be74f8fd8b86fae2ff9feaa50a81fcb4c014"
+  },
+  "checks": {
+    "python_tests": 138,
+    "java_policy_assertions": 113,
+    "kotlin_identity_assertions": 26,
+    "local_signed_apk_and_static_output_validation": "passed",
+    "physical_installation": "not_tested",
+    "authentication_stories_feed_direct_groups": "not_tested",
+    "python_tests_scope": "Current local working tree; successful APK CI commit ran 137 tests, before one additional version-code regression test."
+  },
+  "local_build_note": "revalidated_final_apk_after_manifest_normalization",
+  "local_output": {
+    "manifest": {
+      "package": "dev.friendsonly.instagram",
+      "version_name": "451.0.0.20.80",
+      "version_code": "385806737",
+      "native_abis": [
+        "arm64-v8a"
+      ]
+    },
+    "sha256": "44d6b67bdf5cf8db3a97fd14f38809e7207815e6dbb2a25006e5791595ccc4c3",
+    "size_bytes": 252793912,
+    "signer_sha256": "f72dc3148be7ab84f5490c16df4c38189596a0245a2d72b0b27bb1054a0feaa5",
+    "extension_present": true,
+    "manifest_namespace_order": "valid",
+    "application_identity": {
+      "package": "dev.friendsonly.instagram",
+      "application_label": "Friends Only",
+      "launcher_and_localized_labels_checked": 102,
+      "manifest_launchers": [
+        "com.instagram.android.activity.MainTabActivity"
+      ],
+      "own_provider_authorities": [
+        "dev.friendsonly.instagram.androidx-startup",
+        "dev.friendsonly.instagram.baselcontext",
+        "dev.friendsonly.instagram.contentprovider.users.loggedinusers",
+        "dev.friendsonly.instagram.hatch.chat.files",
+        "dev.friendsonly.instagram.hatch.files",
+        "dev.friendsonly.instagram.provider.AccessLibraryContentProvider",
+        "dev.friendsonly.instagram.provider.phoneid",
+        "dev.friendsonly.instagram.provider.phoneid_lite",
+        "dev.friendsonly.instagram.securefileprovider",
+        "dev.friendsonly.instagram_com.instagram.barcelona.feed.crossapp.contentprovider.ThreadsContentProvider",
+        "dev.friendsonly.instagram_com.instagram.barcelonaig.deferreddeeplink.TixuDeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.barcelonaig.tixu.directtransfer.TixuDirectTransferProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredCurrentUserProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.FamilyAppsUserValuesProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.InstallReferrerProvider",
+        "dev.friendsonly.instagram_com.instagram.creation.drafts.contentprovider.ClipsDraftProvider",
+        "dev.friendsonly.instagram_com.instagram.fileprovider",
+        "dev.friendsonly.instagram_com.instagram.foabackuptoken.FoaBackupTokenProvider",
+        "dev.friendsonly.instagram_com.instagram.growth.xav.fifudeferreddeeplink.FifuDeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.liteprovider.FirstPartyUserValuesLiteProviderV2",
+        "dev.friendsonly.instagram_com.instagram.liteprovider.usdid.UsdidValuesProvider",
+        "dev.friendsonly.instagram_com.instagram.quicksnap.seenstate"
+      ],
+      "own_permission_definitions": [
+        "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+        "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+        "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+      ],
+      "own_permission_references": [
+        "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+        "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+        "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+      ]
+    }
+  },
+  "output_manifest_normalization": {
+    "status": "normalized",
+    "namespace_end_chunks_reordered": 2,
+    "manifest_sha256_before": "88c66a99a40fc41d6d54061039880ae91c3c2bd5a766f968dab581b1a19425fa",
+    "manifest_sha256_after": "5c02bd98fc3b69d4b4a1b82db0d1f84cce77548d29fba2e79fbfa091067726c4",
+    "entries_preserved": 31598
+  },
+  "independent_static_audit": {
+    "schema_version": 1,
+    "status": "passed",
+    "scope": "Independent read-only static package audit; no Android device installation or login test",
+    "file_name": "friends-only-native-0.3.0-alpha.3.apk",
+    "file_bytes": 252793912,
+    "file_sha256": "44d6b67bdf5cf8db3a97fd14f38809e7207815e6dbb2a25006e5791595ccc4c3",
+    "manifest_package": "dev.friendsonly.instagram",
+    "version_code": 385806737,
+    "resource_packages": [
+      {
+        "id": 127,
+        "name": "dev.friendsonly.instagram"
+      }
+    ],
+    "launcher_label": [
+      "Friends Only"
+    ],
+    "component_records_preserved": 747,
+    "providers": {
+      "declarations": 24,
+      "unique_authorities": 23,
+      "external_query_preserved": true
+    },
+    "custom_permissions": [
+      "dev.friendsonly.instagram.permission.SYSTEM_ONLY",
+      "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+      "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+      "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "source_dex_files": 23,
+    "output_dex_files": 20,
+    "native_libraries_preserved": 18,
+    "assets_preserved": 3166,
+    "own_icon_resources": [
+      "res/drawable/friends_only_icon.xml"
+    ],
+    "checks": [
+      "Final manifest has the independent application ID",
+      "Resource table package matches independent application ID",
+      "Launcher label resource is Friends Only",
+      "Unrelated Instagram string remains unchanged",
+      "All application/component Java names and alias targets remain exactly unchanged",
+      "All application/component names remain fully qualified",
+      "All 24 application provider declarations are retained",
+      "All declared provider authorities map exactly to the independent app",
+      "Provider duplicate remains consistent, with 23 distinct authorities",
+      "External provider visibility query remains unchanged",
+      "Exactly four package-owned permission declarations receive matching independent names",
+      "All permission-protected component references are consistent; external permissions are preserved",
+      "Uses-permission references match the exact renamed declaration map",
+      "All original native-library and asset bytes are preserved with no additions or losses",
+      "All 18 original ABI libraries are retained",
+      "All 3166 original assets are retained",
+      "One independent Friends Only launcher icon resource exists",
+      "Final signature verifies using the personal v3 signer",
+      "Manifest namespace closing order requires zero changes",
+      "APK ZIP alignment checks pass",
+      "Exact DEX identity mapping preserves all 164 scoped instruction references",
+      "Original launcher enablement and target classes remain unchanged"
+    ],
+    "device_tests": "not_run",
+    "signature": {
+      "verification": "passed",
+      "scheme_v3": true,
+      "signer_certificate_sha256": "f72dc3148be7ab84f5490c16df4c38189596a0245a2d72b0b27bb1054a0feaa5"
+    },
+    "dex_identity_instruction_mapping": {
+      "status": "passed",
+      "literal_kinds": 16,
+      "source_and_output_reference_count": 164,
+      "old_scoped_literals_remaining_in_output_methods": 0
+    },
+    "launcher_verification": {
+      "status": "passed",
+      "launcher_declarations": 15,
+      "active_exported_launchers": [
+        {
+          "kind": "activity-alias",
+          "name": "com.instagram.android.activity.MainTabActivity",
+          "target": "com.instagram.mainactivity.InstagramMainActivity",
+          "component_enabled": true,
+          "target_enabled": true,
+          "application_enabled": true,
+          "exported": true
+        }
+      ],
+      "all_launcher_enablement_and_target_classes_unchanged": true,
+      "aapt35_badging_observation": "Neither original base.apk nor rebuilt candidate reports a launchable-activity line; binary manifest confirms MAIN plus LAUNCHER on the enabled exported alias.",
+      "device_launcher_test": "not_run"
+    },
+    "namespace_validation": {
+      "status": "passed",
+      "namespace_end_chunks_reordered": 0,
+      "manifest_bytes_unchanged_by_read_only_check": true
+    },
+    "zipalign": {
+      "status": "passed",
+      "alignment_bytes": 4,
+      "native_page_alignment_kib": 16,
+      "command_return_code": 0
+    }
+  },
+  "android_authentication_and_signing_checks": "unchanged",
+  "github_actions": {
+    "run_id": 39019337357,
+    "url": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357",
+    "commit": "5cb46fa1960237cf91e5ca36f81a91a8e9222b7b",
+    "status": "success",
+    "python_tests": 137,
+    "java_policy_assertions": 113,
+    "kotlin_identity_assertions": 26,
+    "apk_artifact": {
+      "id": 12095918541,
+      "name": "friends-only-personal-test-apk-35",
+      "url": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541",
+      "file_name": "friends-only-personal.apk"
+    },
+    "reports_artifact": {
+      "id": 12096107581,
+      "name": "native-patch-reports-35"
+    },
+    "output": {
+      "manifest": {
+        "package": "dev.friendsonly.instagram",
+        "version_name": "451.0.0.20.80",
+        "version_code": "385806737",
+        "native_abis": [
+          "arm64-v8a"
+        ]
+      },
+      "sha256": "ab5d7814d353fb5d4f3541aa8b1655ee8ea656aeb971a24a97bcd7d046daa6c9",
+      "size_bytes": 253154478,
+      "signer_sha256": "cbb947321ad01c55144a7bd71c82dea7bc135b61b12e465470ba00367d6e2ae4",
+      "extension_present": true,
+      "manifest_namespace_order": "valid",
+      "application_identity": {
+        "package": "dev.friendsonly.instagram",
+        "application_label": "Friends Only",
+        "launcher_and_localized_labels_checked": 102,
+        "manifest_launchers": [
+          "com.instagram.android.activity.MainTabActivity"
+        ],
+        "own_provider_authorities": [
+          "dev.friendsonly.instagram.androidx-startup",
+          "dev.friendsonly.instagram.baselcontext",
+          "dev.friendsonly.instagram.contentprovider.users.loggedinusers",
+          "dev.friendsonly.instagram.hatch.chat.files",
+          "dev.friendsonly.instagram.hatch.files",
+          "dev.friendsonly.instagram.provider.AccessLibraryContentProvider",
+          "dev.friendsonly.instagram.provider.phoneid",
+          "dev.friendsonly.instagram.provider.phoneid_lite",
+          "dev.friendsonly.instagram.securefileprovider",
+          "dev.friendsonly.instagram_com.instagram.barcelona.feed.crossapp.contentprovider.ThreadsContentProvider",
+          "dev.friendsonly.instagram_com.instagram.barcelonaig.deferreddeeplink.TixuDeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.barcelonaig.tixu.directtransfer.TixuDirectTransferProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredCurrentUserProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.FamilyAppsUserValuesProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.InstallReferrerProvider",
+          "dev.friendsonly.instagram_com.instagram.creation.drafts.contentprovider.ClipsDraftProvider",
+          "dev.friendsonly.instagram_com.instagram.fileprovider",
+          "dev.friendsonly.instagram_com.instagram.foabackuptoken.FoaBackupTokenProvider",
+          "dev.friendsonly.instagram_com.instagram.growth.xav.fifudeferreddeeplink.FifuDeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.liteprovider.FirstPartyUserValuesLiteProviderV2",
+          "dev.friendsonly.instagram_com.instagram.liteprovider.usdid.UsdidValuesProvider",
+          "dev.friendsonly.instagram_com.instagram.quicksnap.seenstate"
+        ],
+        "own_permission_definitions": [
+          "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+          "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+          "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+        ],
+        "own_permission_references": [
+          "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+          "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+          "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+        ]
+      }
+    },
+    "output_manifest_normalization": {
+      "status": "normalized",
+      "namespace_end_chunks_reordered": 2,
+      "manifest_sha256_before": "f973478a469fc9a9f63c688198248272d4b65de1bf4b67196ef6d08d957cb4c8",
+      "manifest_sha256_after": "b25fe6c9e0e9162c3ac90fe880b0854daef9ad7e656f199b5429f69ae651fe37",
+      "entries_preserved": 31600
+    },
+    "signing": "disposable_key_not_preserved",
+    "static_validation": "passed",
+    "local_and_ci_outputs_differ": "Separate resource rebuilds and disposable signing keys; local checksum is not the CI artifact checksum."
+  },
+  "api37_install_only_check": {
+    "run_id": 39019676627,
+    "url": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627",
+    "status": "failed_emulator_infrastructure_no_package_manager_verdict",
+    "source_run_id": 39019337357,
+    "source_artifact_name": "friends-only-personal-test-apk-35",
+    "app_launch_or_authentication": "not_requested",
+    "artifact_id": 12096526389,
+    "artifact_url": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627/artifacts/12096526389",
+    "apk_sha256": "ab5d7814d353fb5d4f3541aa8b1655ee8ea656aeb971a24a97bcd7d046daa6c9",
+    "apk_size_bytes": 253154478,
+    "device_sdk": 37,
+    "arm64_abi_advertised": true,
+    "services_readiness": "passed_after_five_seconds_stability",
+    "free_data_bytes": 7346233344,
+    "apk_copied": true,
+    "ordinary_install_attempt_count": 1,
+    "adb_error": "cmd: Failure calling service package: Broken pipe (32)",
+    "install_script_exit_code": 224,
+    "package_manager_install_verdict": null,
+    "emulator_version": "37.2.12",
+    "gpu_mode": "swiftshader",
+    "graphics_crash": {
+      "process": "SurfaceFlinger",
+      "assertion": "!rcEnc->featureInfo()->hasReadColorBufferDma",
+      "before_installation_utc": "2026-10-17T09:06:01Z",
+      "system_server_killed_utc": "2026-10-17T09:06:03Z",
+      "during_installation_utc": "2026-10-17T09:06:29Z"
+    },
+    "physical_phone_result": "not_tested"
+  }
+}

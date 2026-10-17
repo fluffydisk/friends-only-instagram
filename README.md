@@ -1,17 +1,29 @@
 # Friends Only
 
-**Current direction: native Instagram APK patches (0.3.0 alpha).** The new
-[native-patches project](native-patches/README.md) compiles local native UI and
-discovery filters into a patch bundle. It preserves Instagram's native client;
-it requires a compatible original APK and independent signer verification.
-The supplied APKM was validated and a signed native test APK was produced.
-The first phone install failed on Android 17 / One UI 9 with a confirmed version
-downgrade error. The [alpha.2 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288/artifacts/12075512879)
-uses a higher version code and awaits another phone test; account features remain
-unverified. A separate [installation diagnostics tool](install-diagnostics/README.md)
-captures Android's exact result. See the module's
-[evidence](native-patches/VERIFICATION.md). The cloud workflow builds the patch
-bundle by default and can apply it to a manually supplied APK or APKM.
+**Current direction: native Instagram APK patches (0.3.0-alpha.3).** The
+[native-patches project](native-patches/README.md) adds native navigation and
+selective discovery filters to the compatible Instagram client. The new output
+uses its own package, `dev.friendsonly.instagram`, and **Friends Only** launcher
+name/icon to support coexistence with the official app under Android's normal
+installation rules. Instagram's interface is otherwise largely retained; this
+is not yet a complete minimalist redesign.
+
+Earlier same-package test APKs failed to install on the user's Galaxy S24+
+(Android 17 / One UI 9). The latest phone test, using the working v2
+[installation diagnostics tool](install-diagnostics/README.md), confirmed
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE` (legacy `-7`): Android rejected our signing
+key for `com.instagram.android`. No Instagram record was visible in the current
+profile; the retained record's location is unknown. Alpha.3 addresses this
+conflict by using our own app identity, without bypassing signature or account
+checks. Its local bundle build passed 138 Python tests, 113 Java policy
+assertions and 26 Kotlin identity assertions. Signed alpha.3 APKs passed local and
+[GitHub static build checks](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357).
+[Download the alpha.3 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541),
+extract the ZIP and open `friends-only-personal.apk` through the phone's file
+manager. Alpha.3 installation, launch and all native account features remain
+unverified. A hosted API 37 install check failed in emulator graphics/services
+without an Android package-install verdict. See
+[evidence and limits](native-patches/VERIFICATION.md).
 
 The WebView implementation below is retained as an earlier working approach
 and fallback. Its APK is a separate product from the native patch experiment.
@@ -22,8 +34,9 @@ A small native Android shell around Instagram’s own website, with Home and
 Messages navigation and conservative local interface filters. No backend, paid
 service, recreated feed, dummy conversations, or private Instagram API.
 
-**An APK has been compiled in Codex Cloud. Instagram account functionality has
-not been tested on Android.** This is an installable MVP for compatibility
+**An APK has been compiled in Codex Cloud, and the user reported that this earlier
+WebView app works on their phone.** Account behavior has not been independently
+tested in cloud. This is an installable MVP for compatibility
 testing, not a promise that Instagram permits WebView login or that the feed
 contains only followed accounts. See [verification](docs/VERIFICATION.md) for
 the exact evidence and [phone checklist](docs/DEVICE_TESTING.md) before relying

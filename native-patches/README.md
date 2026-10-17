@@ -5,36 +5,41 @@ Android. It changes selected controls in Instagram’s native interface; it does
 not replace the existing Friends Only WebView application. That application and
 its build workflow remain separate.
 
-**The bundle is not an installable APK.** An original APKM has now been supplied;
-its 11 inner APKs passed signature and identity validation, and the split merge
-passed a code/library/asset preservation audit. Both native patches were applied
-successfully and a personally signed APK was produced and statically verified.
-The first phone installation was reported to fail on Android 17 / One UI 9;
-the diagnostic tool identified `INSTALL_FAILED_VERSION_DOWNGRADE`. The new
-alpha.2 variant uses version code 385806736 instead of source 385709029, above
-the phone's recorded 385806735. The corrected candidate needs a new phone test. See
-[installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md) and
-[VERIFICATION.md](VERIFICATION.md) for the latest recorded result;
-a successful bundle build alone does not establish Instagram compatibility.
+**The bundle is not an installable APK.** The supplied original APKM's 11
+inner APKs passed signature and identity validation; merging preserved its
+original code, native libraries and assets. The earlier signed alpha.1 and
+alpha.2 outputs passed cloud static checks but failed installation on the user's
+Galaxy S24+ running Android 17 / One UI 9. The latest phone result is
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE` (legacy `-7`): the personally signed APK
+cannot update Android's existing `com.instagram.android` signing identity.
+The location of the record is unknown; no other-profile installation is assumed.
 
-## Download the corrected alpha.2 test APK
+Version **0.3.0-alpha.3** adds our own app identity:
+`dev.friendsonly.instagram`, launcher name **Friends Only**, and an original
+vector icon. It is intended to install alongside official Instagram, without
+removing it or bypassing Android's signature checks. The bundle build and a
+local signed APK's static checks passed, followed by its successful
+[full GitHub APK workflow](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357).
+**No alpha.3 APK installation, launch or account behavior has been verified yet.** See [VERIFICATION.md](VERIFICATION.md) and
+[installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
 
-The [successful alpha.2 APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288)
-produced [friends-only-personal-test-apk-17](https://github.com/fluffydisk/friends-only-instagram/actions/runs/38968571288/artifacts/12075512879).
-Open that artifact link in a browser while signed into GitHub, download the ZIP,
-and extract `friends-only-personal.apk`. The artifact is retained for 7 days.
-This is the native patched app, separate from the WebView workflow's APK.
+## Alpha.3 test APK
 
-Read the installation/signature notes below before replacing an installed app.
-The earlier alpha.1 APK failed with `INSTALL_FAILED_VERSION_DOWNGRADE`. This new
-APK uses version code **385806736**; its installation, launch, login and account
-features remain unverified. Select the newly extracted file in the separate
-diagnostics tool and share Android's result, rather than repeatedly removing apps.
-Its launcher still uses Instagram's name/icon; Home long-press opens our settings.
+[Download `friends-only-personal-test-apk-35`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+from the successful alpha.3 GitHub build. Sign into GitHub in a browser, extract
+the ZIP, and open `friends-only-personal.apk` through Android's normal file
+installation flow. The artifact is retained for 7 days. This native
+patched app is separate from the earlier WebView app and its APK workflow.
+
+The output version code is **385806737**. The older
+`friends-only-personal-test-apk-17` is alpha.2, uses `com.instagram.android`, and
+is known to fail on the user's phone; it is retained only as historical evidence.
+Our existing v2 diagnostic helper targets that older package. Use normal
+file-manager installation for alpha.3 rather than that helper.
 
 ## Initial scope
 
-Two Friends Only patches are included:
+Three Friends Only patches are included:
 
 1. **Native navigation:** hide the Reels, Explore/Search, and Create tabs by
    default using exact resource names inside the supported bottom tab bar.
@@ -49,13 +54,19 @@ Two Friends Only patches are included:
    API client or backend. The intended preserved paths include authentication,
    Home feed, Stories, individual posts/videos, Direct, and group conversations.
    Their actual behavior still needs APK/device testing.
+3. **App identity:** use `dev.friendsonly.instagram`, the Friends Only launcher
+   label and our own vector icon. Re-scope app-defined permissions and declared
+   provider authorities, including exact code references, to avoid collisions
+   with official Instagram. External package queries and permissions, component
+   class names, JNI paths and native libraries retain their original identities.
+   Android and Instagram authentication/integrity checks remain in force.
 
 Hiding Explore also hides the Search entry in that tab. This version does not
 remove suggested posts from Home, determine who you follow, force chronological
-Following, or guarantee a friends-only feed. It does not implement a full reskin:
-the initial proof keeps Instagram’s launcher name/icon and identifies our local
-settings as **Friends Only**. There is no clone package, updater, analytics,
-credential form, or authentication/integrity bypass.
+Following, or guarantee a friends-only feed. Instagram's screens remain largely
+unchanged: our launcher identity and local settings are not a full reskin.
+There is no updater, added analytics, credential form, or
+signature/authentication/integrity bypass.
 
 Instagram's own networking, permissions, tracking and privacy terms remain in
 effect. Our small extension adds no permissions or third-party collection;
@@ -179,19 +190,22 @@ or generated patched APK belongs in this repository.
 ## Phone installation, after output verification
 
 First require a successful application report and output signature/package
-verification. **Do not remove a working Instagram installation while a verified
-patched APK is still unavailable.** The original package name is retained:
-`com.instagram.android`. Our signing key differs from Instagram’s, so Android
-cannot install this over the official app or alongside it as a clone.
+verification. Alpha.3's output package is **`dev.friendsonly.instagram`**, separate
+from official Instagram's **`com.instagram.android`**. You do not need to remove
+the official app or delete another profile. Install the verified APK using
+Android's normal file-manager flow; allow that source to request installation
+when Android asks. Existing device policies still apply.
 
-Once a verified build exists, choosing to replace the official installation
-requires uninstalling that installation and loses its local session/settings
-and other local app data. Make that choice only after reviewing the output and
-the limitations. Installation then uses Android’s normal APK sideloading flow;
-Samsung Auto Blocker or device policy may affect it. The launcher still says
-Instagram in this initial proof. Sign in through Instagram’s own native screens;
-no login-success claim is made for a re-signed build and no restriction bypass
-is included. Keep the official store installation route available for rollback.
+The launcher says **Friends Only** and uses our own icon. Sign in only through
+Instagram's native screens. Package renaming and a valid personal signature do
+not prove Instagram accepts the client: login, SSO, deep links and other
+features may fail. Stop on platform rejection; no bypass is included. Official
+Instagram can remain installed or be restored through Play Store.
+
+Fresh CI builds use disposable keys unless the signing secrets described above
+are configured. Future builds of our own package may therefore need a stable
+key for updates, or removal of the older Friends Only native build, which
+clears that app's local data. This does not require removing official Instagram.
 
 Record tests for login/challenges, Stories, ordinary photo/video posts, existing
 Direct and group conversations, tab visibility, Home long-press, every toggle,
@@ -203,41 +217,49 @@ filter restores its controls and that unfamiliar layouts remain usable.
 | Item | Evidence for this prototype |
 | --- | --- |
 | Source/tool versions | Pinned in this module; upstream attribution below |
-| Bundle build and policy checks | Passed in cloud on 2026-10-16: Java, D8, Kotlin, both patches loaded; 113 Java assertions and 115 Python tests |
+| Bundle build and policy checks | Passed locally in cloud on 2026-10-17: three patches loaded, 138 Python tests, 113 Java policy assertions, 26 Kotlin identity assertions |
 | Original APKM validation | Supplied input: 11 APKs passed cryptographic signature/package/version checks |
 | Split merge audit | Passed for 23 DEX files, 18 native libraries and 3,166 assets; resource/runtime compatibility still unverified |
 | Applying fingerprints to Instagram | Passed: unique tab-bar binder and protected Tigon request entry point |
-| Patched Instagram APK/signature | Produced in cloud; package/signature/extension/16 KiB alignment checks passed |
-| Device installation | Alpha.1 failed on S24+ Android 17 / One UI 9: confirmed downgrade (-25); alpha.2 with higher version code awaits phone testing |
+| Patched APK/signature | Local and GitHub alpha.3 signed APKs produced; all static output validators passed |
+| Device installation | Alpha.1 downgrade (-25); alpha.2 first session error (-110), then confirmed signature conflict (-7) with v2 helper; alpha.3 not tested on the phone |
+| Hosted API 37 alpha.3 install check | Failed in emulator graphics/services; ADB broken pipe, no PackageManager verdict |
 | Login, feed, Stories, Direct, groups on a phone | Not tested for this prototype |
 
+The exact alpha.3 CI APK reached the hosted API 37 installation step, but
+emulator graphics crashes killed services and ADB returned a broken pipe.
+[Run 39019676627](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627)
+failed without a PackageManager verdict; no app launch/login was attempted.
 The earlier WebView app’s phone report is not evidence about these native
 patches. The next milestone is recording real installation/account tests of the
 signed native output.
 After that, refine the minimalist native appearance from observed layouts and
-establish stable signing for upgrades. Broader feed filtering and branding
-changes are outside this first proof.
+establish stable signing for upgrades. Broader feed filtering and a full native redesign remain future work.
 
 See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these results.
 
 ## Türkçe kısa rehber
 
-- **Native patches** iş akışını APK alanlarını boş bırakarak çalıştır: sonuç
-  `friends-only.mpp` yama paketidir; telefona kurulacak APK değildir.
-- Girdi olarak belirtilen sürümün değiştirilmemiş tek parça arm64 APK’sı veya
-  desteklenen APKM paketi kullanılabilir. Dosya özeti ve bağımsız olarak
-  doğrulanmış imzalayan sertifika özeti gerekir. Yüklenen APKM’nin 11 APK parçası
-  doğrulandı; birleştirmede 23 DEX, 18 native kütüphane ve 3.166 varlık korundu.
-  İki yama da uygulandı ve imzalanmış APK üretildi; statik çıktı kontrolleri geçti.
-  İlk kurulum Android 17 / One UI 9 cihazında başarısız oldu; teşhis aracı
-  `INSTALL_FAILED_VERSION_DOWNGRADE` hatasını doğruladı. Yeni alpha.2 APK’sı
-  **385806736** sürüm koduyla üretildi ve yukarıdaki indirme bağlantısına kondu.
-  Yeni APK’nin telefonda kurulumu, giriş ve hesap özellikleri henüz doğrulanmadı.
-- Doğrulanmış çıktı hazır olmadan mevcut Instagram’ı kaldırma. Aynı paket adı
-  ve farklı imza nedeniyle resmi uygulamanın üstüne güncelleme kurulamaz;
-  kaldırma yerel verileri siler. İlk denemede başlatıcı adı/simgesi Instagram
-  olarak kalır; uygun olduğunda Ana Sayfa’ya uzun basmak Friends Only ayarlarını
-  açar. Bu çalışma mevcut WebView uygulamasını değiştirmez.
+- **Native patches** iş akışını APK alanlarını boş bırakarak çalıştırmak yalnızca
+  `friends-only.mpp` yama paketini üretir; bu dosya telefona kurulamaz.
+- Desteklenen girdi Instagram `451.0.0.20.80` / `385709029` sürümünün
+  değiştirilmemiş arm64 APK'sı veya APKM'sidir. Dosya ve bağımsız imzalayan
+  sertifika özetleri doğrulanır. Yüklenen APKM'nin 11 parçası doğrulandı;
+  birleştirmede 23 DEX, 18 native kütüphane ve 3.166 varlık korundu.
+- Önceki APK'lar `com.instagram.android` paketini kullanıyordu. V2 teşhis aracı
+  telefonda aynı dosya için gerçek **imza çakışmasını (-7)** gösterdi.
+  Android'in kaydı hangi konumda tuttuğu bilinmiyor; başka profil kurulu olduğu
+  varsayılmıyor. Instagram'ı tekrar kaldırmak veya telefonu sıfırlamak gerekmiyor.
+- Alpha.3 kendi `dev.friendsonly.instagram` paketini, **Friends Only** adını ve
+  simgesini kullanır. Yama derlemesi ve cloud ortamında üretilen imzalı APK'nin
+  statik kontrolleri geçti. GitHub derlemesi de başarılı: yukarıdaki
+  `friends-only-personal-test-apk-35` bağlantısından APK indirilebilir.
+  Kurulum, açılış, giriş, hikâyeler ve mesajlar henüz doğrulanmadı.
+  APK hazır olduğunda ZIP'i çıkartıp yeni dosyayı dosya yöneticisiyle kur.
+  Mevcut v2 teşhis aracı eski paket için hazırlanmıştır.
+- Bu çalışma tam bir arayüz tasarımı değildir. Instagram'ın mevcut native
+  ekranları korunur; Ana Sayfa'ya uzun basmak Friends Only filtre ayarlarını
+  açar. Normal video gönderileri ve hikâyeler özellikle kaldırılmaz.
 
 ## License and attribution
 

@@ -135,6 +135,34 @@ class VersionApkTests(unittest.TestCase):
             archive.writestr("assets/data", b"asset fixture", compress_type=zipfile.ZIP_STORED)
         self.apk.chmod(0o600)
 
+    def test_resource_rebuild_namespace_order_and_version_are_both_fixed_before_signing(self):
+        from axml import _chunks, normalize_apk_manifest, normalize_namespace_order
+        original = document()
+        root_offset = next(chunk[0] for chunk in _chunks(original) if chunk[1] == 0x102)
+        # Model the observed resource encoder output: adjacent namespace ends
+        # repeat opening order instead of closing the most recent scope first.
+        namespace_a = struct.pack("<II", 4, 1)
+        namespace_b = struct.pack("<II", 5, 1)
+        content = (original[8:root_offset] + node(0x100, namespace_a) + node(0x100, namespace_b) +
+                   original[root_offset:] + node(0x101, namespace_a) + node(0x101, namespace_b))
+        broken = struct.pack("<HHI", 3, 8, 8 + len(content)) + content
+        with zipfile.ZipFile(self.apk, "r") as archive:
+            payloads = {entry.filename: archive.read(entry) for entry in archive.infolist() if entry.filename != "AndroidManifest.xml"}
+        with zipfile.ZipFile(self.apk, "w") as archive:
+            archive.writestr("AndroidManifest.xml", broken)
+            for name, value in payloads.items():
+                archive.writestr(name, value)
+        namespace_report = normalize_apk_manifest(self.apk)
+        version_report = set_apk_version_code(self.apk, 385806737)
+        self.assertEqual(namespace_report["namespace_end_chunks_reordered"], 2)
+        self.assertEqual(version_report["version_code_after"], 385806737)
+        with zipfile.ZipFile(self.apk) as archive:
+            manifest = archive.read("AndroidManifest.xml")
+            self.assertEqual(normalize_namespace_order(manifest)[1], 0)
+            self.assertEqual(_version_attribute(manifest)[1], 385806737)
+            for name, value in payloads.items():
+                self.assertEqual(archive.read(name), value)
+
     def test_atomic_update_preserves_payloads_compression_order_and_original_source(self):
         source = self.directory / "original.apk"
         shutil.copyfile(self.apk, source)

@@ -67,7 +67,7 @@ object QuietThemePolicyTest {
             }
             if (name.endsWith("Dark") || name.endsWith("Light")) {
                 val mode = if (name.endsWith("Dark")) "dark" else "light"
-                verify(values["igds_color_primary_background"] == QUIET_PALETTE.getValue("${mode}_canvas"), "Explicit $mode theme must retain its mode")
+                verify(values["igds_color_primary_background"] == "@color/friends_only_${mode}_canvas", "Explicit $mode theme must retain its mode")
                 verify(values["igds_color_primary_text_on_media"] == "@color/original_igds_color_primary_text_on_media", "Do not recolor media overlays")
                 verify(values["igds_color_error_or_destructive"] == "@color/original_igds_color_error_or_destructive", "Do not obscure error/destructive states")
             } else {
@@ -126,8 +126,27 @@ object QuietThemePolicyTest {
         verify(quietLaunchBackgroundXml(true).contains(QUIET_PALETTE.getValue("dark_canvas")), "Night splash drawable must inline own dark canvas")
 
         val colors = QUIET_PALETTE
-        verify(colors.size == 14 && colors.values.all { it.matches(Regex("#[A-F0-9]{8}")) }, "Palette must contain only literal ARGB colors with no resource allocation")
-        verify(styles.elements("item").filter { it.textContent.startsWith("#") }.size == 47, "All 47 semantic color attributes must inline typed colors")
+        verify(colors.size == 14 && colors.values.all { it.matches(Regex("#[A-F0-9]{8}")) }, "Palette values must be literal ARGB colors")
+        val paletteDocument = parse("""<resources><color name="original_color">#FF010203</color></resources>""")
+        verify(appendQuietPaletteColors(paletteDocument) == 14, "Append every independent palette color to the tracked values file")
+        val paletteValues = paletteDocument.elements("color").associate { it.getAttribute("name") to it.textContent }
+        verify(paletteValues["original_color"] == "#FF010203", "Existing color values must stay unchanged")
+        verify(paletteValues.size == 15 && colors.all { (suffix, value) -> paletteValues["friends_only_$suffix"] == value },
+            "Every new semantic target must have an independent defined color")
+        verify(runCatching { appendQuietPaletteColors(paletteDocument) }.isFailure, "Duplicate palette definitions must fail closed")
+        val semanticReferences = styles.elements("item").filter { it.textContent.startsWith("@color/friends_only_") }
+        verify(semanticReferences.size == 47, "All 47 native semantic attributes must remain color resource references")
+        semanticReferences.forEach { item ->
+            verify(paletteValues.containsKey(item.textContent.removePrefix("@color/")),
+                "Every native semantic reference must resolve to an allocated palette color")
+        }
+        verify(styles.elements("style").filter { it.getAttribute("name") in QUIET_STYLE_IDS &&
+            (it.getAttribute("name").endsWith("Dark") || it.getAttribute("name").endsWith("Light")) }
+            .flatMap { style -> (0 until style.getElementsByTagName("item").length).map { style.getElementsByTagName("item").item(it) as Element } }
+            .none { it.textContent.startsWith("#") }, "Literal semantic colors would produce native resourceId=0")
+        verify(runCatching {
+            applyQuietThemeStyles(parse(fixture().replace("@color/original_igds_color_primary_background", "#FF151A17")))
+        }.isFailure, "Reject literal semantic source values rather than producing getColor(0) startup failures")
         verify(!quietLaunchBackgroundXml().contains("@color/friends_only_") && !quietLaunchBackgroundXml(true).contains("@color/friends_only_"),
             "Launch drawable colors must not depend on new values resources")
         fun luminance(hex: String): Double {

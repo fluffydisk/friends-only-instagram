@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "version": "0.3.0-alpha.6",
+  "date_utc": "2026-10-17",
+  "trigger": "User confirms exact alpha.5 cloud APK installs normally but repeatedly crashes on opening on Galaxy S24+ Android17/SDK37. Old v2 installer package-hint error is a separate helper limitation.",
+  "application": {
+    "version": "0.3.0-alpha.6",
+    "package_name": "dev.friendsonly.instagram",
+    "application_label": "Friends Only",
+    "output_version_code": 385806740
+  },
+  "alpha5_cloud_apk_sha256": "c9294c038a6727b5686b1bff8585630094f05ef2dae3a9444fb080775d32f646",
+  "root_cause_evidence": {
+    "native_theme_resolver": "LX/00RQ;->A0b(Context,int): resolveAttribute(..., true), then return TypedValue.resourceId with no literal-color fallback",
+    "startup_callsite": "InstagramMainActivity.A1y: igds_color_primary_background (0x7f0407b1) -> A0b -> Context.getColor(id)",
+    "defect": "Alpha.5 replaced47 native semantic color resource references with inline colors. A resolved inline color has resourceId0; Context.getColor(0) cannot load a resource.",
+    "phone_exception_trace": "not_available",
+    "certainty": "Concrete native code/resource contract defect consistent with reported startup failure; not established as the sole observed phone cause."
+  },
+  "fix": {
+    "semantic_attributes_restored_to_resource_references": 47,
+    "own_colors_appended_to_tracked_existing_values_colors_xml": 14,
+    "original_color_ids_and_values_preserved": 1097,
+    "native_theme_resolver_modified": false,
+    "other_native_feature_logic_changed": false,
+    "new_permissions_network_requests_diagnostics_or_data_collection": false
+  },
+  "checks": {
+    "bundle_build": "passed",
+    "python_tests": 163,
+    "java_assertions": {
+      "focus": 180,
+      "feed": 32,
+      "chrome": 26
+    },
+    "kotlin_assertions": {
+      "identity": 26,
+      "tap": 42,
+      "following": 35,
+      "theme": 145
+    },
+    "actual_source_resource_assertions": 150,
+    "morphe_resource_encode_preflight": "passed",
+    "preflight_emitted_styles": 7,
+    "preflight_nonzero_semantic_references": 47,
+    "preflight_own_color_resources": 14,
+    "new_output_validator_rejects_actual_alpha5": "passed_full_output_inspector_on_actual_signed_alpha5_apk",
+    "full_local_apk": "in_progress",
+    "full_github_apk": "pending",
+    "alpha6_phone_installation_opening_and_features": "not_tested"
+  },
+  "patch_bundle": {
+    "file": "friends-only.mpp",
+    "sha256": "98d082bc56b308925c6fe1c0021629ba88377a6731a0c41e1d5428e608578dd4",
+    "size_bytes": 103744
+  },
+  "resource_only_preflight": {
+    "schema_version": 1,
+    "status": "passed",
+    "scope": "Read-only compiled ARSC color-resource contract audit, not device startup test",
+    "sha256": "c2486d7496d2140e89f56465507f253682d41ce59da4a75322230021a097f05e",
+    "semantic_reference_count": 47,
+    "own_allocated_color_count": 14,
+    "source_color_ids_and_values_preserved": 1097,
+    "own_palette_ids": {
+      "friends_only_light_canvas": "0x7f0604c1",
+      "friends_only_light_surface": "0x7f0604c2",
+      "friends_only_light_elevated": "0x7f0604c3",
+      "friends_only_light_text": "0x7f0604c4",
+      "friends_only_light_secondary_text": "0x7f0604c5",
+      "friends_only_light_link": "0x7f0604c6",
+      "friends_only_light_button": "0x7f0604c7",
+      "friends_only_dark_canvas": "0x7f0604c8",
+      "friends_only_dark_surface": "0x7f0604c9",
+      "friends_only_dark_elevated": "0x7f0604ca",
+      "friends_only_dark_text": "0x7f0604cb",
+      "friends_only_dark_secondary_text": "0x7f0604cc",
+      "friends_only_dark_link": "0x7f0604cd",
+      "friends_only_dark_button": "0x7f0604ce"
+    },
+    "native_contract": "LX/00RQ.A0b(Context,I) returns TypedValue.resourceId; InstagramMainActivity.A1y passes it to Context.getColor(I)",
+    "device_startup": "not_tested"
+  },
+  "limits": [
+    "No actual phone exception stacktrace has been captured.",
+    "The resource-only preflight and output validation establish compiled resource contracts, not Android17 device startup.",
+    "Alpha.6 still needs normal installation/opening and feature-specific phone checks.",
+    "Strict following metadata may hide legitimate posts; Home can be short or empty. In-feed Story units are filtered; top Stories tray/playback remains unverified.",
+    "Clean cloud APKs use disposable signers and can require removing only the prior Friends Only app, clearing that app local session and settings."
+  ]
+}

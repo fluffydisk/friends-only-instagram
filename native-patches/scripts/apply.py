@@ -21,6 +21,7 @@ from validate_apkm import validate_apkm
 from merge_apkm import merge_verified_splits
 from axml import normalize_apk_manifest, normalize_namespace_order
 from version_code import set_apk_version_code
+from validate_theme import inspect_theme_apk
 
 
 def validate_patch_result(result: dict) -> None:
@@ -204,9 +205,11 @@ def inspect_output(apk: Path, aapt: Path, apksigner: Path) -> dict:
         )
     if not extension_present:
         raise ValidationError("The signed APK is missing the native extension.")
+    theme_colors = inspect_theme_apk(apk, aapt)
     return {"manifest": manifest, "sha256": sha256(apk), "size_bytes": apk.stat().st_size,
             "signer_sha256": digests[0].lower(), "extension_present": True,
-            "manifest_namespace_order": "valid", "application_identity": identity}
+            "manifest_namespace_order": "valid", "application_identity": identity,
+            "theme_color_resources": theme_colors}
 
 
 def apply(args: argparse.Namespace) -> dict:

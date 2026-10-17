@@ -26,7 +26,9 @@ internal val QUIET_TAB_IDS = linkedMapOf(
     "tab_profile_drawable" to "0x7f083067",
 )
 internal const val QUIET_LAUNCH_STYLE_ID = "0x7f1400a1"
-/** Literal typed colors avoid adding or reassigning any source color resource IDs. */
+/** Independent values; semantic attributes must point at color resources, never inline literals.
+ * Native LX/00RQ.A0b resolves attributes via TypedValue.resourceId; literal colors resolve to 0.
+ */
 internal val QUIET_PALETTE = linkedMapOf(
     "light_canvas" to "#FFF8F7F4", "light_surface" to "#FFEDEEE9", "light_elevated" to "#FFFFFFFF",
     "light_text" to "#FF242B27", "light_secondary_text" to "#FF626B65",
@@ -35,6 +37,22 @@ internal val QUIET_PALETTE = linkedMapOf(
     "dark_text" to "#FFF2F3EE", "dark_secondary_text" to "#FFB3BDB5",
     "dark_link" to "#FFC0CFC4", "dark_button" to "#FF375A49",
 )
+
+/** Append to the tracked source values file so Morphe allocates real, nonzero color IDs. */
+internal fun appendQuietPaletteColors(document: Document): Int {
+    val resources = document.documentElement
+    check(resources.tagName == "resources") { "Unsupported quiet palette values root." }
+    val existingNames = resources.quietChildren().map { it.getAttribute("name") }.toSet()
+    QUIET_PALETTE.forEach { (suffix, value) ->
+        val name = "friends_only_$suffix"
+        check(name !in existingNames) { "Quiet palette color already exists: $name." }
+        resources.appendChild(document.createElement("color").apply {
+            setAttribute("name", name)
+            textContent = value
+        })
+    }
+    return QUIET_PALETTE.size
+}
 
 private fun Element.quietChildren(): List<Element> = buildList {
     for (index in 0 until childNodes.length) {
@@ -83,7 +101,12 @@ internal fun applyQuietThemeStyles(document: Document): Int {
         themed.forEach { (attribute, value) ->
             val item = items.filter { it.getAttribute("name") == attribute }.singleOrNull()
                 ?: error("Unsupported quiet-theme attribute: $name/$attribute.")
-            item.textContent = QUIET_PALETTE.getValue("${mode}_$value")
+            // Existing native consumers call getColor(resolveAttribute(...).resourceId).
+            // A literal #ARGB would leave resourceId=0 and crash otherwise valid screens.
+            check(item.textContent.startsWith("@color/")) {
+                "Native semantic color must remain a resource reference: $name/$attribute."
+            }
+            item.textContent = "@color/friends_only_${mode}_$value"
             replacements++
         }
     }
@@ -175,6 +198,11 @@ val quietVisualTheme = resourcePatch(
     dependsOn(appIdentity)
     execute {
         document("res/values/public.xml").use { verifyQuietThemeResourceIds(it) }
+        // A separate newly created values file was not reliably registered by this encoder.
+        // Appending through document() tracks the existing file and lets the encoder allocate IDs.
+        document("res/values/colors.xml").use {
+            check(appendQuietPaletteColors(it) == 14) { "Unsupported quiet palette size." }
+        }
         document("res/values/styles.xml").use {
             check(applyQuietThemeStyles(it) == 57) { "Unsupported quiet-theme surface count." }
             check(applyQuietLaunchTheme(it, false) == 3) { "Unsupported legacy launch-only theme." }

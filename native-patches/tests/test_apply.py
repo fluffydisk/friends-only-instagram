@@ -1,6 +1,8 @@
 """Patching report checks: an engine exit code alone must never authorize signing."""
 import copy
+import contextlib
 import importlib.util
+import io
 from pathlib import Path
 import sys
 import unittest
@@ -30,6 +32,7 @@ IDENTITY_XML = '''N: android=http://schemas.android.com/apk/res/android
       E: provider (line=6)
         A: android:authorities(0x01010018)="com.facebook.pages.app.ig4work.tokenhandoff"
     E: application (line=7)
+      A: android:label(0x01010001)=@0x7f130009
       E: provider (line=8)
         A: android:authorities(0x01010018)="dev.friendsonly.instagram.provider.a;dev.friendsonly.instagram.provider.b"
       E: activity (line=9)
@@ -37,6 +40,16 @@ IDENTITY_XML = '''N: android=http://schemas.android.com/apk/res/android
         A: android:permission(0x01010006)="dev.friendsonly.instagram.permission.SYSTEM_ONLY"
       E: activity (line=10)
         A: android:permission(0x01010006)="com.instagram.android.permission.CREATE_SHORTCUT"
+      E: activity-alias (line=11)
+        A: android:name(0x01010003)="com.instagram.android.activity.MainTabActivity"
+        A: android:label(0x01010001)=@0x7f130009
+        A: android:targetActivity(0x01010202)="com.instagram.android.activity.SettingsActivity"
+        A: android:exported(0x01010010)=(type 0x12)0xffffffff
+        E: intent-filter (line=12)
+          E: action (line=13)
+            A: android:name(0x01010003)="android.intent.action.MAIN"
+          E: category (line=14)
+            A: android:name(0x01010003)="android.intent.category.LAUNCHER"
 '''
 
 
@@ -52,9 +65,41 @@ class OutputIdentityTests(unittest.TestCase):
         for badging in (IDENTITY_BADGING.replace("application-label:'Friends Only'", "application-label:'Instagram'"),
                         IDENTITY_BADGING.replace("application-label-tr:'Friends Only'", "application-label-tr:'Instagram'"),
                         IDENTITY_BADGING.replace("label='Friends Only'", "label='Instagram'"),
-                        "application-label:'Friends Only'\n"):
+                        ""):
             with self.subTest(badging=badging), self.assertRaisesRegex(ValidationError, "labels"):
                 module.inspect_application_identity(badging, IDENTITY_XML)
+
+    def test_manifest_alias_proves_launcher_when_aapt_badging_omits_alias(self):
+        badging = "application-label:'Friends Only'\napplication-label-tr:'Friends Only'\n"
+        result = module.inspect_application_identity(badging, IDENTITY_XML)
+        self.assertEqual(result["manifest_launchers"], ["com.instagram.android.activity.MainTabActivity"])
+
+    def test_disabled_or_unexported_default_alias_is_rejected(self):
+        for xml in (IDENTITY_XML.replace('E: activity-alias (line=11)', 'E: activity-alias (line=11)\n        A: android:enabled(0x0101000e)=(type 0x12)0x0'),
+                    IDENTITY_XML.replace('android:exported(0x01010010)=(type 0x12)0xffffffff', 'android:exported(0x01010010)=(type 0x12)0x0')):
+            with self.subTest(xml=xml), self.assertRaises(ValidationError):
+                module.inspect_application_identity(IDENTITY_BADGING, xml)
+
+    def test_alias_label_must_match_app_label_reference(self):
+        xml = IDENTITY_XML.replace('A: android:label(0x01010001)=@0x7f130009\n        A: android:targetActivity',
+                                  'A: android:label(0x01010001)=@0x7f130123\n        A: android:targetActivity')
+        with self.assertRaisesRegex(ValidationError, "launcher label"):
+            module.inspect_application_identity(IDENTITY_BADGING, xml)
+
+    def test_alias_can_inherit_application_label(self):
+        xml = IDENTITY_XML.replace('        A: android:label(0x01010001)=@0x7f130009\n', '')
+        module.inspect_application_identity(IDENTITY_BADGING, xml)
+
+    def test_main_and_launcher_must_be_in_the_same_intent_filter(self):
+        xml = IDENTITY_XML.replace('          E: category (line=14)', '        E: intent-filter (line=14)\n          E: category (line=14)')
+        with self.assertRaisesRegex(ValidationError, "MAIN/LAUNCHER"):
+            module.inspect_application_identity(IDENTITY_BADGING, xml)
+
+    def test_launcher_target_must_be_declared_and_enabled(self):
+        xml = IDENTITY_XML.replace('android:targetActivity(0x01010202)="com.instagram.android.activity.SettingsActivity"',
+                                  'android:targetActivity(0x01010202)="com.instagram.MissingActivity"')
+        with self.assertRaisesRegex(ValidationError, "target activity"):
+            module.inspect_application_identity(IDENTITY_BADGING, xml)
 
     def test_one_old_authority_in_a_semicolon_list_is_rejected(self):
         xml = IDENTITY_XML.replace(OWN_PACKAGE + ".provider.b", "com.instagram.android.provider.b")
@@ -147,6 +192,43 @@ class PatchResultTest(unittest.TestCase):
             with mock.patch.object(sys, 'argv', argv), mock.patch.object(module, 'apply', side_effect=zipfile.BadZipFile()):
                 self.assertEqual(module.main(), 1)
             self.assertEqual(json.loads(report.read_text())['status'], 'failed')
+
+    def test_our_validation_error_identifies_failed_check_without_subprocess_details(self):
+        import json
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "report.json"
+            argv = ["apply.py", "--apk", str(Path(directory) / "original.apk"), "--sha256", "a" * 64,
+                    "--signer-sha256", "b" * 64, "--patch-bundle", str(Path(directory) / "own.mpp"),
+                    "--output", str(Path(directory) / "patched.apk"), "--report", str(report)]
+            error = ValidationError("The output manifest has non-nested namespace closing events.")
+            stderr = io.StringIO()
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(module, "apply", side_effect=error), contextlib.redirect_stderr(stderr):
+                self.assertEqual(module.main(), 1)
+            result = json.loads(report.read_text())
+            self.assertEqual(result["category"], "validation")
+            self.assertEqual(result["reason"], str(error))
+            self.assertIn(str(error), stderr.getvalue())
+            self.assertNotIn(directory, stderr.getvalue())
+
+    def test_subprocess_exception_does_not_print_sensitive_command_arguments(self):
+        import json
+        import subprocess
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "report.json"
+            argv = ["apply.py", "--apk", str(Path(directory) / "original.apk"), "--sha256", "a" * 64,
+                    "--signer-sha256", "b" * 64, "--patch-bundle", str(Path(directory) / "own.mpp"),
+                    "--output", str(Path(directory) / "patched.apk"), "--report", str(report)]
+            secret = "synthetic-sensitive-signing-argument"
+            error = subprocess.CalledProcessError(1, ["sign", secret])
+            stderr = io.StringIO()
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(module, "apply", side_effect=error), contextlib.redirect_stderr(stderr):
+                self.assertEqual(module.main(), 1)
+            self.assertNotIn(secret, stderr.getvalue() + report.read_text())
+            self.assertNotIn("validation", json.loads(report.read_text()).get("category", ""))
 
     def test_partial_or_foreign_result_rejected(self):
         changes = [

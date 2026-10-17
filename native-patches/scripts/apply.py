@@ -19,7 +19,7 @@ from build import PATCH_NAMES
 from validate_apk import ValidationError, inspect_archive, inspect_manifest, run_command, validate_apk
 from validate_apkm import validate_apkm
 from merge_apkm import merge_verified_splits
-from axml import normalize_namespace_order
+from axml import normalize_apk_manifest, normalize_namespace_order
 from version_code import set_apk_version_code
 
 
@@ -43,6 +43,72 @@ def validate_patch_result(result: dict) -> None:
         raise ValidationError("At least one required patching step did not succeed.")
 
 
+def inspect_manifest_launchers(xmltree: str, expected_label: str) -> list[str]:
+    """Prove launcher aliases from the manifest when aapt omits badging aliases."""
+    roots: list[dict] = []
+    stack: list[tuple[int, dict]] = []
+    for line in xmltree.splitlines():
+        element = re.match(r"^(\s*)E:\s+([A-Za-z0-9_-]+)(?:\s|$)", line)
+        if element:
+            indent = len(element[1])
+            while stack and stack[-1][0] >= indent:
+                stack.pop()
+            node = {"tag": element[2], "attrs": {}, "children": []}
+            (stack[-1][1]["children"] if stack else roots).append(node)
+            stack.append((indent, node))
+            continue
+        attribute = re.match(r'^\s*A:\s+([A-Za-z0-9_:-]+)(?:\([^)]*\))?=(.*)$', line)
+        if attribute and stack:
+            name, value = attribute.groups()
+            if value.startswith('"'):
+                value = value.split('"', 2)[1]
+            stack[-1][1]["attrs"][name] = value.strip()
+    manifests = [node for node in roots if node["tag"] == "manifest"]
+    applications = [node for manifest in manifests for node in manifest["children"] if node["tag"] == "application"]
+    if len(manifests) != 1 or len(applications) != 1:
+        raise ValidationError("The output manifest does not declare one application.")
+    application = applications[0]
+    true_values = {"true", "(type 0x12)0xffffffff", "(type 0x12)0x1"}
+
+    def enabled(node: dict) -> bool:
+        return node["attrs"].get("android:enabled", "true") in true_values
+
+    app_label = application["attrs"].get("android:label")
+    if not app_label or not enabled(application):
+        raise ValidationError("The output application must have its own label and remain enabled.")
+    components = [node for node in application["children"] if node["tag"] in {"activity", "activity-alias"}]
+    activities = {node["attrs"].get("android:name"): node for node in components if node["tag"] == "activity"}
+    launchers: list[str] = []
+    for component in components:
+        launcher_filter = any(
+            child["tag"] == "intent-filter" and
+            any(item["tag"] == "action" and item["attrs"].get("android:name") == "android.intent.action.MAIN" for item in child["children"]) and
+            any(item["tag"] == "category" and item["attrs"].get("android:name") == "android.intent.category.LAUNCHER" for item in child["children"])
+            for child in component["children"]
+        )
+        if not launcher_filter or not enabled(component):
+            continue
+        attrs = component["attrs"]
+        if attrs.get("android:exported") not in true_values:
+            raise ValidationError("An enabled launcher component is not exported.")
+        inherited_label = app_label
+        if component["tag"] == "activity-alias":
+            target = activities.get(attrs.get("android:targetActivity"))
+            if target is None or not enabled(target):
+                raise ValidationError("A launcher alias has no enabled declared target activity.")
+            inherited_label = target["attrs"].get("android:label", app_label)
+        effective_label = attrs.get("android:label", inherited_label)
+        if effective_label not in {app_label, expected_label}:
+            raise ValidationError("A launcher label does not match the Friends Only application label.")
+        name = attrs.get("android:name")
+        if not name:
+            raise ValidationError("A launcher component has no declared name.")
+        launchers.append(name)
+    if not launchers:
+        raise ValidationError("The output manifest has no enabled MAIN/LAUNCHER entry point.")
+    return launchers
+
+
 def inspect_application_identity(badging: str, xmltree: str) -> dict:
     """Check the new app identity without rewriting class or native-library names."""
     own_package = VERSIONS["friends_only"]["package_name"]
@@ -50,8 +116,11 @@ def inspect_application_identity(badging: str, xmltree: str) -> dict:
     label = VERSIONS["friends_only"]["application_label"]
     labels = re.findall(r"^application-label(?:-[^:]+)?:'([^']*)'\s*$", badging, re.M)
     launcher_labels = re.findall(r"^launchable-activity:.*?\blabel='([^']*)'", badging, re.M)
-    if not labels or not launcher_labels or any(value != label for value in labels + launcher_labels):
+    if not labels or any(value != label for value in labels + launcher_labels):
         raise ValidationError("The application and launcher labels must be Friends Only in every locale.")
+    # aapt 35 omits launchable-activity for the unchanged Instagram alias layout,
+    # including the original APK. Verify its actual manifest intent filters.
+    manifest_launchers = inspect_manifest_launchers(xmltree, label)
 
     def scoped(value: str, package: str) -> bool:
         return value == package or value.startswith(package + ".")
@@ -103,6 +172,7 @@ def inspect_application_identity(badging: str, xmltree: str) -> dict:
         raise ValidationError("A reference to an app-defined permission still uses Instagram's package identity.")
     return {"package": own_package, "application_label": label,
             "launcher_and_localized_labels_checked": len(labels) + len(launcher_labels),
+            "manifest_launchers": manifest_launchers,
             "own_provider_authorities": sorted(own_authorities),
             "own_permission_definitions": sorted(definitions),
             "own_permission_references": sorted(references)}
@@ -195,6 +265,10 @@ def apply(args: argparse.Namespace) -> dict:
             raise ValidationError("Patch engine did not produce a readable result report.") from error
         if not unsigned.is_file():
             raise ValidationError("The engine did not produce an unsigned APK.")
+        # Resource encoding can reintroduce APKEditor's adjacent namespace-end
+        # ordering even when the merge input was normalized. Repair only the
+        # unsigned result, before alignment and normal Android signing.
+        namespace_change = normalize_apk_manifest(unsigned)
         # Our independently signed variant has its own monotonic version code.
         # This changes release metadata before signing, not Android's checks.
         version_change = set_apk_version_code(unsigned, args.output_version_code)
@@ -229,6 +303,7 @@ def apply(args: argparse.Namespace) -> dict:
                 "input": source, "output": result, "patch_bundle_sha256": sha256(bundle),
                 "patches": PATCH_NAMES, "signing": "user_provided_key" if stable else "disposable_key_not_preserved",
                 "output_version_code_change": version_change,
+                "output_manifest_normalization": namespace_change,
                 "application_identity_change": {"source_package": VERSIONS["instagram"]["package_name"],
                                                 "output_package": VERSIONS["friends_only"]["package_name"],
                                                 "application_label": VERSIONS["friends_only"]["application_label"]},
@@ -263,7 +338,15 @@ def main() -> int:
         write_report(args.report, report)
         print("PASS: personal patched APK signed and statically verified. Phone testing remains required.")
         return 0
-    except (ValidationError, ValueError, RuntimeError, OSError, zipfile.BadZipFile, subprocess.CalledProcessError):
+    except ValidationError as error:
+        # ValidationError is reserved for our fixed, non-sensitive diagnostics.
+        # Preserve the precise failed check without printing subprocess command
+        # lines, signing arguments, environments or raw APK data.
+        write_report(args.report, {"schema_version": 1, "status": "failed", "category": "validation",
+                                   "reason": str(error), "device_tests": "not_run"})
+        print(f"No APK delivered: {error}", file=sys.stderr)
+        return 1
+    except (ValueError, RuntimeError, OSError, zipfile.BadZipFile, subprocess.CalledProcessError):
         # Never echo a failed signing invocation/environment, URL, or raw APK data.
         write_report(args.report, {"schema_version": 1, "status": "failed",
                                    "reason": "Input validation, patching, signing or output verification failed.",

@@ -1,22 +1,26 @@
 # Friends Only
 
-**Alpha.5 is withdrawn: it installs but immediately closes on the user's Galaxy
-S24+ (Android 17 / One UI 9). Do not download or reinstall artifact 55.** Alpha.6
-is being fixed; no replacement APK is available yet. Static builds and package
-checks passed, but they did not validate startup behavior.
+**[Download the alpha.6 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982).** It corrects the identified theme
+resource-reference bug and passed the GitHub APK build plus its new mandatory
+compiled-theme guard. **Alpha.6 opening on the phone is still unverified.**
 
-A confirmed code-contract bug in the new theme is consistent with the reported
-crash: native code expects color resource IDs, while alpha.5 supplied inline
-colors. No phone crash stack trace has been captured, so this is not established
-as the sole cause on that phone. See [current evidence](native-patches/VERIFICATION.md).
+Remove only the older **Friends Only** native app, which clears its local
+session/settings, then extract the ZIP and install `friends-only-personal.apk`
+through the normal file manager. These CI builds use different disposable keys.
+Do not remove official Instagram, reset the phone or use the old v2 diagnostic
+helper. Test opening before testing account/feed features.
 
-[Alpha.3 is the fallback known to open on this phone](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541).
-Its screenshot shows a logged-in Home feed, Stories tray and three-tab navigation;
-Story playback, message sending, groups and the login/challenge flow were not
-separately verified. The user has not tested alpha.4. Returning to alpha.3 may
-require uninstalling only **Friends Only**, clearing its local session/settings,
-and signing in again. Do not remove official Instagram or reset the phone. Use
-the normal file manager, not the old v2 diagnostic helper.
+**Alpha.5 remains withdrawn:** it installed but immediately closed on the user's
+S24+ / Android 17. Do not reinstall artifact 55. The identified color contract
+bug is consistent with that crash; no actual phone stack trace proves it was
+the sole cause. Alpha.6's code/build checks passed 163 Python tests and all
+Java/Kotlin suites; those results do not establish phone startup success.
+
+[Alpha.3 remains the fallback known to open](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541).
+Its screenshot shows logged-in Home/feed, a Stories tray and three-tab navigation;
+Story playback, sending messages, groups and the login/challenge flow were not
+separately verified. Alpha.4 is untested. Fallback installation can also require
+removing only Friends Only and signing in again.
 
 The [native-patches project](native-patches/README.md) keeps Instagram's actual
 native post, Story and chat components under our own app identity. Its newest
@@ -25,8 +29,8 @@ their runtime behavior remains unverified. Missing following metadata can make
 Home short or empty, and in-feed Story units without a primary post are dropped
 too. Cached/alternate renderer coverage, top Stories-tray playback and a
 fully friends-only or chronological feed are not established. Other Instagram
-controls or branding can remain outside the verified surfaces. Wait for a
-verified startup fix before testing these features.
+controls or branding can remain outside the verified surfaces. First confirm
+alpha.6 opens on the phone, then test these features.
 
 The WebView implementation below is retained as an earlier working approach
 and fallback. Its APK is a separate product from the native patch experiment.

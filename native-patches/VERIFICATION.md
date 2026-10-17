@@ -1,15 +1,15 @@
 # Native patch evidence · updated 2026-10-17
 
-This module is a native-patching experiment. **Alpha.5 installs but immediately
-crashes on opening on the user's S24+; it is withdrawn.** Alpha.6 is being fixed
-and has no replacement APK yet. Alpha.3 is the only build known to open on that
-phone; the user has not tested alpha.4. Alpha.3's screenshot shows logged-in
-Home/feed, a Stories tray and three-tab navigation. Story playback, Direct
-sending, groups and the login/challenge flow were not separately verified.
+This module is a native-patching experiment. **[Alpha.6's test APK is available](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982)
+and passed local/GitHub output checks; its phone installation/opening is
+unverified. Alpha.5 is withdrawn:** it installs but immediately closes on the
+user's S24+ / SDK 37. Alpha.3 is the only build known to open on that phone;
+alpha.4 remains untested. Story playback, Direct sending, groups and the
+login/challenge flow were not separately verified.
 
-All patches target only Instagram `451.0.0.20.80`. Static build/audit success is
-not runtime validation; the phone report below supersedes alpha.5's earlier
-untested-installation status.
+All patches target Instagram `451.0.0.20.80`. Static build/audit success is not
+runtime validation. The color-resource fix corrects a confirmed code contract,
+but no phone stack trace proves that defect was the sole alpha.5 crash cause.
 
 ## Alpha.3 full build checks actually run in cloud
 
@@ -472,11 +472,62 @@ with the reported crash**. No actual phone crash stack trace has been captured,
 so it is not proved to be the phone's sole failure cause.
 
 Alpha.5 is withdrawn from recommended use despite its successful static checks.
-Do not redownload/reinstall artifact 55 or reset the phone. Alpha.6's fix is in
-progress; **no replacement APK exists yet**. Alpha.3 remains the known-to-open
+Do not redownload/reinstall artifact 55 or reset the phone. The alpha.6 candidate
+is now available for a new startup test; **do not use the broken artifact 55**. Alpha.3 remains the known-to-open
 fallback. Returning to it may require removing only Friends Only, losing its
 local session/settings and signing in again; no official Instagram removal is
 needed.
+
+## Alpha.6: resource-reference contract fix · phone validation pending
+
+Source **`91ce031`**, version code **385806740**, changes all **47 semantic
+attributes** back to `@color` references instead of inline ARGB. Fourteen own
+palette colors are appended in the existing tracked `colors.xml`; all **1,097
+original color resource IDs and values** remain unchanged. Native
+`LX/00RQ.A0b` is not patched or bypassed, and no new requests, permissions,
+backend or diagnostic helper are added.
+
+Mandatory final output validation now runs the theme APK guard: it checks all
+**seven semantic style families**, **47 nonzero color-resource references** and
+**14 exact palette values**. Running the integrated `inspect_output` against the
+actual signed broken alpha.5 APK **rejected it**, establishing a regression
+check against the delivered defect rather than a mock alone.
+
+Completed checks passed **163 Python tests** (140 earlier + 23 new cases), Java
+Focus **180**, Feed **32**, Chrome **26**, and Kotlin Identity **26**, Tap **42**,
+Following **35**, QuietTheme **145** assertions. A separate actual-source theme
+audit passed **150** checks. The actual Morphe resource preflight passed all
+**14 added colors / 47 semantic references**.
+
+Full application/signing/output validation then passed on the final local APK:
+version code **385806740**, package **`dev.friendsonly.instagram`**,
+**252,810,488 bytes**, SHA-256
+`e8ce885c9705ada059e23fb84444c71a139a307e4d9c6e9888dd30fb1868834f`.
+The mandatory emitted-color guard passed all **7 styles / 47 references /
+14 palette colors**. An independent binary ARSC audit on that exact SHA passed
+and confirmed all **1,097 original color IDs and values** were unchanged. The
+local patch-bundle SHA-256 is
+`98d082bc56b308925c6fe1c0021629ba88377a6731a0c41e1d5428e608578dd4`.
+The [GitHub APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107)
+(run **62**, source `91ce031`) **succeeded**. Downloaded CI reports and actual job
+logs confirm **163 Python tests**, Java **180/32/26**, Kotlin **26/42/35/145**, all
+**six patches**, rebuilding, signing and static output verification. The CI APK's
+new **mandatory emitted-theme guard** passed all **7 styles / 47 nonzero
+semantic color references / 14 exact palette values**.
+
+Download [`friends-only-personal-test-apk-62`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982)
+and extract `friends-only-personal.apk`. The CI APK is **253,171,054 bytes**,
+SHA-256 `b2bd1a1587fc1af920663d3eca4b6508f8be01a61a97ebed71f31d1fc37fb235`.
+The [CI reports artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112822382)
+records its metadata. Its signing key was disposable. The local and CI patch
+bundles have the identical SHA-256 shown above.
+
+The independent **1,097-original-color ID/value preservation audit applies to
+the local APK only**; the CI APK passed its own mandatory emitted-theme guard,
+but its full original-color inventory was not independently audited. No
+alpha.6 phone installation, opening, UI, feed, Story, Direct or authentication
+success is claimed. Passing these checks is not proof of phone startup. No phone stack trace is available to establish the
+identified contract bug as the sole cause of the user's crash.
 
 ## Cloud installation attempts
 
@@ -509,23 +560,26 @@ PackageInstaller verdict for the APK:
 
 ## Remaining device checks
 
-Alpha.5's normal installation is now user-confirmed; its startup is a reported
-failure. The strict feed, shell, Stories and messaging were not reached. Static
-source/DEX/ARSC audits remain evidence about their limited checks, not runtime
-compatibility. Alpha.4 is still untested; alpha.3 is the only known-to-open native
-baseline. Older emulator failures are separate from this real phone result.
+Alpha.5 installed normally but failed startup; its strict feed, shell, Stories
+and messaging were not reached. Alpha.6's source/local/GitHub checks passed,
+including the new mandatory compiled-theme guard, but **phone installation and
+opening remain unverified**. Alpha.4 is untested, and alpha.3 is the only native
+build known to open on this phone.
 
-Wait for an alpha.6 replacement with a verified startup fix; do not retry the
-broken alpha.5 artifact. No new APK is available yet. If needed, use the
+Download the [alpha.6 candidate](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982),
+extract it and install through the normal file manager. Remove only the older
+**Friends Only** native app first because the disposable CI signing key changed;
+this clears its local session/settings and may require signing in again. Do not
+use the old v2 helper, remove official Instagram or reset the phone. Do not
+reinstall broken artifact 55. The
 [alpha.3 fallback](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-through the file manager, removing only Friends Only if signatures/downgrade
-checks prevent replacement. This clears its local session/settings. Do not use
-the legacy v2 helper, remove official Instagram, or reset the phone.
+remains available if needed.
 
-Once the fixed APK exists, record startup separately before testing themes,
-settings, Home filtering, in-feed/top-tray Stories, ordinary posts, the tap guard,
-Direct/groups or authentication. A phone stack trace is still needed to confirm
-whether the observed startup crash matches the identified color contract bug.
+Record alpha.6 startup separately before testing themes, settings, Home
+filtering, in-feed/top-tray Stories, ordinary posts, the tap guard, Direct/groups
+or authentication. If it still closes, a phone stack trace is needed to identify
+the remaining cause; the existing record does not establish the color-contract
+defect as the phone's sole cause.
 
 When reporting issues, include APK/run identifier, Instagram version, S24+
 Android/One UI version, steps and a screenshot with names/messages redacted.

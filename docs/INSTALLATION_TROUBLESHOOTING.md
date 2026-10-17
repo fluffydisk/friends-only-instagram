@@ -4,7 +4,9 @@
 (SM-S926B), Android 17 / SDK 37 / One UI 9. It is withdrawn.** The user removed
 the older Friends Only app before the successful normal installation. The
 selected file's SHA-256/size match CI artifact 55. **Do not download or reinstall
-that artifact.** Alpha.6 is being fixed; no replacement APK is available yet.
+that artifact.** [Alpha.6's test APK is now available](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982);
+local/GitHub builds and its new mandatory color-reference guard passed. Its
+phone installation/opening is still unverified.
 
 A confirmed theme code-contract bug is consistent with this crash: native color
 consumers expect resource IDs, but alpha.5 supplies inline colors that resolve
@@ -68,20 +70,40 @@ Kotlin 26/42/35/92 checks. Independent emitted DEX/resource audits passed on the
 final local APK; those audits were not repeated on the CI APK bytes. These
 checks do not prove rendered phone UI or feed behavior.
 
-## Fallback or wait for alpha.6
+## Alpha.6 source fix and validation status
 
-The [alpha.3 fallback artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-is the only native build confirmed to open on the phone. If you choose to return
-to it, extract the ZIP and install `friends-only-personal.apk` through the normal
-file manager. Disposable signing keys and downgrade checks may require removing
-only **Friends Only** first; that clears its local session/settings and may
-require signing in again. **Do not remove official Instagram, delete profiles
-or reset the phone.** Do not use the old v2 diagnostic helper for our own package.
+Alpha.6 (version code **385806740**) restores all 47 semantic color attributes
+to color-resource references, preserving the original 1,097 color IDs/values.
+A new mandatory output guard rejected the actual signed broken alpha.5 APK.
+Its 163 Python tests, Java/Kotlin suites and 150 actual-source checks passed.
+The signed local APK passed its mandatory emitted-color guard and independent
+binary resource audit. The GitHub APK build and its own mandatory theme guard
+also passed. The full 1,097-original-color audit was local-only. Phone
+installation/opening remains unverified. This corrects a
+confirmed code contract, not a phone-verified crash outcome. There is still no
+actual phone stack trace proving it is the only cause.
 
-Alpha.6's startup fix is in progress; there is no new APK yet. Do not reinstall
-the broken artifact 55 while waiting. The workflow's optional stable-signing
-setup is documented in the [native README](../native-patches/README.md); no secret
-or paid service is required to build an APK.
+## Install the alpha.6 candidate and check startup
+
+1. Download [the alpha.6 artifact 62 ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982)
+   while signed into GitHub, then extract `friends-only-personal.apk`.
+2. Remove only the older **Friends Only** native app because the disposable CI
+   key changed. This clears its local session/settings; signing in again may be
+   necessary. Do not remove official Instagram or reset the phone.
+3. Open the new APK through the normal file manager and confirm installation.
+   Do not use the old v2 diagnostic helper. Check opening before testing feed,
+   themes, Stories or messages; report the exact version and result separately.
+
+Alpha.6 is version code **385806740**. Its code/resource checks correct the
+identified bug, but successful startup on the phone has not been confirmed. Do
+not reinstall broken artifact 55. The
+[alpha.3 fallback](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+is the only native build known to open on this phone; replacement can also
+require removing only Friends Only and losing its local data.
+
+The workflow's optional stable-signing setup is documented in the
+[native README](../native-patches/README.md); no secret or paid service is
+required to build an APK.
 
 ## Recorded installation history
 
@@ -95,7 +117,7 @@ or paid service is required to build an APK.
 | Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
 | Alpha.4 | Combined Home/profile local and GitHub APK checks passed; user explicitly has not phone-tested it |
 | Alpha.5 | Normal installation succeeded after old Friends Only removal; opening closes immediately; withdrawn despite passing static builds/audits |
-| Alpha.6 | Startup fix in progress; no new APK yet |
+| Alpha.6 | Local/GitHub APK builds and mandatory emitted-theme guard passed; local independent color preservation audit passed; phone installation/opening unverified |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

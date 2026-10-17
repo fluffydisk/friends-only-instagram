@@ -23,26 +23,37 @@ when given alpha.3 is a helper limitation, not a rejection of the normal install
 See [VERIFICATION.md](VERIFICATION.md) and
 [installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
 
-**Alpha.4 is being built** to stop known video-post taps on Home and user
-profiles from opening the Reels viewer. The combined four-patch bundle passed
-139 Python tests, 180 Java policy assertions, 26 Kotlin identity assertions and
-42 Kotlin guard assertions. APK production and phone checks are pending.
-Alpha.3 remains the working baseline below until a new APK is validated and published.
+**Alpha.4 is ready for phone testing.** It adds a guard for known video-post
+taps on Home and user profiles opening Reels. Local and
+[GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923)
+passed 139 Python tests, 180 Java policy assertions, 26 Kotlin identity assertions
+and 42 Kotlin guard assertions. Its signed local APK also passed an independent
+static guard audit. **Alpha.4 installation and tap behavior on the phone have
+not yet been verified.**
 
-## Alpha.3 test APK
+## Download the alpha.4 test APK
 
-[Download `friends-only-personal-test-apk-35`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-from the successful alpha.3 GitHub build. Sign into GitHub in a browser, extract
-the ZIP, and open `friends-only-personal.apk` through Android's normal file
-installation flow. The artifact is retained for 7 days. This native
-patched app is separate from the earlier WebView app and its APK workflow.
+[Download `friends-only-personal-test-apk-44`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
+from the successful combined Home/profile build. Sign into GitHub in a browser,
+extract the ZIP, and open `friends-only-personal.apk` through Android's normal
+file installation flow. The artifact is retained for 7 days. Its output version
+code is **385806738**, package **`dev.friendsonly.instagram`**.
 
-The output version code is **385806737**. The older
-`friends-only-personal-test-apk-17` is alpha.2, uses `com.instagram.android`, and
-is known to fail on the user's phone; it is retained only as historical evidence.
-Our existing v2 diagnostic helper targets that older package. Use normal
-file-manager installation for alpha.3 and later versions rather than that helper.
-The user has confirmed alpha.3 installs and opens using this normal flow.
+The new setting defaults on. Long-press Home to change **Akış ve profilden Reels
+açılmasını engelle**. Use the file manager for installation; the old v2 diagnostic
+helper targets another package. The alpha.3 CI key was disposable, so a new key
+cannot update it. If Android rejects the update, remove only the older **Friends
+Only** native app and install alpha.4; its local session/settings are cleared.
+Official Instagram does not need removal.
+
+## Previous working alpha.3 baseline
+
+The user confirmed alpha.3 normal installation and opening. Its
+[`friends-only-personal-test-apk-35`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+artifact is a fallback baseline, version code **385806737**. It does not contain
+the new feed/profile tap guard. Alpha.2's older `friends-only-personal-test-apk-17`
+uses `com.instagram.android` and is known to fail on this phone; it is historical
+evidence only.
 
 ## Initial scope
 
@@ -67,7 +78,7 @@ Alpha.3 includes three Friends Only patches; alpha.4 adds a fourth:
    with official Instagram. External package queries and permissions, component
    class names, JNI paths and native libraries retain their original identities.
    Android and Instagram authentication/integrity checks remain in force.
-4. **Feed video taps (alpha.4, APK/phone validation pending):** the
+4. **Feed video taps (alpha.4, phone validation pending):** the
    **Friends Only feed video taps** patch intercepts the Reels/Clips launch path
    only for fourteen exact source values: six Home-feed sources and eight
    user-profile sources, including your own profile. With its independent
@@ -250,7 +261,7 @@ filter restores its controls and that unfamiliar layouts remain usable.
 | Hosted API 37 alpha.3 install check | Failed in emulator graphics/services; ADB broken pipe, no PackageManager verdict |
 | Visible phone UI | User screenshot: logged-in Home feed, Stories tray, Home/Messages/Profile navigation |
 | Story playback, Direct sending, groups, login/challenge flow | Not specifically tested/reported |
-| Alpha.4 combined bundle/guard | Four patches loaded; 139 Python tests, 180 Java policy assertions, 26 identity + 42 guard Kotlin assertions passed; APK/phone verification pending |
+| Alpha.4 combined bundle/guard | Local and GitHub APK builds passed: 139 Python tests, 180 Java policy assertions, 26 identity + 42 guard Kotlin assertions; local static guard audit passed; phone test pending |
 
 The exact alpha.3 CI APK reached the hosted API 37 installation step, but
 emulator graphics crashes killed services and ADB returned a broken pipe.
@@ -281,12 +292,14 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   Alpha.3'te verdiği paket adı uyuşmazlığı (-2), APK'nin normal kurulumunun
   başarısız olduğu anlamına gelmez. Yeni APK'ları dosya yöneticisiyle kur.
 - Alpha.4, akışta ve kullanıcı profillerinde videoya dokununca Reels ekranına
-  geçişi durdurmak için hazırlanıyor. **Akış ve profilden Reels açılmasını
+  geçişi durdurmak için hazırlandı. **Akış ve profilden Reels açılmasını
   engelle** ayarı varsayılan olarak açık; akış içi videolar korunacak. Mesajlar,
   hikâyeler, grup profilleri ve tanınmayan kaynaklar bu kuralın dışında.
   Akış ve profil kapsamındaki dört yama derlendi; 139 Python testi, 180 Java
-  kontrolü, 26 kimlik ve 42 guard Kotlin kontrolü geçti. APK üretimi ve cihaz
-  testi bekliyor.
+  kontrolü, 26 kimlik ve 42 guard Kotlin kontrolü geçti. Cloud ortamındaki imzalı
+  APK'nin statik kontrolleri ve bağımsız guard kontrolü de geçti. GitHub APK
+  derlemesi başarılı: yukarıdaki `friends-only-personal-test-apk-44` dosyasını
+  indir. Yeni sürümün cihazdaki kurulumu ve dokunma davranışı henüz doğrulanmadı.
 - Alpha.3'ün imzası geçiciydi. Yeni sürüm imza nedeniyle güncellenemezse yalnızca
   eski **Friends Only** uygulamasını kaldırıp yenisini kur; yerel oturum ve
   ayarlar silinir. Resmî Instagram'ı kaldırmak veya telefonu sıfırlamak gerekmez.

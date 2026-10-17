@@ -3,6 +3,8 @@
 **Use this helper only for the older `com.instagram.android` APKs.** Alpha.3
 and later use `dev.friendsonly.instagram`; install those through the normal file
 manager. The user has confirmed alpha.3 installs and opens that way.
+The [current alpha.4 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
+is ready; its phone installation/tap behavior is not yet verified.
 
 [Download the v2 diagnostics APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39017587861/artifacts/12094909613)
 from the successful cloud build. Sign into GitHub, extract the ZIP and install

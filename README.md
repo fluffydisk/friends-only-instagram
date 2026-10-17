@@ -17,14 +17,19 @@ The older v2 diagnostic helper targets `com.instagram.android` and rejects this
 new package with a package-hint mismatch; that helper error does not contradict
 the successful normal installation.
 
-**Alpha.4 is in development:** a separate, enabled-by-default setting will stop
-known video-post taps on Home and user profiles from opening Instagram's Reels
-viewer. Inline video playback is intended to remain available. The combined
-four-patch bundle build passed its checks; APK production and phone checks are
-pending. Alpha.4 uses output version code **385806738**. Clean CI builds currently use disposable signing keys;
-updating alpha.3 with a new key will require removing only the older **Friends
-Only** native app, clearing its local session/settings. Official Instagram does
-not need to be removed. See [evidence and limits](native-patches/VERIFICATION.md).
+**[Download the alpha.4 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677).** Its new enabled-by-default setting
+blocks known video-post taps on Home and user profiles from opening the Reels
+viewer. Inline video playback is intended to remain available. Local and
+[GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923)
+passed 139 Python tests, 180 Java policy assertions, 26 Kotlin identity assertions
+and 42 Kotlin guard assertions. Alpha.4 uses version code **385806738**; its
+installation and tap behavior on the phone are **not yet verified**.
+
+Extract the ZIP and install `friends-only-personal.apk` through the file manager.
+The delivered alpha.3 key was disposable; the new key cannot update it. Remove
+only the older **Friends Only** native app before installing alpha.4 if Android
+rejects the update. This clears its local session/settings. Official Instagram
+does not need removal. See [evidence and limits](native-patches/VERIFICATION.md).
 
 The WebView implementation below is retained as an earlier working approach
 and fallback. Its APK is a separate product from the native patch experiment.

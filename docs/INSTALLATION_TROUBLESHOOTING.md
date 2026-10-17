@@ -22,26 +22,28 @@ Do not use that helper for alpha.3 or later own-package APKs. The helper's
 printed `Package: com.instagram.android` field is fixed; it does not determine
 the selected APK's real identity.
 
-## Installing the working baseline or next update
+## Install the alpha.4 test APK
 
-Alpha.3 uses **`dev.friendsonly.instagram`**, the **Friends Only** launcher name,
-our own icon and version code **385806737**. It can use Android's normal
+Alpha.4 uses **`dev.friendsonly.instagram`**, the **Friends Only** launcher name,
+our own icon and version code **385806738**. It uses Android's normal
 separate-package installation flow. No signature, authentication or integrity
 bypass is included.
 
-1. Download [the alpha.3 `friends-only-personal-test-apk-35` ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+1. Download [the alpha.4 `friends-only-personal-test-apk-44` ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
    while signed into GitHub, and extract `friends-only-personal.apk`.
 2. Open the APK through the phone's file manager and complete Android's normal
    confirmation. Allow the selected source to request installation if asked.
 3. Open **Friends Only**. Test specific features separately and report the
    version/artifact used rather than assuming all account behavior is verified.
 
-Alpha.4 is in development, with output version code **385806738**. Its new
-**Akış ve profilden Reels açılmasını engelle** setting will stop known
-video-post taps on Home and user profiles from opening the Reels viewer while
-retaining inline video. Its combined four-patch bundle passed 139 Python tests,
+Alpha.4's new **Akış ve profilden Reels açılmasını engelle** setting defaults on
+and is intended to stop known video-post taps on Home and user profiles from
+opening the Reels viewer while retaining inline video. Its combined four-patch bundle passed 139 Python tests,
 180 Java policy assertions, 26 Kotlin identity assertions and 42 Kotlin guard
-assertions. APK production and phone verification are pending. Use the same file-manager installation flow when that APK is ready.
+assertions. A signed local APK and independent static guard audit also passed.
+The [GitHub APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923)
+also passed the same automated checks and produced the downloadable APK above.
+Its phone installation and tap behavior remain unverified.
 
 **Alpha.3's signing key was disposable.** A new key cannot update that installed
 build. If Android rejects the alpha.4 update, uninstall only the older **Friends
@@ -65,7 +67,7 @@ establish that Instagram accepts every login/challenge or feature.
 | Alpha.2, diagnostic v2 | `FAILURE_CONFLICT (5)`, legacy `-7`: `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, signature mismatch |
 | Alpha.3, normal file manager | User confirmed installation/opening; screenshot shows logged-in Home/feed, Stories tray and Home/Messages/Profile navigation |
 | Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
-| Alpha.4 | Combined Home/profile bundle passed; APK production and phone verification pending |
+| Alpha.4 | Combined Home/profile local and GitHub APK checks passed; phone installation/tap verification pending |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

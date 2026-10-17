@@ -1,8 +1,8 @@
 # Native patch evidence · updated 2026-10-17
 
 This module is a native-patching experiment. **Alpha.3 is installed and opening
-on the user's phone; alpha.4 is in development.** It targets only Instagram
-`451.0.0.20.80`; upstream compatibility claims are not evidence for our patches.
+on the user's phone; alpha.4's APK is ready for phone testing.** It targets only
+Instagram `451.0.0.20.80`; upstream compatibility claims are not evidence for our patches.
 The user-provided screenshot shows a logged-in Home feed, Stories tray and
 Home/Messages/Profile navigation. Story playback, Direct sending, group-chat
 behavior and the authentication/challenge flow have not been separately tested.
@@ -297,7 +297,30 @@ patches** loaded, **139 Python tests, 180 Java policy assertions, 26 Kotlin
 identity assertions and 42 Kotlin guard assertions** succeeded. Static call-site
 tracing also confirmed that `PROFILE` and `SELF_PROFILE` reach the guarded core
 viewer path. This is source/bytecode evidence, not a phone navigation test.
-Combined-scope APK production/output validation and phone testing are pending.
+Applying the combined patch set produced a signed local alpha.4 APK with
+version code **385806738**. All output validators, signature and alignment checks
+passed. Its size is **252,798,008 bytes**, SHA-256
+`d7324c80fa592f0199707168b19c585c69f033f13803671236efc258a4a3b2a8`.
+The independent guard audit found exactly **one injected call across 20 DEX
+files**, with all 171 original instructions/branches preserved (177 instructions
+after insertion). All fourteen source names exist in both Instagram's enum and
+our compiled policy. [Alpha.4 evidence](evidence/native-alpha4-2026-10-17.json)
+records the local output and audit; this is static evidence only.
+
+The [GitHub APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923)
+(number 44, source `777dd17800f67648fd654e3de1ac485c124fe2f4`) **succeeded**.
+Its logs confirm **139 Python tests, 180 Java policy assertions, 26 Kotlin
+identity assertions and 42 Kotlin guard assertions** passed. The verified
+original APKM was merged, all four patches were applied, and the rebuilt,
+personally signed output passed static validation. Download
+[`friends-only-personal-test-apk-44`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
+and extract `friends-only-personal.apk`. Its
+[`native-patch-reports-44`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103085505)
+artifact records the CI output metadata. The CI APK is **253,154,478 bytes**,
+SHA-256 `5f69a59c7c41881abb7aff9dc7124414ad2e3e3ea32f0bb0d2ea7aa723fe7800`.
+Its clean-build signing key is different from the local APK's key and was not
+preserved. No combined alpha.4 phone installation or tap behavior has been
+verified.
 
 Alpha.3 was signed with a disposable CI key. The next key cannot update that
 installed build. If an update is rejected, remove only **Friends Only**, which
@@ -341,13 +364,13 @@ PackageInstaller verdict for the APK:
 No physical Android device is attached to this cloud environment. Alpha.3's
 successful installation/opening and visible Home/feed/Stories tray come from
 the user's report and screenshot. Alpha.4's combined Home/profile bundle passed
-its build/checks; APK production and testing on that phone are pending.
+local and GitHub APK builds/checks; testing on that phone is pending.
 Older cloud emulator failures remain recorded above; they do not override the actual phone's successful normal installation.
 
 Keep official Instagram installed, or restore it through Play Store if desired.
 The [alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-can be installed through the normal file-manager flow. Use the same flow for
-alpha.4 when its verified APK is available. The v2 diagnostic helper targets the
+is the previous working version. Download the [alpha.4 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677),
+extract it and use the normal file-manager installation flow. The v2 diagnostic helper targets the
 old `com.instagram.android` package and should not be used for either.
 Record each remaining item separately:
 

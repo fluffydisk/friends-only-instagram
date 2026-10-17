@@ -19,7 +19,7 @@
     "output_version_code": 385806739
   },
   "checks": {
-    "full_bundle_build": "passed",
+    "full_bundle_build": "passed_final_in_app_story_scope_wording",
     "python_tests": 140,
     "java_assertions": {
       "existing_focus_policy": 180,
@@ -33,7 +33,7 @@
       "quiet_theme": 92
     },
     "additional_original_resource_audit_assertions": 97,
-    "local_apk_build": "pending",
+    "local_apk_build": "final_wording_rebuild_pending; previous_inline_palette_APK_signed_and_statically_verified",
     "github_apk_build": "pending",
     "physical_installation_and_new_features": "not_tested",
     "fixed_build_issue": "The pinned resource encoder rejected new named palette values even after PublicXmlManager allocation. Palette colors are now typed literals in the exact semantic/launch attributes and launch drawables; no new named color resources or existing color ID edits are needed.",
@@ -64,7 +64,13 @@
     "shared_media_story_direct_profile_parsers_modified": false,
     "new_requests_or_header_rewrites": false,
     "private_field_reflection": false,
-    "local_metadata_logging_or_storage": false
+    "local_metadata_logging_or_storage": false,
+    "story_related_home_wrappers_removed": [
+      "stories_netego",
+      "tagged_edge_story",
+      "explore_story"
+    ],
+    "story_scope_limit": "The supported Home item parser includes XDTStoriesInFeedItem/portable-tray units without primary ordinary Media. These in-feed Story units are skipped; source analysis does not prove all are recommendations. Regular Stories parsers and requests are unchanged, but top-tray preservation and playback remain phone-unverified."
   },
   "quiet_design": {
     "default_enabled_runtime_header_navigation": true,
@@ -105,6 +111,7 @@
     "Followed posts with missing relationship metadata may be hidden, producing a shorter or empty Home feed.",
     "Changing follow filter requires refreshing already displayed items.",
     "A stored disabled following filter can briefly use the strict default until native tab/preferences initialization on cold start; refresh may be needed.",
+    "Strict Home filtering also removes non-primary-media in-feed Story units. Regular top Stories tray behavior must be checked on the phone; no Story parser/request changes were added.",
     "Disk-cache and alternate-render bypasses are not verified.",
     "No chronology, completeness or live server/account feed guarantee is established by static tests.",
     "Original post, Story, Direct and profile components remain; unfamiliar or unverified native surfaces keep original behavior.",
@@ -117,11 +124,20 @@
       "run_number": 49,
       "status": "cancelled_by_us_after_local_resource_encoding_failure",
       "apk_delivered": false
+    },
+    {
+      "run_id": 39059060768,
+      "run_number": 52,
+      "status": "passed_before_in_app_story_scope_wording_clarification",
+      "selected_for_final_delivery": false
     }
   ],
   "patch_bundle": {
     "file": "friends-only.mpp",
-    "sha256": "be1b79ffd5cdc1fc9af8a57bbba9b974fe2fdeca6362c7aaf54d5a4e66cc96bf",
-    "size_bytes": 102608
+    "sha256": "02e677dcce7f61972ed38c2c44e6894562e892d3ff0d23a9cc8740fad2971edf",
+    "size_bytes": 102616
+  },
+  "github_actions": {
+    "status": "pending_final_wording_source_push_and_build"
   }
 }

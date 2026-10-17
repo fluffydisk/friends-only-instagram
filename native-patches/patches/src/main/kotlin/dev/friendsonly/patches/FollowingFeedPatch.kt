@@ -176,7 +176,7 @@ private object HomeFeedParser : Fingerprint(custom = { method, owner -> inspectH
 @Suppress("unused")
 val followingFeed = bytecodePatch(
     name = "Friends Only following feed",
-    description = "Strict native Home feed: ordinary posts require explicit followed-author metadata; drops sponsored, recommendation and unknown feed units without touching Stories or Direct.",
+    description = "Strict native Home feed: ordinary posts require explicit followed-author metadata; skips other Home units without modifying shared Story or Direct parsers.",
     default = true,
 ) {
     compatibleWith(INSTAGRAM)

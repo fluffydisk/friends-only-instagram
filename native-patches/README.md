@@ -102,7 +102,9 @@ following-feed and quiet-theme patches (six total):
    recommendation and unknown units are dropped; absent or changed metadata is
    rejected. It starts strict even before preferences load. No private API
    client, new network request, request-header rewrite or following-list scrape
-   is added. Shared media, Stories, Direct and profile parsers are not patched.
+   is added. Shared media, standalone Stories, Direct and profile parsers are
+   not patched. Story units embedded in the Home feed are dropped too when
+   they have no primary media post; they are not proven recommendation-only.
 6. **Quiet visual theme (alpha.5, APK/phone validation pending):**
    **Friends Only quiet visual theme** supplies warm neutral light/dark
    surfaces, restrained Story rings, independent tab artwork and own OS splash
@@ -125,6 +127,12 @@ purge already rendered/cached content; cache and alternate renderer behavior
 still require phone tests. The patch does not change server ordering or request
 a chronological feed, and cannot yet establish a fully friends-only experience.
 Ordinary photo/video posts with confirmed followed authors remain eligible.
+Home also supports in-feed Story units (`stories_netego`, including
+`XDTStoriesInFeedItem`/`reels`/`portable_tray`, plus `tagged_edge_story` and
+`explore_story`). They lack the required primary media and are dropped by strict
+mode; they cannot all be classified as recommendations. Standalone Story
+parsers/requests are unchanged, but top-tray playback still needs a phone test.
+This filter therefore does not establish that every Story surface is preserved.
 
 **Minimal header and navigation / Sade başlık ve gezinme** (`quiet_ui`) defaults
 on. Turning it off restores our runtime header/tab decorations; the compiled
@@ -354,8 +362,10 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   tema ekleniyor. Friends Only başlığı, **Ayarlar** düğmesi ve
   **Arkadaşlar / Sohbetler / Ben** gezinmesi var; tüm gönderi/sohbet bileşenleri
   baştan yazılmış değildir. Bilgi eksikse akış kısalabilir veya boş olabilir:
-  **Yalnızca takip ettiğim hesaplar** ayarını kapatıp akışı yenile. Hikâyeler,
-  mesajlar ve profil ayrıştırıcıları bu Home filtresinin dışında. Altı yama
+  **Yalnızca takip ettiğim hesaplar** ayarını kapatıp akışı yenile. Bağımsız
+  hikâye, mesaj ve profil ayrıştırıcıları değişmez; fakat akış içine gömülü
+  hikâye kartları da atılır ve hepsinin öneri olduğu doğrulanmış değildir.
+  Üst hikâye sırasının oynatılması ayrıca telefonda test edilmelidir. Altı yama
   son derlemede geçti: 140 Python testi, tüm Java/Kotlin kontrolleri (92 tema
   kontrolü dahil), ayrıca 97 kaynak kontrolü ve ayrı drawable derleme kontrolü
   başarılı. APK üretimi ve cihaz testleri bekliyor; alpha.4 de henüz telefonda
@@ -365,7 +375,9 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   ayarlar silinir. Resmî Instagram'ı kaldırmak veya telefonu sıfırlamak gerekmez.
 - Bu çalışma tam bir arayüz tasarımı değildir. Instagram'ın mevcut native
   ekranları korunur; Ana Sayfa'ya uzun basmak Friends Only filtre ayarlarını
-  açar. Normal video gönderileri ve hikâyeler özellikle kaldırılmaz.
+  açar. Video-dokunma engeli gönderileri silmez; katı Home filtresi ise akış
+  içindeki hikâye birimlerini de atabilir. Tüm hikâye yüzeylerinin korunduğu
+  henüz doğrulanmadı.
 
 ## License and attribution
 

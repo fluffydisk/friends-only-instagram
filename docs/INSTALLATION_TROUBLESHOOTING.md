@@ -35,8 +35,11 @@ unverified; this is not a server-side chronological-feed guarantee.
 
 If Home is unexpectedly empty, open the Home **Settings / Ayarlar** button or
 long-press Home, turn off that following filter, then refresh Home. Refresh
-again when enabling it. Stories, Direct and profile parsers are not filtered by
-this patch. The extension creates no new API requests or credential collection.
+again when enabling it. Standalone Story, Direct and profile parsers are
+unchanged. Home-embedded Story cards without a primary media post are dropped
+too, and are not proven to be recommendations only. Top Stories-tray playback
+still needs a phone test; all Story surfaces cannot be claimed preserved.
+The extension creates no new API requests or credential collection.
 
 Alpha.5 also adds neutral light/dark surfaces, restrained Story rings, an own
 Home header and text navigation. **Minimal header and navigation / Sade başlık

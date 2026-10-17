@@ -170,8 +170,8 @@ public final class FocusHooks {
                 current.blockFeedReelsOpen());
         TextView note = new TextView(activity);
         note.setText(tr
-                ? "Takip filtresi açıkken reklamlar ve takip bilgisi doğrulanamayan gönderiler gizlenir; bu yüzden akış daha kısa veya boş olabilir. Filtreyi değiştirince akışı yenile. Hikâyeler ve sohbetler bu filtreden etkilenmez. Videolar akışta kalır."
-                : "The follow filter hides ads and posts without confirmed following information, so the feed can be shorter or empty. Refresh the feed after changing it. Stories and chats are outside this filter. Videos stay in the feed.");
+                ? "Takip filtresi açıkken reklamlar ve takip bilgisi doğrulanamayan gönderiler gizlenir; bu yüzden akış daha kısa veya boş olabilir. Filtreyi değiştirince akışı yenile. Akışın içindeki hikâye kutuları da gizlenir; sohbetler filtrelenmez. Videolar akışta kalır."
+                : "The follow filter hides ads and posts without confirmed following information, so the feed can be shorter or empty. Refresh the feed after changing it. Story sections inside the feed are also hidden; chats are not filtered. Videos stay in the feed.");
         note.setPadding(0, padding / 2, 0, padding / 2);
         content.addView(note);
         boolean dark = QuietChrome.isDarkTheme(root);

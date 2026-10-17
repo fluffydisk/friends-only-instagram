@@ -345,9 +345,17 @@ two array boundaries (`items` and `feed_items`). It checks an ordinary post's
 primary author's existing `friendship_status.following` value, requiring the
 boxed Boolean `TRUE`; `followed_by` is not used. Injected/sponsored posts,
 non-post wrappers and unknown units are rejected. The original null/skip guards
-handle the rejected entries. The shared Media, Stories, Direct and profile
-parsers are not modified. There is no new API client, request/header rewrite,
+handle the rejected entries. The shared Media, standalone Stories, Direct and
+profile parsers are not modified. There is no new API client, request/header rewrite,
 following-list request, scraping, credential reading or outbound collection.
+
+Actual Home `feed_items` also supports `stories_netego`
+(`XDTStoriesInFeedItem`, with `reels`/`portable_tray`) and `tagged_edge_story` /
+`explore_story` wrappers. They do not supply the required primary Media post, so
+strict mode drops these **in-feed Story units** too. Their recommendation-only
+status cannot be established. Regular Story parsers/requests are unchanged;
+this does not prove every Story surface is unaffected. Top Stories-tray
+playback remains unverified on the phone.
 
 `following_only` defaults true, including before preferences initialize.
 Reflection/metadata failure is strict: the item is rejected. That can remove
@@ -456,8 +464,9 @@ When alpha.5's APK is available, record each item separately:
    Do not infer verified following status only from the app's tab label.
 3. Video-post taps on Home/user profiles with the guard enabled/disabled, plus
    inline playback. Stories, Direct and group-profile launches should stay usable.
-4. Story playback, ordinary photo/video interactions, existing Direct/groups
-   and manually sending a test message.
+4. Top-tray Story playback and the effect on in-feed Story cards, ordinary
+   photo/video interactions, existing Direct/groups and manually sending a test
+   message.
 5. Settings persistence, Disable filters versus appearance, rotation,
    background/foreground, offline recovery and navigation.
 6. Login/challenge/session behavior when naturally encountered; stop on platform

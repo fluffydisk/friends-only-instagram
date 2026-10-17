@@ -8,10 +8,12 @@ Instagram's actual native post, Story and chat components.
 **Alpha.5 is in development** with two new patches: a strict Home filter that
 keeps ordinary posts only when the primary author's existing metadata explicitly
 says you follow them, and a quiet light/dark theme with a Friends Only Home
-header, Settings button and **Friends / Chats / Me** navigation. Stories, Direct
-and profile parsers are outside the Home filter. This is a focused native shell,
-not a replacement renderer for every Instagram screen; some original controls
-or branding can remain outside the verified surfaces.
+header, Settings button and **Friends / Chats / Me** navigation. Standalone
+Story, Direct and profile parsers are unchanged, but strict Home filtering also
+drops in-feed Story units without a primary post; those are not proven to be
+recommendations only. Top Stories-tray playback remains unverified. This native
+shell retains Instagram's content components; other controls or branding can
+remain outside the verified surfaces.
 
 The new following filter defaults on and discards sponsored, non-post and
 unknown Home units on the supported parser path. Missing following metadata may

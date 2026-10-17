@@ -11,12 +11,12 @@ import sys
 import zipfile
 from common import BUILD, REPORTS, ROOT, VERSIONS, android_paths, bootstrap, java_tool, run, sha256, write_report
 
-PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking"]
+PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking", "Friends Only app identity"]
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="Run policy, Python and patch-bundle loading checks")
+    parser.add_argument("--check", action="store_true", help="Run Java/Kotlin policy, Python and patch-bundle loading checks")
     args = parser.parse_args()
     java, javac = java_tool("java"), java_tool("javac")
     version = run([javac, "-version"], capture=True).strip()
@@ -72,7 +72,7 @@ def main() -> None:
     if VERSIONS["instagram"]["supported_version"] not in listed:
         raise RuntimeError("Bundle did not expose the required Instagram version pin.")
     (REPORTS / "patch-list.txt").write_text(listed, encoding="utf-8")
-    checks = ["javac native runtime", "D8 native runtime", "Kotlin patches", "pinned engine loads both patches"]
+    checks = ["javac native runtime", "D8 native runtime", "Kotlin patches", "pinned engine loads all three patches"]
     if args.check:
         test_classes = BUILD / "test-classes"
         test_classes.mkdir()
@@ -80,14 +80,29 @@ def main() -> None:
         run([javac, "--release", "8", "-classpath", classes, "-d", test_classes, *tests])
         run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))),
              "dev.friendsonly.patch.runtime.FocusPolicyTest"])
+        patch_test_sources = sorted((ROOT / "patches/src/test/kotlin").rglob("*.kt"))
+        if not patch_test_sources:
+            raise RuntimeError("Missing app identity policy tests.")
+        patch_test_classes = BUILD / "patch-test-classes"
+        patch_test_classes.mkdir()
+        # Compile tests with the main sources so Kotlin's internal manifest
+        # helpers stay internal; these classes are never packaged in the bundle.
+        run([compiler, "-jvm-target", "21", "-classpath", cli, "-d", patch_test_classes,
+             *kotlin_sources, *patch_test_sources])
+        run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
+             "dev.friendsonly.patches.AppIdentityPolicyTest"])
         run([sys.executable, "-m", "unittest", "discover", "-s", ROOT / "tests", "-v"])
-        checks += ["pure Java policy assertions", "Python tooling unit tests"]
+        checks += ["pure Java policy assertions", "Kotlin application identity policy assertions", "Python tooling unit tests"]
     final_bundle = BUILD / "friends-only.mpp"
     bundle.replace(final_bundle)
     bundle = final_bundle
     report = {
         "status": "passed", "schema_version": 1, "kind": "patch_bundle_only",
         "version": VERSIONS['friends_only']['version'], "supported_instagram_version": VERSIONS["instagram"]["supported_version"],
+        "source_package": VERSIONS["instagram"]["package_name"],
+        "output_package": VERSIONS["friends_only"]["package_name"],
+        "output_application_label": VERSIONS["friends_only"]["application_label"],
+        "android_signature_and_version_checks": "unchanged",
         "bundle": {"file": bundle.name, "sha256": sha256(bundle), "size_bytes": bundle.stat().st_size},
         "checks": checks, "jdk": version,
         "instagram_apk_patched": False, "device_tests": "not_run", "authentication_test": "not_run",

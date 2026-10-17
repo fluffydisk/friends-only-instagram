@@ -18,10 +18,13 @@ approaches are adapted from **FeurStagram**:
 - Upstream license: GNU General Public License v3.0.
 
 Friends Only modifies that work into its own small patch set and native
-extension: scoped tab visibility, local settings, and exact Reels/Explore
-collection-request suppression. We do not distribute upstream’s prepatched
-Instagram APKs or include its clone, updater, debug bridge, broader feed
-filtering, or signature-check bypass patches in this module.
+extension: scoped tab visibility, local settings, exact Reels/Explore
+collection-request suppression, and an independent app-identity adaptation.
+The latter renames the package, declared provider authorities and owned
+permissions, their exact bytecode references, and launcher branding. It preserves
+component classes, native libraries and external visibility queries. We do not
+distribute upstream’s prepatched Instagram APKs or include its updater, debug
+bridge, broader feed filtering, or signature-check bypass patches.
 
 ## Preserved upstream acknowledgements
 
@@ -33,8 +36,8 @@ FeurStagram’s NOTICE attributes these GPLv3 works:
   not imply Morphe authorship, endorsement, or affiliation.
 - **Piko** — <https://github.com/crimera/piko>. Upstream identifies some
   Instagram patch approaches, notably network blocking and cloning, as adapted
-  from Piko. Friends Only retains that acknowledgement; its initial patch set
-  does not include a clone patch.
+  from Piko. Friends Only retains that acknowledgement for its network filter
+  and app-identity adaptation.
 
 Tools downloaded during the build retain their respective licenses. This
 module’s GPL license does not grant rights to Instagram binaries or branding.

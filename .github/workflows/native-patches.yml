@@ -30,10 +30,20 @@ on:
         type: boolean
         default: false
       existing_native_smoke:
-        description: 'Test the existing alpha2 APK on API 37 instead of building a new bundle or APK'
+        description: 'Test a selected existing APK on API 37 instead of building a new bundle or APK'
         required: false
         type: boolean
         default: false
+      existing_native_source_run_id:
+        description: 'Run ID containing the existing native APK artifact (used only for existing APK check)'
+        required: false
+        type: string
+        default: '38968571288'
+      existing_native_artifact_name:
+        description: 'Exact existing personal APK artifact name (used only for existing APK check)'
+        required: false
+        type: string
+        default: 'friends-only-personal-test-apk-17'
 
 permissions:
   contents: read
@@ -188,13 +198,13 @@ jobs:
           temporary = pathlib.Path(os.environ['RUNNER_TEMP'])
           shutil.rmtree(temporary / 'friends-only-input', ignore_errors=True)
           (temporary / 'friends-only-signing.p12').unlink(missing_ok=True)
-  install-existing-alpha2:
+  install-existing-native:
     if: github.event_name == 'workflow_dispatch' && inputs.existing_native_smoke == true
     permissions:
       contents: read
       actions: read
     uses: ./.github/workflows/native-install-smoke.yml
     with:
-      source_run_id: '38968571288'
-      artifact_name: friends-only-personal-test-apk-17
+      source_run_id: ${{ inputs.existing_native_source_run_id }}
+      artifact_name: ${{ inputs.existing_native_artifact_name }}
       android_api: '37.0'

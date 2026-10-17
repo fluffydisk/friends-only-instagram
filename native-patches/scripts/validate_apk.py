@@ -26,6 +26,7 @@ import zlib
 
 PACKAGE_NAME = "com.instagram.android"
 SUPPORTED_VERSIONS = frozenset({"451.0.0.20.80"})
+SOURCE_VERSION_CODE = "385709029"
 REQUIRED_ABI = "arm64-v8a"
 MAX_APK_BYTES = 1024 * 1024 * 1024
 MAX_ENTRY_BYTES = 512 * 1024 * 1024
@@ -204,17 +205,21 @@ def inspect_archive(path: Path) -> dict:
         raise ValidationError("The APK ZIP structure or entry integrity is invalid.") from exc
 
 
-def inspect_manifest(badging: str, xmltree: str, archive_abis: list[str]) -> dict:
+def inspect_manifest(badging: str, xmltree: str, archive_abis: list[str], *,
+                     expected_package: str = PACKAGE_NAME,
+                     expected_version_code: str | None = SOURCE_VERSION_CODE) -> dict:
     packages = re.findall(r"^package:\s*(.+)$", badging, flags=re.MULTILINE)
     if len(packages) != 1:
         raise ValidationError("aapt did not return a unique APK package.")
     attributes = dict(re.findall(r"([A-Za-z][A-Za-z0-9_:-]*)='([^']*)'", packages[0]))
-    if attributes.get("name") != PACKAGE_NAME:
-        raise ValidationError("The APK package is not com.instagram.android.")
+    if attributes.get("name") != expected_package:
+        raise ValidationError(f"The APK package is not {expected_package}.")
     if attributes.get("versionName") not in SUPPORTED_VERSIONS:
         raise ValidationError("The APK version is not in the supported version allowlist.")
     if not re.fullmatch(r"[0-9]{1,20}", attributes.get("versionCode", "")):
         raise ValidationError("The APK has an invalid version code.")
+    if expected_version_code is not None and attributes["versionCode"] != expected_version_code:
+        raise ValidationError("The APK version code does not match the supported build.")
     if any("split" in name.lower() and value for name, value in attributes.items()):
         raise ValidationError("Split APKs are not supported; supply a complete standalone APK.")
     if re.search(r"^\s*uses-split:", badging, flags=re.MULTILINE):

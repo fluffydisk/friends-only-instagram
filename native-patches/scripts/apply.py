@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shutil
 import subprocess
@@ -25,6 +26,9 @@ from version_code import set_apk_version_code
 def validate_patch_result(result: dict) -> None:
     """Never sign a partial or incompatible patch result, even after an exit-code zero."""
     # Morphe omits default-valued success=true; an explicit false still fails.
+    # The pinned CLI snapshots report identity before executing any patches.
+    # Its report therefore identifies the original input, while inspect_output
+    # independently requires the renamed, personally signed application.
     if (result.get("success", True) is not True or result.get("failedPatches") or
             result.get("packageName") != VERSIONS["instagram"]["package_name"] or
             result.get("packageVersion") != VERSIONS["instagram"]["supported_version"]):
@@ -32,22 +36,89 @@ def validate_patch_result(result: dict) -> None:
     applied = result.get("appliedPatches", [])
     names = {entry.get("name") for entry in applied}
     if names != set(PATCH_NAMES) or len(applied) != len(PATCH_NAMES):
-        raise ValidationError("The engine did not apply exactly the two Friends Only patches.")
+        raise ValidationError("The engine did not apply exactly the three Friends Only patches.")
     steps = result.get("patchingSteps", [])
     if (len(steps) != 2 or {step.get("step") for step in steps} != {"PATCHING", "REBUILDING"} or
             any(step.get("success") is not True for step in steps)):
         raise ValidationError("At least one required patching step did not succeed.")
 
 
+def inspect_application_identity(badging: str, xmltree: str) -> dict:
+    """Check the new app identity without rewriting class or native-library names."""
+    own_package = VERSIONS["friends_only"]["package_name"]
+    original_package = VERSIONS["instagram"]["package_name"]
+    label = VERSIONS["friends_only"]["application_label"]
+    labels = re.findall(r"^application-label(?:-[^:]+)?:'([^']*)'\s*$", badging, re.M)
+    launcher_labels = re.findall(r"^launchable-activity:.*?\blabel='([^']*)'", badging, re.M)
+    if not labels or not launcher_labels or any(value != label for value in labels + launcher_labels):
+        raise ValidationError("The application and launcher labels must be Friends Only in every locale.")
+
+    def scoped(value: str, package: str) -> bool:
+        return value == package or value.startswith(package + ".")
+
+    definitions: set[str] = set()
+    references: set[str] = set()
+    original_references: set[str] = set()
+    own_authorities: set[str] = set()
+    stack: list[tuple[int, str]] = []
+    for line in xmltree.splitlines():
+        element = re.match(r"^(\s*)E:\s+([A-Za-z0-9_-]+)(?:\s|$)", line)
+        if element:
+            indent = len(element[1])
+            while stack and stack[-1][0] >= indent:
+                stack.pop()
+            stack.append((indent, element[2]))
+            continue
+        attribute = re.match(r'^\s*A:\s+([A-Za-z0-9_:-]+)(?:\([^)]*\))?="([^"\r\n]*)"', line)
+        if not attribute or not stack:
+            continue
+        name, value = attribute.groups()
+        tag = stack[-1][1]
+        if name == "android:authorities" and tag == "provider" and any(item[1] == "application" for item in stack):
+            for authority in value.split(";"):
+                # Original providers also use identities outside the original
+                # root package (for example com.instagram.fileprovider). The
+                # patch maps those into an own-package underscore namespace.
+                if not (scoped(authority, own_package) or authority.startswith(own_package + "_")):
+                    raise ValidationError("A provider authority still uses Instagram's package identity.")
+                own_authorities.add(authority)
+        permission_definition = name == "android:name" and tag in {"permission", "permission-tree", "permission-group"}
+        permission_reference = (name in {"android:permission", "android:readPermission", "android:writePermission"} or
+                                name == "android:name" and tag in {"uses-permission", "uses-permission-sdk-23"})
+        if permission_definition or permission_reference:
+            if value.startswith("."):
+                value = own_package + value
+            if permission_definition and scoped(value, original_package):
+                raise ValidationError("A custom permission still uses Instagram's package identity.")
+            if permission_reference and scoped(value, original_package):
+                original_references.add(value)
+            if scoped(value, own_package):
+                (definitions if permission_definition else references).add(value)
+    if not own_authorities or not definitions:
+        raise ValidationError("The output is missing its package-scoped providers or custom permissions.")
+    if references - definitions:
+        raise ValidationError("An own-package permission reference has no matching declaration.")
+    original_definitions = {original_package + value[len(own_package):] for value in definitions}
+    if original_references & original_definitions:
+        raise ValidationError("A reference to an app-defined permission still uses Instagram's package identity.")
+    return {"package": own_package, "application_label": label,
+            "launcher_and_localized_labels_checked": len(labels) + len(launcher_labels),
+            "own_provider_authorities": sorted(own_authorities),
+            "own_permission_definitions": sorted(definitions),
+            "own_permission_references": sorted(references)}
+
+
 def inspect_output(apk: Path, aapt: Path, apksigner: Path) -> dict:
     archive = inspect_archive(apk)
+    badging = run_command([str(aapt), "dump", "badging", str(apk)], "Output manifest check")
+    xmltree = run_command([str(aapt), "dump", "xmltree", str(apk), "AndroidManifest.xml"], "Output manifest check")
     manifest = inspect_manifest(
-        run_command([str(aapt), "dump", "badging", str(apk)], "Output manifest check"),
-        run_command([str(aapt), "dump", "xmltree", str(apk), "AndroidManifest.xml"], "Output manifest check"),
+        badging, xmltree,
         archive["native_abis"],
+        expected_package=VERSIONS["friends_only"]["package_name"], expected_version_code=None,
     )
+    identity = inspect_application_identity(badging, xmltree)
     signer_text = run_command([str(apksigner), "verify", "--verbose", "--print-certs", str(apk)], "Output signature check")
-    import re
     digests = re.findall(r"^Signer #\d+ certificate SHA-256 digest:\s*([a-fA-F0-9]{64})\s*$", signer_text, re.M)
     if len(digests) != 1:
         raise ValidationError("Expected one verified personal APK signer.")
@@ -65,7 +136,7 @@ def inspect_output(apk: Path, aapt: Path, apksigner: Path) -> dict:
         raise ValidationError("The signed APK is missing the native extension.")
     return {"manifest": manifest, "sha256": sha256(apk), "size_bytes": apk.stat().st_size,
             "signer_sha256": digests[0].lower(), "extension_present": True,
-            "manifest_namespace_order": "valid"}
+            "manifest_namespace_order": "valid", "application_identity": identity}
 
 
 def apply(args: argparse.Namespace) -> dict:
@@ -110,7 +181,7 @@ def apply(args: argparse.Namespace) -> dict:
             patch_input = snapshot
         patch_report = work / "engine-result.json"
         unsigned, aligned, signed = [work / name for name in ("unsigned.apk", "aligned.apk", "signed.apk")]
-        print("Input identity verified; applying only Friends Only UI/discovery patches...", flush=True)
+        print("Original input identity verified; applying only Friends Only UI/discovery/app identity patches...", flush=True)
         command = [java, "-Xmx4g", "-jar", cli, "patch", "--bytecode-mode=FULL", "--unsigned",
                    "--exclusive", "-p", bundle]
         for name in PATCH_NAMES:
@@ -151,11 +222,18 @@ def apply(args: argparse.Namespace) -> dict:
         result = inspect_output(signed, android_tools / "aapt", android_tools / "apksigner")
         if result["manifest"]["version_code"] != str(args.output_version_code):
             raise ValidationError("The final version code does not match the requested build metadata.")
+        if result["signer_sha256"] == source["signature"]["certificate_sha256"]:
+            raise ValidationError("The output must use a personal signing identity distinct from the source publisher.")
         shutil.copyfile(signed, output)
         return {"schema_version": 1, "status": "passed", "kind": "personally_signed_instagram_apk",
                 "input": source, "output": result, "patch_bundle_sha256": sha256(bundle),
                 "patches": PATCH_NAMES, "signing": "user_provided_key" if stable else "disposable_key_not_preserved",
                 "output_version_code_change": version_change,
+                "application_identity_change": {"source_package": VERSIONS["instagram"]["package_name"],
+                                                "output_package": VERSIONS["friends_only"]["package_name"],
+                                                "application_label": VERSIONS["friends_only"]["application_label"]},
+                "android_signature_and_version_checks": "unchanged",
+                "source_and_output_signers_differ": True,
                 "device_tests": "not_run", "authentication_test": "not_run",
                 "official_instagram_update_compatible": False}
 

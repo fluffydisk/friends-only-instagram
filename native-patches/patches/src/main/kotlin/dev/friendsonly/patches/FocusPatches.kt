@@ -24,7 +24,7 @@ private const val EXTENSION = "extensions/extension.mpe"
 // Match both named surfaces so unrelated ViewGroup binders cannot qualify.
 private const val TAB_BAR_RESOURCE = 0x7f0b408d
 private const val TAB_SHADOW_RESOURCE = 0x7f0b408e
-private val INSTAGRAM = Compatibility(
+internal val INSTAGRAM = Compatibility(
     name = "Instagram",
     packageName = "com.instagram.android",
     apkFileType = ApkFileType.APK,

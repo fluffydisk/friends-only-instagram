@@ -173,12 +173,13 @@ jobs:
           PY
           "$adb_bin" start-server
           "$emulator_bin" -avd friends-only-smoke -port 5554 -cores 2 -memory 4096 \
-            -accel on -no-window -gpu swiftshader_indirect -no-snapshot -noaudio \
+            -accel on -no-window -gpu swiftshader -no-snapshot -noaudio \
             -no-boot-anim -no-metrics -camera-back none -camera-front none \
             > "$reports/emulator-console.txt" 2>&1 &
           emulator_pid=$!
           deadline=$((SECONDS + 420))
           ready=false
+          stable_since=-1
           readiness_adb() {
             remaining=$((deadline - SECONDS))
             if [ "$remaining" -le 0 ]; then return 124; fi
@@ -186,6 +187,7 @@ jobs:
             timeout "${remaining}s" "$adb_bin" -s "$serial" "$@"
           }
           while [ "$SECONDS" -lt "$deadline" ]; do
+            probe_ready=false
             if ! kill -0 "$emulator_pid" 2>/dev/null; then
               echo 'Emulator exited before Android services were ready.' | tee -a "$reports/readiness.txt"
               exit 1
@@ -210,9 +212,18 @@ jobs:
                 && packages=$(readiness_adb shell cmd package list packages --user 0 android 2>> "$reports/readiness.txt") \
                 && printf '%s\n' "$packages" | tr -d '\r' | grep -qx 'package:android' \
                 && readiness_adb shell settings get global device_provisioned >> "$reports/readiness.txt" 2>&1; then
+                probe_ready=true
+              fi
+            fi
+            # A transiently recovered system_server must not immediately qualify as ready.
+            if [ "$probe_ready" = true ]; then
+              if [ "$stable_since" -lt 0 ]; then stable_since=$SECONDS; fi
+              if [ "$((SECONDS - stable_since))" -ge 5 ]; then
                 ready=true
                 break
               fi
+            else
+              stable_since=-1
             fi
             sleep 2
           done
@@ -220,7 +231,7 @@ jobs:
             echo 'Android package, input and settings services did not become ready within 420 seconds; no installation attempted.' | tee -a "$reports/readiness.txt"
             exit 1
           fi
-          echo 'Android package, input and settings services are ready.' | tee -a "$reports/readiness.txt"
+          echo 'Android package, input and settings services have remained ready for at least five seconds.' | tee -a "$reports/readiness.txt"
           timeout 15s "$adb_bin" -s "$serial" shell getprop ro.build.version.sdk > "$reports/device-sdk.txt"
           timeout 15s "$adb_bin" -s "$serial" shell getprop ro.build.version.release > "$reports/device-android-release.txt"
           timeout 15s "$adb_bin" -s "$serial" shell getprop ro.product.cpu.abilist > "$reports/device-abis.txt"

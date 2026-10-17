@@ -28,7 +28,7 @@ SPEC.loader.exec_module(validator)
 # Deliberately synthetic certificate digest. It is NOT a Meta certificate.
 TEST_CERTIFICATE = "a" * 64
 BADGING = (
-    "package: name='com.instagram.android' versionCode='451000020' "
+    "package: name='com.instagram.android' versionCode='385709029' "
     "versionName='451.0.0.20.80' platformBuildVersionCode='35'\n"
     "sdkVersion:'28'\n"
     "native-code: 'arm64-v8a'\n"
@@ -134,6 +134,23 @@ class ValidatorTests(unittest.TestCase):
     def test_wrong_package_is_rejected(self):
         with self.assertRaisesRegex(validator.ValidationError, "package is not"):
             self.validate(badging=BADGING.replace("com.instagram.android", "com.example.counterfeit"))
+
+    def test_own_output_identity_is_never_accepted_as_original_input(self):
+        with self.assertRaisesRegex(validator.ValidationError, "package is not com.instagram.android"):
+            self.validate(badging=BADGING.replace("com.instagram.android", "dev.friendsonly.instagram"))
+
+    def test_source_version_code_remains_strict(self):
+        with self.assertRaisesRegex(validator.ValidationError, "supported build"):
+            self.validate(badging=BADGING.replace("385709029", "385806737"))
+
+    def test_manifest_output_package_must_be_explicit_and_cannot_accept_source_identity(self):
+        output = BADGING.replace("com.instagram.android", "dev.friendsonly.instagram").replace("385709029", "385806737")
+        report = validator.inspect_manifest(output, XMLTREE, ["arm64-v8a"],
+                                             expected_package="dev.friendsonly.instagram", expected_version_code="385806737")
+        self.assertEqual(report["package"], "dev.friendsonly.instagram")
+        with self.assertRaisesRegex(validator.ValidationError, "package is not dev.friendsonly.instagram"):
+            validator.inspect_manifest(BADGING, XMLTREE, ["arm64-v8a"],
+                                       expected_package="dev.friendsonly.instagram", expected_version_code=None)
 
     def test_unknown_version_is_not_automatically_accepted(self):
         with self.assertRaisesRegex(validator.ValidationError, "version allowlist"):

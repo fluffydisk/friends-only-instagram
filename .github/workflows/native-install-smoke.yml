@@ -1,0 +1,293 @@
+name: Existing native APK installation check
+
+on:
+  workflow_call:
+    inputs:
+      source_run_id:
+        description: 'Run containing the existing native APK artifact (no rebuild)'
+        required: false
+        type: string
+        default: '38968571288'
+      artifact_name:
+        description: 'Existing personal APK artifact name'
+        required: false
+        type: string
+        default: 'friends-only-personal-test-apk-17'
+      android_api:
+        description: 'Stock Google APIs emulator system image; not Samsung One UI'
+        required: false
+        type: string
+        default: '37.0'
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Run containing the existing native APK artifact (no rebuild)'
+        required: true
+        type: string
+        default: '38968571288'
+      artifact_name:
+        description: 'Existing personal APK artifact name'
+        required: true
+        type: string
+        default: 'friends-only-personal-test-apk-17'
+      android_api:
+        description: 'Stock Google APIs emulator system image; not Samsung One UI'
+        required: true
+        type: choice
+        default: '37.0'
+        options:
+          - '37.0'
+          - '35'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: native-install-smoke-${{ github.ref }}-${{ inputs.android_api }}
+  cancel-in-progress: true
+
+jobs:
+  install-existing-apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      SOURCE_ARTIFACT_NAME: ${{ inputs.artifact_name }}
+      SMOKE_ANDROID_API: ${{ inputs.android_api }}
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate existing artifact selection
+        shell: python
+        run: |
+          import os, pathlib, re
+          if not re.fullmatch(r'[1-9][0-9]*', os.environ['SOURCE_RUN_ID']):
+              raise SystemExit('Source run ID must be a positive integer.')
+          if not re.fullmatch(r'friends-only-personal-test-apk-[1-9][0-9]*', os.environ['SOURCE_ARTIFACT_NAME']):
+              raise SystemExit('Select an existing personal test APK artifact.')
+          if os.environ['SMOKE_ANDROID_API'] not in ('35', '37.0'):
+              raise SystemExit('Only the listed stock emulator images are supported.')
+          pathlib.Path('native-install-reports').mkdir()
+      - name: Download the existing APK without rebuilding or signing
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: native-install-input
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+      - name: Record exact input identity and test scope
+        shell: python
+        run: |
+          import hashlib, json, os, pathlib
+          root = pathlib.Path('native-install-input')
+          apk = root / 'friends-only-personal.apk'
+          entries = list(root.rglob('*'))
+          if entries != [apk] or not apk.is_file() or apk.is_symlink():
+              raise SystemExit('Expected exactly friends-only-personal.apk in the artifact.')
+          digest = hashlib.file_digest(apk.open('rb'), 'sha256').hexdigest()
+          record = {
+              'repository': os.environ['GITHUB_REPOSITORY'],
+              'source_run_id': os.environ['SOURCE_RUN_ID'],
+              'source_artifact_name': os.environ['SOURCE_ARTIFACT_NAME'],
+              'apk_sha256': digest,
+              'apk_size_bytes': apk.stat().st_size,
+              'requested_system_image': 'system-images;android-' + os.environ['SMOKE_ANDROID_API'] + ';google_apis;x86_64',
+              'test_scope': 'One ordinary adb installation on a fresh stock emulator; no app launch, login, or Samsung One UI coverage.',
+              'apk_rebuilt_or_resigned': False,
+          }
+          pathlib.Path('native-install-reports/input-and-scope.json').write_text(json.dumps(record, indent=2) + '\n')
+          print(json.dumps(record, indent=2))
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Prepare stock emulator image and free hosted runner space
+        shell: bash
+        run: |
+          df -h / | tee native-install-reports/disk-before.txt
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android/sdk/ndk
+          df -h / | tee native-install-reports/disk-after.txt
+          image="system-images;android-${SMOKE_ANDROID_API};google_apis;x86_64"
+          if ! sdkmanager emulator "$image" 2>&1 | tee native-install-reports/system-image-download.txt; then
+            sdkmanager emulator "$image" 2>&1 | tee native-install-reports/system-image-retry.txt
+          fi
+          test -c /dev/kvm
+          sudo chmod a+rw /dev/kvm
+          "$ANDROID_HOME/emulator/emulator" -accel-check 2>&1 | tee native-install-reports/emulator-acceleration.txt
+      - name: Prepare bounded emulator and installation script
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/friends-only-existing-apk-smoke.sh" <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          reports="$PWD/native-install-reports"
+          adb_bin="$ANDROID_HOME/platform-tools/adb"
+          emulator_bin="$ANDROID_HOME/emulator/emulator"
+          serial=emulator-5554
+          emulator_pid=''
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/friends-only-smoke-avd"
+          mkdir -p "$ANDROID_AVD_HOME"
+          collect_diagnostics_and_stop() {
+            result=$?
+            trap - EXIT
+            printf '%s\n' "$result" > "$reports/install-script-exit-code.txt"
+            # These bounded commands also run when boot readiness fails before installation.
+            timeout 20s "$adb_bin" -s "$serial" logcat -d -v threadtime > "$reports/emulator-logcat.txt" 2>&1 || true
+            timeout 15s "$adb_bin" -s "$serial" shell service list > "$reports/emulator-services.txt" 2>&1 || true
+            timeout 15s "$adb_bin" -s "$serial" shell getprop > "$reports/emulator-properties.txt" 2>&1 || true
+            if [ "$result" -ne 0 ]; then
+              timeout 20s "$adb_bin" -s "$serial" shell dumpsys package installs > "$reports/failure-install-sessions.txt" 2>&1 || true
+              timeout 20s "$adb_bin" -s "$serial" shell dumpsys package > "$reports/failure-package-manager.txt" 2>&1 || true
+            fi
+            timeout 10s "$adb_bin" -s "$serial" emu kill > "$reports/emulator-stop.txt" 2>&1 || true
+            if [ -n "$emulator_pid" ]; then
+              kill "$emulator_pid" 2>/dev/null || true
+              for _ in 1 2 3 4 5; do
+                if ! kill -0 "$emulator_pid" 2>/dev/null; then break; fi
+                sleep 1
+              done
+              kill -KILL "$emulator_pid" 2>/dev/null || true
+              wait "$emulator_pid" 2>/dev/null || true
+            fi
+            exit "$result"
+          }
+          trap collect_diagnostics_and_stop EXIT
+          image="system-images;android-${SMOKE_ANDROID_API};google_apis;x86_64"
+          printf 'no\n' | avdmanager create avd --force --name friends-only-smoke --package "$image" --device pixel_6 2>&1 | tee "$reports/avd-creation.txt"
+          python3 - <<'PY'
+          import os, pathlib
+          config = pathlib.Path(os.environ['ANDROID_AVD_HOME']) / 'friends-only-smoke.avd' / 'config.ini'
+          # Set userdata capacity before first boot; -partition-size alone is insufficient.
+          lines = [line for line in config.read_text().splitlines()
+                   if line.partition('=')[0].strip() != 'disk.dataPartition.size']
+          lines.append('disk.dataPartition.size=8G')
+          content = '\n'.join(lines) + '\n'
+          config.write_text(content)
+          pathlib.Path('native-install-reports/avd-config.ini').write_text(content)
+          PY
+          "$adb_bin" start-server
+          "$emulator_bin" -avd friends-only-smoke -port 5554 -cores 2 -memory 4096 \
+            -accel on -no-window -gpu swiftshader -no-snapshot -noaudio \
+            -no-boot-anim -no-metrics -camera-back none -camera-front none \
+            > "$reports/emulator-console.txt" 2>&1 &
+          emulator_pid=$!
+          deadline=$((SECONDS + 420))
+          ready=false
+          stable_since=-1
+          readiness_adb() {
+            remaining=$((deadline - SECONDS))
+            if [ "$remaining" -le 0 ]; then return 124; fi
+            if [ "$remaining" -gt 10 ]; then remaining=10; fi
+            timeout "${remaining}s" "$adb_bin" -s "$serial" "$@"
+          }
+          while [ "$SECONDS" -lt "$deadline" ]; do
+            probe_ready=false
+            if ! kill -0 "$emulator_pid" 2>/dev/null; then
+              echo 'Emulator exited before Android services were ready.' | tee -a "$reports/readiness.txt"
+              exit 1
+            fi
+            # sys.boot_completed alone can become 1 before system_server services exist.
+            # Check callable PackageManager/Settings as well as the live input service.
+            if readiness_adb get-state >> "$reports/readiness.txt" 2>&1 \
+              && boot_completed=$(readiness_adb shell getprop sys.boot_completed 2>> "$reports/readiness.txt") \
+              && [ "${boot_completed//$'\r'/}" = 1 ]; then
+              services_ready=true
+              for service_name in package input settings; do
+                if service_state=$(readiness_adb shell service check "$service_name" 2>> "$reports/readiness.txt"); then
+                  printf '%s\n' "$service_state" >> "$reports/readiness.txt"
+                  if [ "${service_state//$'\r'/}" != "Service $service_name: found" ]; then
+                    services_ready=false
+                  fi
+                else
+                  services_ready=false
+                fi
+              done
+              if [ "$services_ready" = true ] \
+                && packages=$(readiness_adb shell cmd package list packages --user 0 android 2>> "$reports/readiness.txt") \
+                && printf '%s\n' "$packages" | tr -d '\r' | grep -qx 'package:android' \
+                && readiness_adb shell settings get global device_provisioned >> "$reports/readiness.txt" 2>&1; then
+                probe_ready=true
+              fi
+            fi
+            # A transiently recovered system_server must not immediately qualify as ready.
+            if [ "$probe_ready" = true ]; then
+              if [ "$stable_since" -lt 0 ]; then stable_since=$SECONDS; fi
+              if [ "$((SECONDS - stable_since))" -ge 5 ]; then
+                ready=true
+                break
+              fi
+            else
+              stable_since=-1
+            fi
+            sleep 2
+          done
+          if [ "$ready" != true ]; then
+            echo 'Android package, input and settings services did not become ready within 420 seconds; no installation attempted.' | tee -a "$reports/readiness.txt"
+            exit 1
+          fi
+          echo 'Android package, input and settings services have remained ready for at least five seconds.' | tee -a "$reports/readiness.txt"
+          timeout 15s "$adb_bin" -s "$serial" shell getprop ro.build.version.sdk > "$reports/device-sdk.txt"
+          timeout 15s "$adb_bin" -s "$serial" shell getprop ro.build.version.release > "$reports/device-android-release.txt"
+          timeout 15s "$adb_bin" -s "$serial" shell getprop ro.product.cpu.abilist > "$reports/device-abis.txt"
+          python3 - <<'PY'
+          import os, pathlib
+          reports = pathlib.Path('native-install-reports')
+          actual_sdk = (reports / 'device-sdk.txt').read_text().strip()
+          expected_sdk = os.environ['SMOKE_ANDROID_API'].split('.')[0]
+          if actual_sdk != expected_sdk:
+              raise SystemExit('Wrong device SDK: ' + actual_sdk + ', expected ' + expected_sdk)
+          abis = (reports / 'device-abis.txt').read_text().strip().split(',')
+          if 'arm64-v8a' not in abis:
+              raise SystemExit('The stock image does not advertise arm64-v8a support; this APK cannot be tested here.')
+          PY
+          timeout 15s "$adb_bin" -s "$serial" shell df -k /data | tee "$reports/device-data-disk-kib.txt"
+          python3 - <<'PY'
+          import json, pathlib, re
+          reports = pathlib.Path('native-install-reports')
+          required = 2 * 1024 ** 3
+          record = {'phase': 'emulator_storage_preflight', 'required_free_bytes': required}
+          try:
+              # The command is scoped to /data, but Android can report its /data/user/0 bind mount.
+              rows = [line.split() for line in (reports / 'device-data-disk-kib.txt').read_text().splitlines() if line.strip()]
+              if rows and rows[0] == ['Filesystem', '1K-blocks', 'Used', 'Available', 'Use%', 'Mounted', 'on']:
+                  rows = rows[1:]
+              if len(rows) != 1:
+                  raise ValueError('Expected exactly one filesystem row from df -k /data.')
+              row = rows[0]
+              if (len(row) != 6 or not all(re.fullmatch(r'[0-9]+', field) for field in row[1:4])
+                      or not re.fullmatch(r'[0-9]+%', row[4]) or not row[5].startswith('/')):
+                  raise ValueError('Malformed filesystem row from df -k /data.')
+              available = int(row[3]) * 1024
+              record['reported_mount'] = row[5]
+              record['available_free_bytes'] = available
+              record['status'] = 'ready' if available >= required else 'insufficient_space'
+          except ValueError as error:
+              record.update(status='unreadable_free_space', detail=str(error))
+          if record['status'] != 'ready':
+              record['failure_scope'] = 'emulator_infrastructure'
+          (reports / 'storage-preflight.json').write_text(json.dumps(record, indent=2) + '\n')
+          print(json.dumps(record, indent=2))
+          if record['status'] != 'ready':
+              raise SystemExit('Emulator infrastructure lacks confirmed 2 GiB free /data space; no APK installation attempted.')
+          PY
+          # One ordinary install only: no retry, downgrade/reinstall flags, app launch, or login.
+          timeout --signal=TERM --kill-after=15s 300s "$adb_bin" -s "$serial" install --no-streaming native-install-input/friends-only-personal.apk 2>&1 | tee "$reports/adb-install.txt"
+          SH
+      - name: Install existing APK once after Android services are ready
+        timeout-minutes: 16
+        shell: bash
+        run: bash "$RUNNER_TEMP/friends-only-existing-apk-smoke.sh"
+      - name: Upload installation evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-install-evidence-api-${{ inputs.android_api }}-${{ github.run_number }}
+          path: native-install-reports/
+          if-no-files-found: warn
+          retention-days: 14

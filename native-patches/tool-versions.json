@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "jdk_major": 21,
+  "friends_only": {
+    "version": "0.3.0-alpha.5",
+    "package_name": "dev.friendsonly.instagram",
+    "application_label": "Friends Only",
+    "output_version_code": 385806739
+  },
+  "android": {
+    "compile_sdk": 35,
+    "build_tools": "35.0.0",
+    "min_sdk": 23
+  },
+  "instagram": {
+    "package_name": "com.instagram.android",
+    "supported_version": "451.0.0.20.80",
+    "supported_version_code": "385709029"
+  },
+  "kotlin": {
+    "version": "2.4.21",
+    "url": "https://github.com/JetBrains/kotlin/releases/download/v2.4.21/kotlin-compiler-2.4.21.zip",
+    "sha256": "7cc140e76daf416a0424a5557f99afd7ca89ebd463ea1101261e3e01c33e75cd"
+  },
+  "apkeditor": {
+    "version": "1.4.9",
+    "url": "https://github.com/REAndroid/APKEditor/releases/download/V1.4.9/APKEditor-1.4.9.jar",
+    "sha256": "a9cd40df818845456be6d696de6110c89edf4b0a0580cb83438ed6b25a366e67"
+  },
+  "morphe": {
+    "desktop_version": "1.18.1",
+    "patcher_version": "1.15.1",
+    "url": "https://github.com/MorpheApp/morphe-desktop/releases/download/v1.18.1/morphe-desktop-1.18.1-all.jar",
+    "sha256": "1b506ab5f03d16a2f65026d5e0e1910d01fc1e2152f21eaeb44ed2f30856597b"
+  }
+}

@@ -18,10 +18,10 @@ new package with a package-hint mismatch; that helper error does not contradict
 the successful normal installation.
 
 **Alpha.4 is in development:** a separate, enabled-by-default setting will stop
-known Home video-post taps from opening Instagram's Reels viewer. Inline video
-playback is intended to remain available. The full four-patch bundle build
-passed its automated checks; APK production and phone behavior are pending. Alpha.4 uses output
-version code **385806738**. Clean CI builds currently use disposable signing keys;
+known video-post taps on Home and user profiles from opening Instagram's Reels
+viewer. Inline video playback is intended to remain available. The combined
+four-patch bundle build passed its checks; APK production and phone checks are
+pending. Alpha.4 uses output version code **385806738**. Clean CI builds currently use disposable signing keys;
 updating alpha.3 with a new key will require removing only the older **Friends
 Only** native app, clearing its local session/settings. Official Instagram does
 not need to be removed. See [evidence and limits](native-patches/VERIFICATION.md).

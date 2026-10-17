@@ -248,12 +248,13 @@ This is a package-hint limitation in the diagnostic tool. It is **not evidence
 of an alpha.3 installation failure**: the independent normal installation
 succeeded. Do not use that helper for alpha.3 or later own-package APKs.
 
-## Alpha.4: Home video taps into Reels
+## Alpha.4: Home/profile video taps into Reels
 
 The user reports that tapping a video post on Home opens Instagram's Reels
-viewer and wants that transition to do nothing. The new fourth patch is named
-**Friends Only feed video taps**. Output version code is **385806738**; the
-original-input package/version verification remains unchanged.
+viewer and wants that transition to do nothing. They also requested the same
+behavior for user profiles. The fourth patch remains named
+**Friends Only feed video taps** and covers Home plus user profiles. Output
+version code is **385806738**; the original-input package/version verification remains unchanged.
 
 The implementation guards the Clips viewer launch only when its
 `ClipsViewerSource` name exactly matches one of:
@@ -265,22 +266,38 @@ FEED_TIMELINE_FOLLOWING
 FEED_TIMELINE_FAVORITES
 FEED_TIMELINE_ALL
 FEED_TIMELINE_MIXED_UNCONNECTED
+PROFILE
+SELF_PROFILE
+FEED_CONTEXTUAL_PROFILE
+FEED_CONTEXTUAL_SELF_PROFILE
+OPAL_USER_PROFILE
+OPAL_USER_SELF_PROFILE
+PRIME_PROFILE
+PRIME_SELF_PROFILE
 ```
 
 Its independent preference, `block_feed_reels_open`, defaults on. Long-press
-Home to change **Block Reels viewer from feed posts / Gönderiden Reels ekranına
-geçişi engelle**; **Show all** disables it. Hiding the Reels tab is a separate
-setting. Video posts are not removed, inline playback/network handling is not
-changed, and unknown/Stories/Direct/profile launch sources pass through.
-These are implementation intentions and policy-test results, not phone-tested
-behavior. The full local `build.py --check` completed successfully: all **four
-patches** loaded, with **139 Python tests, 160 Java policy assertions, 26 Kotlin
-identity assertions and 42 Kotlin feed-guard assertions** passed. Inspection of
-the actual original 23 DEX files found **exactly one** matching supported method;
-its contract checks passed (17 registers, 171 instructions, no try blocks).
-This verifies the intended insertion contract without claiming runtime behavior.
-Actual APK application/production, output validation and phone testing are
-pending.
+Home to change **Akış ve profilden Reels açılmasını engelle** (block the Reels
+viewer from feed and profiles); **Show all** disables it. Hiding the Reels tab
+is a separate setting. Video posts are not removed, inline playback/network handling is not
+changed. Unknown, Stories, Direct and group-profile launch sources pass through.
+These are intended boundaries, not phone-tested behavior.
+
+Before the profile expansion, the Home-only four-patch `build.py --check` passed
+**139 Python tests, 160 Java policy assertions, 26 Kotlin identity assertions and
+42 Kotlin feed-guard assertions**. Inspection of the original 23 DEX files found
+**exactly one** supported method; its insertion contract passed (17 registers,
+171 instructions, no try blocks). The associated manual
+[Home-only CI run](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39036959634)
+was cancelled before delivery when the user added profiles. Its candidate is
+not a delivered alpha.4 APK.
+
+The final combined Home/profile `build.py --check` then passed: all **four
+patches** loaded, **139 Python tests, 180 Java policy assertions, 26 Kotlin
+identity assertions and 42 Kotlin guard assertions** succeeded. Static call-site
+tracing also confirmed that `PROFILE` and `SELF_PROFILE` reach the guarded core
+viewer path. This is source/bytecode evidence, not a phone navigation test.
+Combined-scope APK production/output validation and phone testing are pending.
 
 Alpha.3 was signed with a disposable CI key. The next key cannot update that
 installed build. If an update is rejected, remove only **Friends Only**, which
@@ -323,9 +340,9 @@ PackageInstaller verdict for the APK:
 
 No physical Android device is attached to this cloud environment. Alpha.3's
 successful installation/opening and visible Home/feed/Stories tray come from
-the user's report and screenshot. Alpha.4's bundle build passed; APK production
-and testing on that phone are pending. Older cloud emulator failures remain recorded above; they do not
-override the actual phone's successful normal installation.
+the user's report and screenshot. Alpha.4's combined Home/profile bundle passed
+its build/checks; APK production and testing on that phone are pending.
+Older cloud emulator failures remain recorded above; they do not override the actual phone's successful normal installation.
 
 Keep official Instagram installed, or restore it through Play Store if desired.
 The [alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
@@ -334,8 +351,9 @@ alpha.4 when its verified APK is available. The v2 diagnostic helper targets the
 old `com.instagram.android` package and should not be used for either.
 Record each remaining item separately:
 
-1. Alpha.4 installation/opening, then tapping Home video posts with the new
-   guard enabled and disabled; inline playback must still work.
+1. Alpha.4 installation/opening, then tapping video posts on Home and user
+   profiles with the new guard enabled and disabled; inline playback must still
+   work. Check that Stories, Direct and group-profile launches are preserved.
 2. Story playback and ordinary photo/video interactions.
 3. Existing Direct/group conversations and sending a test message manually.
 4. Home long-press, every toggle, Show all and settings persistence.

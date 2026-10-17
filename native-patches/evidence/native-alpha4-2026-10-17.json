@@ -13,7 +13,15 @@
       "FEED_TIMELINE_FOLLOWING",
       "FEED_TIMELINE_FAVORITES",
       "FEED_TIMELINE_ALL",
-      "FEED_TIMELINE_MIXED_UNCONNECTED"
+      "FEED_TIMELINE_MIXED_UNCONNECTED",
+      "PROFILE",
+      "SELF_PROFILE",
+      "FEED_CONTEXTUAL_PROFILE",
+      "FEED_CONTEXTUAL_SELF_PROFILE",
+      "OPAL_USER_PROFILE",
+      "OPAL_USER_SELF_PROFILE",
+      "PRIME_PROFILE",
+      "PRIME_SELF_PROFILE"
     ],
     "entry_method": "LX/05b6;->A0C(Landroid/view/View;Landroidx/fragment/app/FragmentActivity;Lcom/instagram/clips/intf/ClipsViewerConfig;Lcom/instagram/common/session/UserSession;ZZZ)V",
     "fingerprint_anchors": [
@@ -21,15 +29,16 @@
       "launchClipsViewer"
     ],
     "source_contract": "Public instance ClipsViewerConfig.A00 field typed ClipsViewerSource, directly extending java.lang.Enum.",
-    "behavior": "Return before opening the Reels viewer for the exact six Home feed source enums, when enabled. The original launcher is retained for other/unknown sources and when disabled.",
+    "behavior": "Return before opening the Reels viewer for the exact Home feed and personal-profile source enums when enabled. Preserve original launcher behavior for DM, Stories, other/unknown sources and when disabled.",
     "inline_playback_click_listeners_and_network_policy": "unchanged",
     "package": "dev.friendsonly.instagram",
-    "output_version_code": 385806738
+    "output_version_code": 385806738,
+    "user_scope_confirmation": "User explicitly requested profile video taps also be blocked."
   },
   "checks": {
-    "java_policy_assertions": 160,
+    "java_policy_assertions": 180,
     "python_tests": 139,
-    "full_bundle_build": "passed",
+    "full_bundle_build": "passed_final_home_and_personal_profile_scope",
     "full_apk_build": "pending",
     "new_navigation_behavior_on_phone": "not_tested",
     "kotlin_identity_assertions": 26,
@@ -44,5 +53,18 @@
     "original_instruction_count": 171,
     "try_blocks": 0,
     "source_contract": "passed"
+  },
+  "superseded_home_only_cloud_build": {
+    "run_id": 39036959634,
+    "status": "cancelled_by_us_after_user_expanded_scope",
+    "apk_delivered": false
+  },
+  "source_profile_route_audit": {
+    "status": "passed_read_only_supported_apk_dex_trace",
+    "routes": [
+      "UserDetailFragment.A0h -> LX/09YO.A00 (PROFILE) -> LX/02tf.A0q -> guarded core A0C",
+      "LX/06J7.FEw (PROFILE or SELF_PROFILE) -> LX/0PlY.A02/A05 -> guarded core A0C or its LX/02tf.A0m/A0u wrappers"
+    ],
+    "phone_runtime_test": "not_run"
   }
 }

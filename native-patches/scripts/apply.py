@@ -251,7 +251,7 @@ def apply(args: argparse.Namespace) -> dict:
             patch_input = snapshot
         patch_report = work / "engine-result.json"
         unsigned, aligned, signed = [work / name for name in ("unsigned.apk", "aligned.apk", "signed.apk")]
-        print("Original input identity verified; applying only Friends Only UI/discovery/app identity patches...", flush=True)
+        print("Original input identity verified; applying only the configured Friends Only patches...", flush=True)
         command = [java, "-Xmx4g", "-jar", cli, "patch", "--bytecode-mode=FULL", "--unsigned",
                    "--exclusive", "-p", bundle]
         for name in PATCH_NAMES:

@@ -158,12 +158,12 @@ public final class FocusHooks {
         addSwitch(content, current, FocusConfig.EXPLORE, tr ? "Keşfet / Arama sekmesini gizle" : "Hide Explore / Search tab", current.hideExplore());
         addSwitch(content, current, FocusConfig.EXTRAS, tr ? "Oluştur kısayolunu gizle" : "Hide Create shortcut", current.hideExtras());
         addSwitch(content, current, FocusConfig.BLOCK_FEED_REELS,
-                tr ? "Gönderiden Reels ekranına geçişi engelle" : "Block Reels viewer from feed posts",
+                tr ? "Akış ve profilden Reels açılmasını engelle" : "Block Reels from feed and profile posts",
                 current.blockFeedReelsOpen());
         TextView note = new TextView(activity);
         note.setText(tr
-                ? "Videolar akışın içinde oynatılmaya devam eder. Keşfet filtresi aynı sekmedeki aramayı da gizler. Bu filtre akışın yalnızca takip ettiklerini içerdiğini garanti etmez. Değişiklikler için ekranı yeniden açman gerekebilir."
-                : "Videos keep playing within the feed. Explore filtering also hides search in that tab. These filters do not guarantee a following-only feed. You may need to reopen a screen after changing a filter.");
+                ? "Videolar akışın içinde oynatılmaya devam eder. Bu ayar açıkken profildeki videolara dokunmak da Reels ekranını açmaz. Keşfet filtresi aynı sekmedeki aramayı da gizler. Bu filtre akışın yalnızca takip ettiklerini içerdiğini garanti etmez. Değişiklikler için ekranı yeniden açman gerekebilir."
+                : "Videos keep playing within the feed. With this setting on, tapping profile videos also leaves the Reels viewer closed. Explore filtering also hides search in that tab. These filters do not guarantee a following-only feed. You may need to reopen a screen after changing a filter.");
         note.setPadding(0, padding / 2, 0, padding / 2);
         content.addView(note);
         final AlertDialog dialog = new AlertDialog.Builder(activity)

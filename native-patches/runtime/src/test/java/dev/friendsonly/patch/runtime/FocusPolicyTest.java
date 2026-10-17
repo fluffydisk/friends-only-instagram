@@ -68,9 +68,18 @@ public final class FocusPolicyTest {
             check(FocusPolicy.shouldBlockFeedReelsOpen(source, true), "known Home-feed viewer source blocked " + source);
             check(!FocusPolicy.shouldBlockFeedReelsOpen(source, false), "feed viewer toggle restores navigation " + source);
         }
+        String[] profileViewerSources = {
+                "PROFILE", "SELF_PROFILE", "FEED_CONTEXTUAL_PROFILE", "FEED_CONTEXTUAL_SELF_PROFILE",
+                "OPAL_USER_PROFILE", "OPAL_USER_SELF_PROFILE", "PRIME_PROFILE", "PRIME_SELF_PROFILE"
+        };
+        for (String source : profileViewerSources) {
+            check(FocusPolicy.shouldBlockFeedReelsOpen(source, true), "known personal-profile viewer source blocked " + source);
+            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, false), "profile viewer toggle restores navigation " + source);
+        }
         String[] preservedViewerSources = {
                 "FEED_TIMELINE_EXPLORE_STORY", "REEL_FEED_TIMELINE", "STORY", "STORIES",
-                "DIRECT", "DIRECT_THREAD", "PROFILE", "PROFILE_GRID", "ADS", "EXPLORE",
+                "DIRECT", "DIRECT_THREAD", "PROFILE_GRID", "ADS", "EXPLORE",
+                "GROUP_PROFILE", "FEED_CONTEXTUAL_GROUP_PROFILE", "GROUP_PROFILE_PENDING_POSTS",
                 "feed_timeline", "FEED_TIMELINE_UNKNOWN", "FEED_TIMELINE_POST_TAP_EXTRA",
                 " FEED_TIMELINE", "FEED_TIMELINE ", "", null
         };

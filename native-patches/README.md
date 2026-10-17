@@ -23,11 +23,11 @@ when given alpha.3 is a helper limitation, not a rejection of the normal install
 See [VERIFICATION.md](VERIFICATION.md) and
 [installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
 
-**Alpha.4 is being built** to stop known Home video-post taps from opening the
-Reels viewer. The full four-patch bundle build passed 139 Python tests, 160 Java
-policy assertions, 26 Kotlin identity assertions and 42 Kotlin feed-guard
-assertions. APK production and phone verification are pending. Alpha.3 remains the working baseline
-below until a new APK is validated and published.
+**Alpha.4 is being built** to stop known video-post taps on Home and user
+profiles from opening the Reels viewer. The combined four-patch bundle passed
+139 Python tests, 180 Java policy assertions, 26 Kotlin identity assertions and
+42 Kotlin guard assertions. APK production and phone checks are pending.
+Alpha.3 remains the working baseline below until a new APK is validated and published.
 
 ## Alpha.3 test APK
 
@@ -69,11 +69,13 @@ Alpha.3 includes three Friends Only patches; alpha.4 adds a fourth:
    Android and Instagram authentication/integrity checks remain in force.
 4. **Feed video taps (alpha.4, APK/phone validation pending):** the
    **Friends Only feed video taps** patch intercepts the Reels/Clips launch path
-   only for six exact Home-feed source values. With its new independent setting
-   enabled, those transitions do nothing; unknown sources and launches from
-   Stories, Direct and profiles pass through. It does not remove video posts or
-   change inline video playback/network requests. Long-press Home and use
-   **Block Reels viewer from feed posts / Gönderiden Reels ekranına geçişi engelle**
+   only for fourteen exact source values: six Home-feed sources and eight
+   user-profile sources, including your own profile. With its independent
+   setting enabled, those transitions do nothing; unknown sources and launches
+   from Stories, Direct and group profiles pass through. It does not remove
+   video posts or change inline video playback/network requests. Long-press Home and use
+   **Akış ve profilden Reels açılmasını engelle** (block the viewer from feed
+   and profiles)
    to change it. The setting defaults on and **Show all** disables it too.
 
 Hiding Explore also hides the Search entry in that tab. This version does not
@@ -248,14 +250,14 @@ filter restores its controls and that unfamiliar layouts remain usable.
 | Hosted API 37 alpha.3 install check | Failed in emulator graphics/services; ADB broken pipe, no PackageManager verdict |
 | Visible phone UI | User screenshot: logged-in Home feed, Stories tray, Home/Messages/Profile navigation |
 | Story playback, Direct sending, groups, login/challenge flow | Not specifically tested/reported |
-| Alpha.4 full bundle and guard | Four patches loaded; 139 Python tests, 160 Java policy assertions, 26 identity + 42 feed-guard Kotlin assertions passed; APK/phone validation pending |
+| Alpha.4 combined bundle/guard | Four patches loaded; 139 Python tests, 180 Java policy assertions, 26 identity + 42 guard Kotlin assertions passed; APK/phone verification pending |
 
 The exact alpha.3 CI APK reached the hosted API 37 installation step, but
 emulator graphics crashes killed services and ADB returned a broken pipe.
 [Run 39019676627](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627)
 failed without a PackageManager verdict; no app launch/login was attempted.
 The earlier WebView app’s phone report is not evidence about these native
-patches. The next milestone is validating alpha.4's narrow feed-to-Reels guard
+patches. The next milestone is validating alpha.4's narrow feed/profile-to-Reels guard
 and recording feature-specific account tests.
 After that, refine the minimalist native appearance from observed layouts and
 establish stable signing for upgrades. Broader feed filtering and a full native redesign remain future work.
@@ -278,10 +280,13 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
 - V2 teşhis aracı eski `com.instagram.android` paketi için hazırlanmıştır.
   Alpha.3'te verdiği paket adı uyuşmazlığı (-2), APK'nin normal kurulumunun
   başarısız olduğu anlamına gelmez. Yeni APK'ları dosya yöneticisiyle kur.
-- Alpha.4, akıştaki videoya dokununca Reels ekranına geçişi durdurmak için
-  hazırlanıyor. Yeni bağımsız ayar varsayılan olarak açık; akış içi videolar
-  korunacak. Dört yamanın derlemesi, 139 Python testi, 160 Java kontrolü ve
-  26 + 42 Kotlin kontrolü geçti; APK üretimi ve cihaz testi bekliyor.
+- Alpha.4, akışta ve kullanıcı profillerinde videoya dokununca Reels ekranına
+  geçişi durdurmak için hazırlanıyor. **Akış ve profilden Reels açılmasını
+  engelle** ayarı varsayılan olarak açık; akış içi videolar korunacak. Mesajlar,
+  hikâyeler, grup profilleri ve tanınmayan kaynaklar bu kuralın dışında.
+  Akış ve profil kapsamındaki dört yama derlendi; 139 Python testi, 180 Java
+  kontrolü, 26 kimlik ve 42 guard Kotlin kontrolü geçti. APK üretimi ve cihaz
+  testi bekliyor.
 - Alpha.3'ün imzası geçiciydi. Yeni sürüm imza nedeniyle güncellenemezse yalnızca
   eski **Friends Only** uygulamasını kaldırıp yenisini kur; yerel oturum ve
   ayarlar silinir. Resmî Instagram'ı kaldırmak veya telefonu sıfırlamak gerekmez.

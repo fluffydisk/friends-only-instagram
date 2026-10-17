@@ -37,11 +37,11 @@ bypass is included.
    version/artifact used rather than assuming all account behavior is verified.
 
 Alpha.4 is in development, with output version code **385806738**. Its new
-**Block Reels viewer from feed posts** setting will stop known Home video-post
-taps from opening the Reels viewer while retaining inline video. Its full
-four-patch bundle passed 139 Python tests, 160 Java policy assertions, 26 Kotlin
-identity assertions and 42 Kotlin feed-guard assertions. APK production and
-phone verification are pending. Use the same file-manager installation flow when that APK is ready.
+**Akış ve profilden Reels açılmasını engelle** setting will stop known
+video-post taps on Home and user profiles from opening the Reels viewer while
+retaining inline video. Its combined four-patch bundle passed 139 Python tests,
+180 Java policy assertions, 26 Kotlin identity assertions and 42 Kotlin guard
+assertions. APK production and phone verification are pending. Use the same file-manager installation flow when that APK is ready.
 
 **Alpha.3's signing key was disposable.** A new key cannot update that installed
 build. If Android rejects the alpha.4 update, uninstall only the older **Friends
@@ -65,7 +65,7 @@ establish that Instagram accepts every login/challenge or feature.
 | Alpha.2, diagnostic v2 | `FAILURE_CONFLICT (5)`, legacy `-7`: `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, signature mismatch |
 | Alpha.3, normal file manager | User confirmed installation/opening; screenshot shows logged-in Home/feed, Stories tray and Home/Messages/Profile navigation |
 | Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
-| Alpha.4 | Bundle build passed; APK production and phone verification pending |
+| Alpha.4 | Combined Home/profile bundle passed; APK production and phone verification pending |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

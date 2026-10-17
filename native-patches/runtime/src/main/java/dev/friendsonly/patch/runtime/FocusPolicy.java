@@ -44,8 +44,8 @@ public final class FocusPolicy {
     }
 
     /**
-     * Stop only supported Home-feed transitions into the Reels viewer. Inline media, Stories,
-     * conversations, profiles and unknown launch sources remain outside this navigation guard.
+     * Stop only supported Home-feed and personal-profile transitions into the Reels viewer.
+     * Inline media, Stories, conversations and unknown launch sources stay outside this guard.
      * This choice is independent of hiding the Reels navigation tab.
      */
     public static boolean shouldBlockFeedReelsOpen(String sourceName, boolean enabled) {
@@ -54,7 +54,15 @@ public final class FocusPolicy {
                 || "FEED_TIMELINE_FOLLOWING".equals(sourceName)
                 || "FEED_TIMELINE_FAVORITES".equals(sourceName)
                 || "FEED_TIMELINE_ALL".equals(sourceName)
-                || "FEED_TIMELINE_MIXED_UNCONNECTED".equals(sourceName));
+                || "FEED_TIMELINE_MIXED_UNCONNECTED".equals(sourceName)
+                || "PROFILE".equals(sourceName)
+                || "SELF_PROFILE".equals(sourceName)
+                || "FEED_CONTEXTUAL_PROFILE".equals(sourceName)
+                || "FEED_CONTEXTUAL_SELF_PROFILE".equals(sourceName)
+                || "OPAL_USER_PROFILE".equals(sourceName)
+                || "OPAL_USER_SELF_PROFILE".equals(sourceName)
+                || "PRIME_PROFILE".equals(sourceName)
+                || "PRIME_SELF_PROFILE".equals(sourceName));
     }
 
     private static boolean matchesExactEndpoint(String path, String[] endpoints) {

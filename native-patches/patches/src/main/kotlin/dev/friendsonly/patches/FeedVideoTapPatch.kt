@@ -82,7 +82,7 @@ private object FeedViewerLaunch : Fingerprint(custom = ::isFeedViewerLaunchCandi
 @Suppress("unused")
 val feedVideoTaps = bytecodePatch(
     name = "Friends Only feed video taps",
-    description = "Keeps Home video taps out of the Reels viewer when enabled; leaves inline playback and other entry sources unchanged.",
+    description = "Keeps Home and personal-profile video taps out of the Reels viewer when enabled; leaves inline playback and other entry sources unchanged.",
     default = true,
 ) {
     compatibleWith(INSTAGRAM)

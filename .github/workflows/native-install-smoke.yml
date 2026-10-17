@@ -235,20 +235,25 @@ jobs:
           if 'arm64-v8a' not in abis:
               raise SystemExit('The stock image does not advertise arm64-v8a support; this APK cannot be tested here.')
           PY
-          timeout 15s "$adb_bin" -s "$serial" shell df -k /data > "$reports/device-data-disk-kib.txt"
+          timeout 15s "$adb_bin" -s "$serial" shell df -k /data | tee "$reports/device-data-disk-kib.txt"
           python3 - <<'PY'
-          import json, pathlib
+          import json, pathlib, re
           reports = pathlib.Path('native-install-reports')
           required = 2 * 1024 ** 3
           record = {'phase': 'emulator_storage_preflight', 'required_free_bytes': required}
           try:
-              rows = [line.split() for line in (reports / 'device-data-disk-kib.txt').read_text().splitlines()]
-              data_rows = [row for row in rows if len(row) >= 6 and row[-1] == '/data']
-              if len(data_rows) != 1:
-                  raise ValueError('Expected one /data row from df -k.')
-              available = int(data_rows[0][3]) * 1024
-              if available < 0:
-                  raise ValueError('Negative available space.')
+              # The command is scoped to /data, but Android can report its /data/user/0 bind mount.
+              rows = [line.split() for line in (reports / 'device-data-disk-kib.txt').read_text().splitlines() if line.strip()]
+              if rows and rows[0] == ['Filesystem', '1K-blocks', 'Used', 'Available', 'Use%', 'Mounted', 'on']:
+                  rows = rows[1:]
+              if len(rows) != 1:
+                  raise ValueError('Expected exactly one filesystem row from df -k /data.')
+              row = rows[0]
+              if (len(row) != 6 or not all(re.fullmatch(r'[0-9]+', field) for field in row[1:4])
+                      or not re.fullmatch(r'[0-9]+%', row[4]) or not row[5].startswith('/')):
+                  raise ValueError('Malformed filesystem row from df -k /data.')
+              available = int(row[3]) * 1024
+              record['reported_mount'] = row[5]
               record['available_free_bytes'] = available
               record['status'] = 'ready' if available >= required else 'insufficient_space'
           except ValueError as error:

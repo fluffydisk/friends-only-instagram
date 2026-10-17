@@ -1,13 +1,19 @@
 # Legacy Android installation diagnostic v2
 
-**Use this helper only for the older `com.instagram.android` APKs.** Alpha.3
-and later use `dev.friendsonly.instagram`; install those through the normal file
-manager. The user has confirmed alpha.3 installs and opens that way.
-[Download the current alpha.5 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262)
-and install it through the file manager. Its local/GitHub builds passed, but its
-phone installation, UI, feed and account behavior are unverified. Alpha.3 is the
-only native phone-tested baseline; the user has not tested alpha.4. Do not use
-this legacy helper for either later build.
+**Alpha.5 is withdrawn: normal installation succeeds, then the app closes
+immediately on opening. Do not redownload/reinstall artifact 55.** Alpha.6 is
+being fixed; no replacement APK is available yet. A confirmed theme color
+contract bug is consistent with the crash, but there is no phone stack trace
+proving it is the sole cause. See [current troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
+
+**This helper only supports old `com.instagram.android` APKs.** Alpha.3 and later
+use `dev.friendsonly.instagram`. Its -2 package-hint error is a tool limitation;
+it does not contradict alpha.5's successful file-manager installation and does
+not diagnose its startup crash. Do not retry the broken APK through this tool.
+Alpha.3 is the fallback known to open; alpha.4 remains untested. Use normal
+file-manager installation for a valid fallback/future fixed APK, with only
+Friends Only removed if replacement requires it. This clears local app data;
+official Instagram and the phone do not need resetting/removal.
 
 [Download the v2 diagnostics APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39017587861/artifacts/12094909613)
 from the successful cloud build. Sign into GitHub, extract the ZIP and install

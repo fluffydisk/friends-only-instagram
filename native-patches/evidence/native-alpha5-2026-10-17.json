@@ -35,7 +35,7 @@
     "additional_original_resource_audit_assertions": 97,
     "local_apk_build": "passed_final_delivery_source",
     "github_apk_build": "passed_final_delivery_source",
-    "physical_installation_and_new_features": "not_tested",
+    "physical_installation_and_new_features": "user_reports_normal_installation_success_but_repeated_startup_crash",
     "fixed_build_issue": "The pinned resource encoder rejected new named palette values even after PublicXmlManager allocation. Palette colors are now typed literals in the exact semantic/launch attributes and launch drawables; no new named color resources or existing color ID edits are needed.",
     "independent_runtime_review": "No release-blocking code defect found in bounded chrome, lifecycle, input, theme, accessibility, config or Home filter; physical behavior untested.",
     "aapt2_new_drawable_compile_and_link": "passed using Android 35 framework, actual selectors/day-night launch XML with a mock own icon and two source attribute stubs; not a full Instagram APK test",
@@ -117,7 +117,7 @@
     "Disk-cache and alternate-render bypasses are not verified.",
     "No chronology, completeness or live server/account feed guarantee is established by static tests.",
     "Original post, Story, Direct and profile components remain; unfamiliar or unverified native surfaces keep original behavior.",
-    "Physical alpha.3 installation/Home are user-confirmed; user explicitly has not tested alpha.4, and alpha.5 is not phone-tested.",
+    "Physical alpha.3 installation/Home are user-confirmed; user explicitly has not tested alpha.4, and alpha.5 is user-confirmed to install but crashes on opening.",
     "Test builds use disposable signing unless stable repository secrets are configured; replacement can require removing only Friends Only."
   ],
   "superseded_cloud_attempts": [
@@ -463,5 +463,25 @@
     "Friends Only following feed",
     "Friends Only quiet visual theme"
   ],
-  "signing": "Cloud output uses a disposable non-preserved key; removing only the old Friends Only native app is required for an incompatible signer, which clears that app local session and settings. Official Instagram removal is unnecessary."
+  "signing": "Cloud output uses a disposable non-preserved key; removing only the old Friends Only native app is required for an incompatible signer, which clears that app local session and settings. Official Instagram removal is unnecessary.",
+  "phone_report_after_delivery": {
+    "device": "samsung SM-S926B",
+    "android_sdk": 37,
+    "android": "17",
+    "one_ui": "9",
+    "normal_installation": "succeeds_after_removing_old_Friends_Only",
+    "opening": "repeated_crash_user_report_and_Samsung_error_dialog",
+    "exact_cloud_apk_sha256": "c9294c038a6727b5686b1bff8585630094f05ef2dae3a9444fb080775d32f646",
+    "apk_size_bytes": 253171054,
+    "old_v2_diagnostic": "Its INSTALL_FAILED_INVALID_APK -2 is the hardcoded com.instagram.android session hint conflicting with dev.friendsonly.instagram; confirmation count 0. This is separate from the installed app startup crash.",
+    "actual_exception_stacktrace": "not_available",
+    "recommendation": "withdraw_alpha5_as_recommended_download; repair_theme_contract_before_next_device_attempt"
+  },
+  "identified_code_regression": {
+    "native_consumer": "LX/00RQ;->A0b(Context,int) resolves a TypedValue and returns its resourceId without literal-color fallback",
+    "startup_callsite": "InstagramMainActivity.A1y uses igds_color_primary_background (0x7f0407b1) -> A0b -> Context.getColor(id)",
+    "alpha5_defect": "47 semantic theme attributes were changed from color resource references to inline ARGB values. Resolving a literal yields resourceId 0; Context.getColor(0) cannot load a resource.",
+    "scope_of_evidence": "Concrete source/runtime-contract defect consistent with reported crash. The exact phone exception and whether it is the only failure have not been captured.",
+    "fix_status": "in_progress; restore resource references using own registered color resources, preserve original color values and identifiers"
+  }
 }

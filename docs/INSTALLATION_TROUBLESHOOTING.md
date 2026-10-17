@@ -1,13 +1,22 @@
 # Native APK installation results
 
-**Alpha.3 installs and opens on the user's Galaxy S24+ (SM-S926B), Android
-17 / SDK 37 / One UI 9, through the normal file manager.** Their screenshot
-shows a logged-in Home feed, Stories tray and Home/Messages/Profile navigation.
-Story playback, message sending, groups and the login/challenge flow have not
-been separately confirmed. The earlier alpha.1/alpha.2 installation errors
-remain recorded below as history. The user explicitly has **not tested
-alpha.4** yet. Alpha.5's downloadable APK is ready; its installation, appearance,
-strict feed and account behavior on the phone are unverified.
+**Alpha.5 installs but closes immediately on opening on the user's Galaxy S24+
+(SM-S926B), Android 17 / SDK 37 / One UI 9. It is withdrawn.** The user removed
+the older Friends Only app before the successful normal installation. The
+selected file's SHA-256/size match CI artifact 55. **Do not download or reinstall
+that artifact.** Alpha.6 is being fixed; no replacement APK is available yet.
+
+A confirmed theme code-contract bug is consistent with this crash: native color
+consumers expect resource IDs, but alpha.5 supplies inline colors that resolve
+to ID zero. No phone stack trace has been captured, so that is not established
+as the sole phone cause. Passing compilation, signing and static audits did not
+validate startup.
+
+Alpha.3 is the only native build known to open on this phone; its screenshot
+shows logged-in Home/feed, Stories tray and three-tab navigation. Story playback,
+message sending, groups and the login/challenge flow were not separately
+verified. The user has not tested alpha.4. See
+[native verification](../native-patches/VERIFICATION.md) for the updated evidence.
 
 ## Legacy helper error on alpha.3
 
@@ -22,11 +31,16 @@ The same APK installed and opened normally through the file manager.
 
 Do not use that helper for alpha.3 or later own-package APKs. The helper's
 printed `Package: com.instagram.android` field is fixed; it does not determine
-the selected APK's real identity.
+the selected APK's real identity. The same package-hint limitation still
+applies to alpha.5; do not repeat that helper test to investigate its separate
+startup crash.
 
-## Alpha.5: a short or empty Home feed
+## Intended feed/settings behavior after a working startup fix
 
-Alpha.5 adds **Only accounts I follow / Yalnızca takip ettiğim hesaplar**, on by
+Alpha.5 closes before Settings or Home can be tested. The following describes
+the implemented design and is not a workaround for its startup crash.
+
+The new filter adds **Only accounts I follow / Yalnızca takip ettiğim hesaplar**, on by
 default. It uses existing metadata in the supported Home response parser:
 ordinary posts need the primary author's explicit `following = true`; injected,
 non-post and unknown units are discarded. Missing relationship metadata is
@@ -34,7 +48,7 @@ rejected too, so even a followed account's post can be hidden and Home can be
 short or empty. Cached/alternate render paths and the actual phone behavior are
 unverified; this is not a server-side chronological-feed guarantee.
 
-If Home is unexpectedly empty, open the Home **Settings / Ayarlar** button or
+Once a fixed build can open, if Home is unexpectedly empty, open the Home **Settings / Ayarlar** button or
 long-press Home, turn off that following filter, then refresh Home. Refresh
 again when enabling it. Standalone Story, Direct and profile parsers are
 unchanged. Home-embedded Story cards without a primary media post are dropped
@@ -54,36 +68,20 @@ Kotlin 26/42/35/92 checks. Independent emitted DEX/resource audits passed on the
 final local APK; those audits were not repeated on the CI APK bytes. These
 checks do not prove rendered phone UI or feed behavior.
 
-## Install the alpha.5 test APK
+## Fallback or wait for alpha.6
 
-Alpha.5 uses **`dev.friendsonly.instagram`**, the **Friends Only** launcher name,
-our own icon and version code **385806739**. It uses Android's normal
-separate-package installation flow. No signature, authentication or integrity
-bypass is included.
+The [alpha.3 fallback artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+is the only native build confirmed to open on the phone. If you choose to return
+to it, extract the ZIP and install `friends-only-personal.apk` through the normal
+file manager. Disposable signing keys and downgrade checks may require removing
+only **Friends Only** first; that clears its local session/settings and may
+require signing in again. **Do not remove official Instagram, delete profiles
+or reset the phone.** Do not use the old v2 diagnostic helper for our own package.
 
-1. Download [the alpha.5 `friends-only-personal-test-apk-55` ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262)
-   while signed into GitHub, and extract `friends-only-personal.apk`.
-2. Open the APK through the phone's file manager and complete Android's normal
-   confirmation. Allow the selected source to request installation if asked.
-3. Open **Friends Only**. Test specific features separately and report the
-   version/artifact used rather than assuming all account behavior is verified.
-
-Alpha.5 also includes **Akış ve profilden Reels açılmasını engelle**, first
-introduced in alpha.4 and enabled by default. It is intended to stop known
-Home/user-profile video taps from opening Reels while retaining inline video.
-Neither version's tap behavior has been phone-tested.
-
-**Alpha.3's signing key was disposable.** A new key cannot update that installed
-build. If Android rejects the new update, uninstall only the older **Friends
-Only** native app, then install the new APK; that clears Friends Only's local
-session/settings. **Do not remove official Instagram, delete profiles or reset
-the phone.** Official Instagram can remain installed or be restored from Play
-Store. Its local data is separate. The workflow supports stable signing with
-three optional repository secrets, documented in the
-[native README](../native-patches/README.md); current integration permissions
-cannot set them automatically. No secrets or paid services are required to
-compile APKs. Successful installation and a visible authenticated Home do not
-establish that Instagram accepts every login/challenge or feature.
+Alpha.6's startup fix is in progress; there is no new APK yet. Do not reinstall
+the broken artifact 55 while waiting. The workflow's optional stable-signing
+setup is documented in the [native README](../native-patches/README.md); no secret
+or paid service is required to build an APK.
 
 ## Recorded installation history
 
@@ -96,7 +94,8 @@ establish that Instagram accepts every login/challenge or feature.
 | Alpha.3, normal file manager | User confirmed installation/opening; screenshot shows logged-in Home/feed, Stories tray and Home/Messages/Profile navigation |
 | Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
 | Alpha.4 | Combined Home/profile local and GitHub APK checks passed; user explicitly has not phone-tested it |
-| Alpha.5 | Local and GitHub six-patch APK builds passed; independent emitted audits on local APK passed; phone installation/UI/feed/account verification pending |
+| Alpha.5 | Normal installation succeeded after old Friends Only removal; opening closes immediately; withdrawn despite passing static builds/audits |
+| Alpha.6 | Startup fix in progress; no new APK yet |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

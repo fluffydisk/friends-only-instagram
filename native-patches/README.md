@@ -5,61 +5,46 @@ Android. It changes selected controls in Instagram’s native interface; it does
 not replace the existing Friends Only WebView application. That application and
 its build workflow remain separate.
 
-**The bundle is not an installable APK.** The supplied original APKM's 11
-inner APKs passed signature and identity validation; merging preserved its
-original code, native libraries and assets. Alpha.3's signed APK passed
-[GitHub build checks](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357)
-and the user **installed and opened it through the phone's file manager** on a
-Galaxy S24+ running Android 17 / One UI 9. Their screenshot shows a logged-in
-Home feed, Stories tray and Home/Messages/Profile navigation. Story playback,
-Direct sending, groups and the login/challenge flow have not been specifically
-verified. The user reports the app's features look good overall.
+**Alpha.5 is withdrawn from recommended use.** The user confirmed normal
+installation of the exact CI artifact 55 on their Galaxy S24+ (Android 17 /
+SDK 37 / One UI 9), then reported immediate closure when opening it. **Do not
+redownload, reinstall or retry that APK.** Alpha.6 is being fixed; no new APK is
+available yet. Passing compilation, signing and static audits did not establish
+startup compatibility.
 
-Alpha.3 uses **`dev.friendsonly.instagram`**, launcher name **Friends Only** and
-our own vector icon. This separate identity resolved the earlier same-package
-installation obstacle without bypassing Android's signature checks. The older
-v2 diagnostic helper hardcodes `com.instagram.android`; its package-hint error
-when given alpha.3 is a helper limitation, not a rejection of the normal install.
-See [VERIFICATION.md](VERIFICATION.md) and
-[installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
+The theme contains a confirmed native contract bug: semantic color consumers
+expect resource IDs, but alpha.5 supplies inline colors that resolve to ID zero.
+That is consistent with the reported crash; no actual phone stack trace has
+been captured, so it is not established as the only phone cause. The alpha.5
+[build artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262)
+is retained **only as broken historical evidence**, not an installation
+recommendation. See [verification](VERIFICATION.md) and
+[troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
 
-**Alpha.5 is ready for phone testing**, with six patches in total. It adds a
-strict metadata-based Home filter and a quiet Friends Only shell/theme. Its
-output version code is **385806739**. Local and
-[GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948)
-passed 140 Python tests, Java suites 180/32/26 and Kotlin suites 26/42/35/92.
-Independent final local APK audits also passed; their scope is documented in
-[verification](VERIFICATION.md). **Alpha.5 installation, appearance, strict
-feed, Stories, Direct and authentication behavior on the phone are unverified.**
-The user explicitly has not tested alpha.4; alpha.3 remains the only confirmed
-native phone baseline.
+## Fallback known to open: alpha.3
 
-## Download the alpha.5 test APK
+The user installed/opened alpha.3 through the normal file manager. Their
+screenshot shows logged-in Home/feed, the Stories tray and Home/Messages/Profile
+navigation. Story playback, Direct sending, groups and the login/challenge flow
+were not separately verified. The user has not tested alpha.4.
 
-[Download `friends-only-personal-test-apk-55`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262)
-from the successful six-patch build. Sign into GitHub in a browser, extract the
-ZIP, and open `friends-only-personal.apk` through Android's normal file-manager
-installation flow. The artifact is retained for 7 days. Its package is
-**`dev.friendsonly.instagram`**, version code **385806739**.
+[Alpha.3 `friends-only-personal-test-apk-35`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+is the fallback baseline, version code **385806737**. Extract its ZIP and use the
+file manager. New/disposable signatures and downgrade checks may require
+removing only **Friends Only** first, clearing that app's local session/settings;
+you may need to sign in again. Official Instagram does not need removal. No
+profile deletion, phone reset or legacy v2 installer helper is needed.
 
-The content filters and minimal header/navigation default on. Open Home
-**Settings / Ayarlar**, or long-press Home, to change them. Read the strict-feed
-and in-feed Story limitations below before testing.
+Alpha.3's independent `dev.friendsonly.instagram` identity resolved the original
+same-package installation obstacle. The legacy v2 helper still hardcodes
+`com.instagram.android`: its -2 package-hint error for our own-package APKs is
+separate from the successful normal installation and subsequent alpha.5 crash.
 
-Use the file manager; the old v2 diagnostic helper targets another package.
-These CI builds use disposable signing keys. If Android rejects the update,
-remove only the older **Friends Only** native app and install alpha.5; that
-clears its local session/settings. Official Instagram does not need removal.
-
-## Previous builds
-
-The user confirmed alpha.3 installation/opening. Its
-[`friends-only-personal-test-apk-35`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-is a fallback baseline, version code **385806737**.
-[Alpha.4 `friends-only-personal-test-apk-44`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
-adds the Home/profile tap guard but lacks the new strict Home filter and quiet
-shell, and the user has not phone-tested it. Alpha.2's same-package artifact 17
-failed on this phone and is historical evidence only.
+[Alpha.4's artifact 44](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
+is an earlier, untested-on-phone build and is not presented as a confirmed
+working upgrade. The withdrawn alpha.5 added the strict following feed and quiet
+shell (six patches), version code **385806739**. Their code/static evidence is
+retained below; alpha.6 output and runtime evidence are pending.
 
 ## Initial scope
 
@@ -98,7 +83,7 @@ following-feed and quiet-theme patches (six total):
    feed and profiles) to change it. The setting defaults on; alpha.5's **Disable filters** also
    disables this guard.
 
-5. **Following feed (alpha.5, phone validation pending):** the
+5. **Following feed (withdrawn alpha.5; startup fix pending):** the
    **Friends Only following feed** patch filters two ordinary-item array
    boundaries inside the supported Home response parser. A post is kept only
    when the primary author's existing `friendship_status.following` is exactly
@@ -109,7 +94,7 @@ following-feed and quiet-theme patches (six total):
    is added. Shared media, standalone Stories, Direct and profile parsers are
    not patched. Story units embedded in the Home feed are dropped too when
    they have no primary media post; they are not proven recommendation-only.
-6. **Quiet visual theme (alpha.5, phone validation pending):**
+6. **Quiet visual theme (withdrawn alpha.5; startup fix pending):**
    **Friends Only quiet visual theme** supplies warm neutral light/dark
    surfaces, restrained Story rings, independent tab artwork and own OS splash
    branding. Runtime decoration gives the supported Home toolbar a Friends Only
@@ -121,7 +106,10 @@ following-feed and quiet-theme patches (six total):
    polling timer or global observer. This is not a complete new post/chat
    renderer; other Instagram chrome can remain outside these verified scopes.
 
-## Alpha.5 settings and limits
+## Implemented settings and limits · startup fix pending
+
+Alpha.5 closes before these features can be tested. The following describes the
+implemented design; wait for a replacement APK with verified startup behavior.
 
 **Only accounts I follow / Yalnızca takip ettiğim hesaplar** (`following_only`)
 defaults on. Missing relationship metadata is not treated as proof of following:
@@ -280,6 +268,10 @@ or generated patched APK belongs in this repository.
 
 ## Phone installation, after output verification
 
+A passing static report is not startup validation. Do not use these general
+steps to retry withdrawn alpha.5; use the known-to-open alpha.3 fallback or wait
+for the alpha.6 replacement.
+
 First require a successful application report and output signature/package
 verification. Alpha.3's output package is **`dev.friendsonly.instagram`**, separate
 from official Instagram's **`com.instagram.android`**. You do not need to remove
@@ -320,15 +312,16 @@ filter restores its controls and that unfamiliar layouts remain usable.
 | Visible phone UI | User screenshot: logged-in Home feed, Stories tray, Home/Messages/Profile navigation |
 | Story playback, Direct sending, groups, login/challenge flow | Not specifically tested/reported |
 | Alpha.4 combined bundle/guard | Local and GitHub APK builds passed: 139 Python tests, 180 Java policy assertions, 26 identity + 42 guard Kotlin assertions; user explicitly has not phone-tested it |
-| Alpha.5 strict feed/quiet shell | Local and GitHub signed APK builds passed all six patches; Python 140, Java 180/32/26, Kotlin 26/42/35/92; independent emitted DEX/resource audits passed on final local APK; phone verification pending |
+| Alpha.5 strict feed/quiet shell | Static builds/audits passed, but phone installation succeeded then opening immediately crashed; withdrawn |
+| Alpha.6 startup fix | In progress; no replacement APK yet |
 
 The exact alpha.3 CI APK reached the hosted API 37 installation step, but
 emulator graphics crashes killed services and ADB returned a broken pipe.
 [Run 39019676627](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627)
 failed without a PackageManager verdict; no app launch/login was attempted.
 The earlier WebView app’s phone report is not evidence about these native
-patches. The next milestone is validating alpha.5's strict Home filter and
-native shell, then recording feature-specific phone tests. Alpha.4 remains untested on the
+patches. The next milestone is fixing and validating startup in alpha.6 before
+attempting strict-feed or UI feature tests. Alpha.4 remains untested on the
 user's phone.
 After that, refine the minimalist native appearance from observed layouts and
 establish stable signing for upgrades. Coverage of additional feed/render paths
@@ -360,8 +353,12 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   kontrolü, 26 kimlik ve 42 guard Kotlin kontrolü geçti. Cloud ortamındaki imzalı
   APK'nin statik kontrolleri ve bağımsız guard kontrolü de geçti. GitHub APK
   derlemesi başarılıydı; kullanıcı alpha.4'ü telefonda henüz denemedi. Güncel
-  alpha.5 bu engeli de içerir; yeni indirme bağlantısı üstteki artifact 55'tir.
-- Alpha.5 telefon testi için hazır: Ana Sayfa'da yalnızca gönderinin asıl yazarını takip
+  alpha.5 de bu engeli içerir, fakat açılış hatası nedeniyle geri çekilmiştir;
+  artifact 55 kurulmasını önermiyoruz.
+- Alpha.5 geri çekildi: normal kurulum başarılı, fakat açılır açılmaz kapanıyor.
+  Artifact 55'i yeniden indirip kurma. Alpha.6 düzeltmesi hazırlanıyor; henüz
+  yeni APK yok. Alpha.3 telefonda açıldığı bilinen geri dönüş sürümüdür.
+- Alpha.5'te uygulanan ama cihazda doğrulanamayan tasarım: Ana Sayfa'da yalnızca gönderinin asıl yazarını takip
   ettiğine dair açık bilgi varsa gönderiyi tutan katı filtre ve sade açık/koyu
   tema ekleniyor. Friends Only başlığı, **Ayarlar** düğmesi ve
   **Arkadaşlar / Sohbetler / Ben** gezinmesi var; tüm gönderi/sohbet bileşenleri
@@ -372,10 +369,9 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   Üst hikâye sırasının oynatılması ayrıca telefonda test edilmelidir. Altı yama
   son derlemede geçti: 140 Python testi, tüm Java/Kotlin kontrolleri (92 tema
   kontrolü dahil), ayrıca 97 kaynak kontrolü ve ayrı drawable derleme kontrolü
-  başarılı. Yerel ve GitHub imzalı APK derlemeleri geçti; yukarıdaki
-  `friends-only-personal-test-apk-55` bağlantısından indir. Alpha.5'in kurulumu,
-  görünümü, akışı ve hesap özellikleri telefonda henüz doğrulanmadı. Alpha.4 de
-  henüz telefonda denenmedi.
+  başarılıydı; fakat bu statik kontroller açılışı doğrulamadı. Alpha.5'in
+  telefona kurulması başarılı, açılması başarısız. Görünüm, akış ve hesap
+  özellikleri test edilemedi. Alpha.4 de henüz telefonda denenmedi.
 - Alpha.3'ün imzası geçiciydi. Yeni sürüm imza nedeniyle güncellenemezse yalnızca
   eski **Friends Only** uygulamasını kaldırıp yenisini kur; yerel oturum ve
   ayarlar silinir. Resmî Instagram'ı kaldırmak veya telefonu sıfırlamak gerekmez.

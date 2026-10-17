@@ -114,31 +114,105 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android/sdk/ndk
           df -h / | tee native-install-reports/disk-after.txt
           image="system-images;android-${SMOKE_ANDROID_API};google_apis;x86_64"
-          if ! sdkmanager "$image" 2>&1 | tee native-install-reports/system-image-download.txt; then
-            sdkmanager "$image" 2>&1 | tee native-install-reports/system-image-retry.txt
+          if ! sdkmanager emulator "$image" 2>&1 | tee native-install-reports/system-image-download.txt; then
+            sdkmanager emulator "$image" 2>&1 | tee native-install-reports/system-image-retry.txt
           fi
+          test -c /dev/kvm
           sudo chmod a+rw /dev/kvm
-      - name: Prepare installation and failure diagnostics script
+          "$ANDROID_HOME/emulator/emulator" -accel-check 2>&1 | tee native-install-reports/emulator-acceleration.txt
+      - name: Prepare bounded emulator and installation script
         shell: bash
         run: |
           cat > "$RUNNER_TEMP/friends-only-existing-apk-smoke.sh" <<'SH'
           #!/usr/bin/env bash
           set -euo pipefail
-          collect_failure_diagnostics() {
+          reports="$PWD/native-install-reports"
+          adb_bin="$ANDROID_HOME/platform-tools/adb"
+          emulator_bin="$ANDROID_HOME/emulator/emulator"
+          serial=emulator-5554
+          emulator_pid=''
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/friends-only-smoke-avd"
+          mkdir -p "$ANDROID_AVD_HOME"
+          collect_diagnostics_and_stop() {
             result=$?
             trap - EXIT
-            printf '%s\n' "$result" > native-install-reports/install-script-exit-code.txt
+            printf '%s\n' "$result" > "$reports/install-script-exit-code.txt"
+            # These bounded commands also run when boot readiness fails before installation.
+            timeout 20s "$adb_bin" -s "$serial" logcat -d -v threadtime > "$reports/emulator-logcat.txt" 2>&1 || true
+            timeout 15s "$adb_bin" -s "$serial" shell service list > "$reports/emulator-services.txt" 2>&1 || true
+            timeout 15s "$adb_bin" -s "$serial" shell getprop > "$reports/emulator-properties.txt" 2>&1 || true
             if [ "$result" -ne 0 ]; then
-              adb logcat -d -v threadtime > native-install-reports/failure-logcat.txt 2>&1 || true
-              adb shell dumpsys package installs > native-install-reports/failure-install-sessions.txt 2>&1 || true
-              adb shell dumpsys package > native-install-reports/failure-package-manager.txt 2>&1 || true
+              timeout 20s "$adb_bin" -s "$serial" shell dumpsys package installs > "$reports/failure-install-sessions.txt" 2>&1 || true
+              timeout 20s "$adb_bin" -s "$serial" shell dumpsys package > "$reports/failure-package-manager.txt" 2>&1 || true
+            fi
+            timeout 10s "$adb_bin" -s "$serial" emu kill > "$reports/emulator-stop.txt" 2>&1 || true
+            if [ -n "$emulator_pid" ]; then
+              kill "$emulator_pid" 2>/dev/null || true
+              for _ in 1 2 3 4 5; do
+                if ! kill -0 "$emulator_pid" 2>/dev/null; then break; fi
+                sleep 1
+              done
+              kill -KILL "$emulator_pid" 2>/dev/null || true
+              wait "$emulator_pid" 2>/dev/null || true
             fi
             exit "$result"
           }
-          trap collect_failure_diagnostics EXIT
-          adb shell getprop ro.build.version.sdk > native-install-reports/device-sdk.txt
-          adb shell getprop ro.build.version.release > native-install-reports/device-android-release.txt
-          adb shell getprop ro.product.cpu.abilist > native-install-reports/device-abis.txt
+          trap collect_diagnostics_and_stop EXIT
+          image="system-images;android-${SMOKE_ANDROID_API};google_apis;x86_64"
+          printf 'no\n' | avdmanager create avd --force --name friends-only-smoke --package "$image" --device pixel_6 2>&1 | tee "$reports/avd-creation.txt"
+          "$adb_bin" start-server
+          "$emulator_bin" -avd friends-only-smoke -port 5554 -cores 2 -memory 4096 \
+            -accel on -no-window -gpu swiftshader_indirect -no-snapshot -noaudio \
+            -no-boot-anim -no-metrics -camera-back none -camera-front none \
+            > "$reports/emulator-console.txt" 2>&1 &
+          emulator_pid=$!
+          deadline=$((SECONDS + 420))
+          ready=false
+          readiness_adb() {
+            remaining=$((deadline - SECONDS))
+            if [ "$remaining" -le 0 ]; then return 124; fi
+            if [ "$remaining" -gt 10 ]; then remaining=10; fi
+            timeout "${remaining}s" "$adb_bin" -s "$serial" "$@"
+          }
+          while [ "$SECONDS" -lt "$deadline" ]; do
+            if ! kill -0 "$emulator_pid" 2>/dev/null; then
+              echo 'Emulator exited before Android services were ready.' | tee -a "$reports/readiness.txt"
+              exit 1
+            fi
+            # sys.boot_completed alone can become 1 before system_server services exist.
+            # Check callable PackageManager/Settings as well as the live input service.
+            if readiness_adb get-state >> "$reports/readiness.txt" 2>&1 \
+              && boot_completed=$(readiness_adb shell getprop sys.boot_completed 2>> "$reports/readiness.txt") \
+              && [ "${boot_completed//$'\r'/}" = 1 ]; then
+              services_ready=true
+              for service_name in package input settings; do
+                if service_state=$(readiness_adb shell service check "$service_name" 2>> "$reports/readiness.txt"); then
+                  printf '%s\n' "$service_state" >> "$reports/readiness.txt"
+                  if [ "${service_state//$'\r'/}" != "Service $service_name: found" ]; then
+                    services_ready=false
+                  fi
+                else
+                  services_ready=false
+                fi
+              done
+              if [ "$services_ready" = true ] \
+                && packages=$(readiness_adb shell cmd package list packages --user 0 android 2>> "$reports/readiness.txt") \
+                && printf '%s\n' "$packages" | tr -d '\r' | grep -qx 'package:android' \
+                && readiness_adb shell settings get global device_provisioned >> "$reports/readiness.txt" 2>&1; then
+                ready=true
+                break
+              fi
+            fi
+            sleep 2
+          done
+          if [ "$ready" != true ]; then
+            echo 'Android package, input and settings services did not become ready within 420 seconds; no installation attempted.' | tee -a "$reports/readiness.txt"
+            exit 1
+          fi
+          echo 'Android package, input and settings services are ready.' | tee -a "$reports/readiness.txt"
+          timeout 15s "$adb_bin" -s "$serial" shell getprop ro.build.version.sdk > "$reports/device-sdk.txt"
+          timeout 15s "$adb_bin" -s "$serial" shell getprop ro.build.version.release > "$reports/device-android-release.txt"
+          timeout 15s "$adb_bin" -s "$serial" shell getprop ro.product.cpu.abilist > "$reports/device-abis.txt"
           python3 - <<'PY'
           import os, pathlib
           reports = pathlib.Path('native-install-reports')
@@ -150,24 +224,13 @@ jobs:
           if 'arm64-v8a' not in abis:
               raise SystemExit('The stock image does not advertise arm64-v8a support; this APK cannot be tested here.')
           PY
-          adb install --no-streaming native-install-input/friends-only-personal.apk 2>&1 | tee native-install-reports/adb-install.txt
+          # One ordinary install only: no retry, downgrade/reinstall flags, app launch, or login.
+          timeout --signal=TERM --kill-after=15s 300s "$adb_bin" -s "$serial" install --no-streaming native-install-input/friends-only-personal.apk 2>&1 | tee "$reports/adb-install.txt"
           SH
-      - name: Install existing APK once on a fresh stock emulator
-        timeout-minutes: 15
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ inputs.android_api }}
-          system-image-api-level: ${{ inputs.android_api }}
-          target: google_apis
-          arch: x86_64
-          profile: pixel_6
-          cores: 2
-          ram-size: 2048M
-          disable-linux-hw-accel: false
-          disable-animations: true
-          emulator-boot-timeout: 420
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
-          script: bash "$RUNNER_TEMP/friends-only-existing-apk-smoke.sh"
+      - name: Install existing APK once after Android services are ready
+        timeout-minutes: 16
+        shell: bash
+        run: bash "$RUNNER_TEMP/friends-only-existing-apk-smoke.sh"
       - name: Upload installation evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4

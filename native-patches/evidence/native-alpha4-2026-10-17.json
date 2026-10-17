@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "version": "0.3.0-alpha.4",
+  "date_utc": "2026-10-17",
+  "trigger": "Phone-confirmed alpha.3 installation and visible Home video; tapping the post enters the full Reels viewer.",
+  "changes": {
+    "patch_name": "Friends Only feed video taps",
+    "setting": "block_feed_reels_open",
+    "default_enabled": true,
+    "source_enum_names": [
+      "FEED_TIMELINE",
+      "FEED_TIMELINE_POST_TAP",
+      "FEED_TIMELINE_FOLLOWING",
+      "FEED_TIMELINE_FAVORITES",
+      "FEED_TIMELINE_ALL",
+      "FEED_TIMELINE_MIXED_UNCONNECTED"
+    ],
+    "entry_method": "LX/05b6;->A0C(Landroid/view/View;Landroidx/fragment/app/FragmentActivity;Lcom/instagram/clips/intf/ClipsViewerConfig;Lcom/instagram/common/session/UserSession;ZZZ)V",
+    "fingerprint_anchors": [
+      "android_purge_26_q2_ClipsPluginImpl_launchClipsViewer_4",
+      "launchClipsViewer"
+    ],
+    "source_contract": "Public instance ClipsViewerConfig.A00 field typed ClipsViewerSource, directly extending java.lang.Enum.",
+    "behavior": "Return before opening the Reels viewer for the exact six Home feed source enums, when enabled. The original launcher is retained for other/unknown sources and when disabled.",
+    "inline_playback_click_listeners_and_network_policy": "unchanged",
+    "package": "dev.friendsonly.instagram",
+    "output_version_code": 385806738
+  },
+  "checks": {
+    "java_policy_assertions": 160,
+    "python_tests": 139,
+    "full_bundle_build": "passed",
+    "full_apk_build": "pending",
+    "new_navigation_behavior_on_phone": "not_tested",
+    "kotlin_identity_assertions": 26,
+    "kotlin_feed_guard_assertions": 42
+  },
+  "signing": "Existing alpha.3 cloud APK used a disposable signer; it cannot be upgraded with a different key. Stable signing remains supported through optional repository secrets; this session cannot manage them (GitHub secrets endpoint returned 403).",
+  "source_and_baseline_evidence": "native-alpha3-2026-10-17.json",
+  "original_dex_matcher_audit": {
+    "dex_files": 23,
+    "matching_methods": 1,
+    "method_register_count": 17,
+    "original_instruction_count": 171,
+    "try_blocks": 0,
+    "source_contract": "passed"
+  }
+}

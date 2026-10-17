@@ -1,10 +1,13 @@
 # Native patch evidence · updated 2026-10-17
 
-This module is a native-patching experiment, now `0.3.0-alpha.3`.
-It targets only Instagram `451.0.0.20.80`; the upstream project's support claim
-is not evidence that our modified patches match that APK.
+This module is a native-patching experiment. **Alpha.3 is installed and opening
+on the user's phone; alpha.4 is in development.** It targets only Instagram
+`451.0.0.20.80`; upstream compatibility claims are not evidence for our patches.
+The user-provided screenshot shows a logged-in Home feed, Stories tray and
+Home/Messages/Profile navigation. Story playback, Direct sending, group-chat
+behavior and the authentication/challenge flow have not been separately tested.
 
-## Checks actually run in cloud
+## Alpha.3 full build checks actually run in cloud
 
 Command, with JDK 21 and Android SDK 35 installed:
 
@@ -138,8 +141,8 @@ INSTALL_FAILED_INTERNAL_ERROR: INSTALL_FAILED_INTERNAL_ERROR: Session files in u
 ```
 
 Opening the APK directly in the file manager also reportedly failed after about
-30 seconds, with a generic not-installed message and no detailed code. Phone
-installation remains failed; launch/account behavior has not been tested.
+30 seconds, with a generic not-installed message and no detailed code. Alpha.2
+installation remained failed; that version never reached launch/account testing.
 
 ## Diagnostic v2: confirmed same-package signature conflict
 
@@ -188,8 +191,10 @@ identities across 24 declared providers, including exact matching DEX strings.
 External package queries and external permissions retain their names. Component
 class names, JNI paths and native libraries are retained. This uses Android's
 normal separate-package installation rules; no signature, authentication or
-integrity bypass is introduced. Coexistence is intended, not yet phone-tested.
-The patch does not provide a complete replacement of Instagram's native UI.
+integrity bypass is introduced. The user subsequently confirmed installation
+and opening through the normal file manager; coexistence with a simultaneously
+installed official Instagram has not been specifically tested. The patch does
+not provide a complete replacement of Instagram's native UI.
 
 The local full bundle build passed **138 Python tests, 113 Java policy assertions
 and 26 Kotlin identity assertions**. Applying all three patches to the actual
@@ -221,8 +226,69 @@ all **164 scoped DEX instruction references** were consistently mapped. Launcher
 alias enablement/targets were preserved, the package/resource table and launcher
 label/icon match Friends Only, and final signature, namespace order and 16 KiB
 alignment passed. [Alpha.3 evidence](evidence/native-alpha3-2026-10-17.json)
-records the exact local file hash and audit. This is static evidence; no
-alpha.3 device installation, launch or account behavior has been verified.
+records the exact local file hash and audit. Those automated checks are static
+evidence; the subsequent phone report below is separate evidence of installation
+and opening.
+
+## Alpha.3 real-phone success and legacy-helper mismatch
+
+The user confirmed that **alpha.3 installs and opens through the phone's file
+manager** on the Samsung SM-S926B, Android 17 / SDK 37 / One UI 9. They reported
+that its features look good overall. Their screenshot shows an authenticated
+Home/feed, the Stories tray, and Home/Messages/Profile navigation. These visible
+screens do not prove Story playback, Direct sending, group behavior, settings
+persistence or the full login/challenge flow; none is separately marked tested.
+
+The same alpha.3 file was also selected in the **older v2 helper**, which sets a
+`com.instagram.android` session package hint. Android returned legacy **-2**
+because the APK's real package is **`dev.friendsonly.instagram`**. The reported
+SHA-256 matches the delivered CI file,
+`ab5d7814d353fb5d4f3541aa8b1655ee8ea656aeb971a24a97bcd7d046daa6c9`.
+This is a package-hint limitation in the diagnostic tool. It is **not evidence
+of an alpha.3 installation failure**: the independent normal installation
+succeeded. Do not use that helper for alpha.3 or later own-package APKs.
+
+## Alpha.4: Home video taps into Reels
+
+The user reports that tapping a video post on Home opens Instagram's Reels
+viewer and wants that transition to do nothing. The new fourth patch is named
+**Friends Only feed video taps**. Output version code is **385806738**; the
+original-input package/version verification remains unchanged.
+
+The implementation guards the Clips viewer launch only when its
+`ClipsViewerSource` name exactly matches one of:
+
+```text
+FEED_TIMELINE
+FEED_TIMELINE_POST_TAP
+FEED_TIMELINE_FOLLOWING
+FEED_TIMELINE_FAVORITES
+FEED_TIMELINE_ALL
+FEED_TIMELINE_MIXED_UNCONNECTED
+```
+
+Its independent preference, `block_feed_reels_open`, defaults on. Long-press
+Home to change **Block Reels viewer from feed posts / Gönderiden Reels ekranına
+geçişi engelle**; **Show all** disables it. Hiding the Reels tab is a separate
+setting. Video posts are not removed, inline playback/network handling is not
+changed, and unknown/Stories/Direct/profile launch sources pass through.
+These are implementation intentions and policy-test results, not phone-tested
+behavior. The full local `build.py --check` completed successfully: all **four
+patches** loaded, with **139 Python tests, 160 Java policy assertions, 26 Kotlin
+identity assertions and 42 Kotlin feed-guard assertions** passed. Inspection of
+the actual original 23 DEX files found **exactly one** matching supported method;
+its contract checks passed (17 registers, 171 instructions, no try blocks).
+This verifies the intended insertion contract without claiming runtime behavior.
+Actual APK application/production, output validation and phone testing are
+pending.
+
+Alpha.3 was signed with a disposable CI key. The next key cannot update that
+installed build. If an update is rejected, remove only **Friends Only**, which
+clears its local session/settings, then install alpha.4. Official Instagram does
+not need removal. Stable signing is already supported through the documented
+optional keystore secrets, but the current GitHub integration cannot configure
+those secrets automatically (HTTP 403). No secret setup is needed to compile
+an APK.
 
 ## Cloud installation attempts
 
@@ -253,39 +319,29 @@ PackageInstaller verdict for the APK:
   Instagram launch/login attempt. This is a failed cloud infrastructure check,
   not evidence that Android accepted or rejected the APK.
 
-## Still not verified
+## Remaining device checks
 
-No physical Android device is attached to this cloud environment. Native
-installation has failed on the user's phone for alpha.1/alpha.2; alpha.3 has not
-yet been tested there. Cold launch and all native account behavior remain
-**unverified**. An earlier software Android 35 emulator did not reach
-PackageManager readiness within the cloud memory limit. An opt-in hosted
-Android 35 attempt failed while downloading its system image. Neither produced
-an APK installation result. The latest alpha.3 hosted API 37 attempt also
-failed in emulator graphics infrastructure, without a PackageManager verdict.
-Successful static builds alone establish no device or emulator installation
-compatibility.
-
-Login, challenges, native library loading, Home/Stories, ordinary video posts,
-Direct sending, groups, filter behavior and settings must be tested on the
-actual output. Instagram can reject a modified/re-signed client. This project
-contains no signature-check, authentication or integrity bypass.
-
-## Test the alpha.3 APK on a phone
+No physical Android device is attached to this cloud environment. Alpha.3's
+successful installation/opening and visible Home/feed/Stories tray come from
+the user's report and screenshot. Alpha.4's bundle build passed; APK production
+and testing on that phone are pending. Older cloud emulator failures remain recorded above; they do not
+override the actual phone's successful normal installation.
 
 Keep official Instagram installed, or restore it through Play Store if desired.
-Download the [verified alpha.3 artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541),
-extract `friends-only-personal.apk` and install it through the normal file-manager
-flow. The existing v2 diagnostic helper targets
-the old `com.instagram.android` output; it should not be used for alpha.3.
-Record each item separately:
+The [alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+can be installed through the normal file-manager flow. Use the same flow for
+alpha.4 when its verified APK is available. The v2 diagnostic helper targets the
+old `com.instagram.android` package and should not be used for either.
+Record each remaining item separately:
 
-1. Installation and cold launch; no account login required for initial crash check.
-2. Native Instagram login/challenge; stop on platform rejection.
-3. Home, Stories and normal photo/video posts; retain shared individual reels.
-4. Existing Direct/group conversations and sending a test message manually.
-5. Hidden tabs, Home long-press, each toggle, Show all and relaunch persistence.
-6. Rotation, background/foreground, offline/online and navigation recovery.
+1. Alpha.4 installation/opening, then tapping Home video posts with the new
+   guard enabled and disabled; inline playback must still work.
+2. Story playback and ordinary photo/video interactions.
+3. Existing Direct/group conversations and sending a test message manually.
+4. Home long-press, every toggle, Show all and settings persistence.
+5. Rotation, background/foreground, offline/online and navigation recovery.
+6. Login/challenge/session behavior when naturally encountered; stop on platform
+   rejection. No authentication, signature or integrity bypass is included.
 
 When reporting issues, include APK/run identifier, Instagram version, S24+
 Android/One UI version, steps and a screenshot with names/messages redacted.

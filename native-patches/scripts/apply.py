@@ -36,7 +36,7 @@ def validate_patch_result(result: dict) -> None:
     applied = result.get("appliedPatches", [])
     names = {entry.get("name") for entry in applied}
     if names != set(PATCH_NAMES) or len(applied) != len(PATCH_NAMES):
-        raise ValidationError("The engine did not apply exactly the three Friends Only patches.")
+        raise ValidationError("The engine did not apply exactly the configured Friends Only patches.")
     steps = result.get("patchingSteps", [])
     if (len(steps) != 2 or {step.get("step") for step in steps} != {"PATCHING", "REBUILDING"} or
             any(step.get("success") is not True for step in steps)):

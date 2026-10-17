@@ -59,6 +59,25 @@ public final class FocusPolicyTest {
         check(!FocusPolicy.shouldHideTab("clips_tab", false, true, true), "Reels tab toggle");
         check(!FocusPolicy.shouldHideTab("search_tab", true, false, true), "Explore tab toggle");
         check(!FocusPolicy.shouldHideTab("creation_tab", true, true, false), "Create tab toggle");
+        check(FocusPolicy.DEFAULT_BLOCK_FEED_REELS_OPEN, "feed-to-Reels navigation blocked by default");
+        String[] feedViewerSources = {
+                "FEED_TIMELINE", "FEED_TIMELINE_POST_TAP", "FEED_TIMELINE_FOLLOWING",
+                "FEED_TIMELINE_FAVORITES", "FEED_TIMELINE_ALL", "FEED_TIMELINE_MIXED_UNCONNECTED"
+        };
+        for (String source : feedViewerSources) {
+            check(FocusPolicy.shouldBlockFeedReelsOpen(source, true), "known Home-feed viewer source blocked " + source);
+            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, false), "feed viewer toggle restores navigation " + source);
+        }
+        String[] preservedViewerSources = {
+                "FEED_TIMELINE_EXPLORE_STORY", "REEL_FEED_TIMELINE", "STORY", "STORIES",
+                "DIRECT", "DIRECT_THREAD", "PROFILE", "PROFILE_GRID", "ADS", "EXPLORE",
+                "feed_timeline", "FEED_TIMELINE_UNKNOWN", "FEED_TIMELINE_POST_TAP_EXTRA",
+                " FEED_TIMELINE", "FEED_TIMELINE ", "", null
+        };
+        for (String source : preservedViewerSources) {
+            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, true), "other/unknown viewer source preserved " + source);
+            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, false), "disabled feed guard preserves other source " + source);
+        }
         System.out.println("FocusPolicyTest: " + assertions + " assertions passed");
     }
 

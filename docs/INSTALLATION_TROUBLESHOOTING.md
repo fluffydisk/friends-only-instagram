@@ -1,52 +1,59 @@
 # Native APK installation results
 
-The latest real-phone test identifies a **signing identity conflict**, rather
-than an unknown installation failure. On the Samsung Galaxy S24+ (SM-S926B),
-Android 17 / SDK 37 / One UI 9, the v2 diagnostic helper returned:
+**Alpha.3 installs and opens on the user's Galaxy S24+ (SM-S926B), Android
+17 / SDK 37 / One UI 9, through the normal file manager.** Their screenshot
+shows a logged-in Home feed, Stories tray and Home/Messages/Profile navigation.
+Story playback, message sending, groups and the login/challenge flow have not
+been separately confirmed. The earlier alpha.1/alpha.2 installation errors
+remain recorded below as history.
 
-```text
-Status: FAILURE_CONFLICT (5)
-Legacy status: -7
-INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.instagram.android signatures do not match newer version; ignoring!
-```
+## Legacy helper error on alpha.3
 
-Android will not accept our personal signing key as an update to Instagram's
-`com.instagram.android` identity. The tool reported no Instagram record visible
-in the current profile, and the user reported removing the official app and no
-other-profile installation. The location/origin of Android's conflicting record
-is unknown. This is not evidence that another profile copy exists.
+The old v2 diagnostic tool creates an install session with the fixed package
+hint **`com.instagram.android`**. Alpha.3's actual package is
+**`dev.friendsonly.instagram`**. Selecting alpha.3 in that helper produced legacy
+**-2**, reporting that the real package does not match the session hint.
+The reported SHA-256 matches the delivered alpha.3 APK:
+`ab5d7814d353fb5d4f3541aa8b1655ee8ea656aeb971a24a97bcd7d046daa6c9`.
+This is a limitation of the old helper, **not an alpha.3 installation rejection**.
+The same APK installed and opened normally through the file manager.
 
-## Alpha.3 uses its own application identity
+Do not use that helper for alpha.3 or later own-package APKs. The helper's
+printed `Package: com.instagram.android` field is fixed; it does not determine
+the selected APK's real identity.
 
-Version **0.3.0-alpha.3** builds as **`dev.friendsonly.instagram`**, with the
-**Friends Only** launcher name and our own icon. Its output version code is
-**385806737**. Re-scoped app permissions and provider authorities are intended
-to let it coexist with official Instagram under Android's normal checks.
-There is no signature, authentication or integrity bypass.
+## Installing the working baseline or next update
 
-The local bundle build passed 138 Python tests, 113 Java policy assertions and
-26 Kotlin identity assertions. A signed alpha.3 APK was produced locally in cloud
-and passed all static output validators. The [full GitHub APK workflow](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357)
-also succeeded. Alpha.3 installation and launch remain unverified.
+Alpha.3 uses **`dev.friendsonly.instagram`**, the **Friends Only** launcher name,
+our own icon and version code **385806737**. It can use Android's normal
+separate-package installation flow. No signature, authentication or integrity
+bypass is included.
 
 1. Download [the alpha.3 `friends-only-personal-test-apk-35` ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-   while signed into GitHub, and extract the new `friends-only-personal.apk`.
-2. Open that APK through the phone's file manager and complete the normal
-   Android confirmation. Allow the selected source to request installation if
-   Android asks. Do not choose the older `friends-only-personal-test-apk-17` file.
-3. Launch **Friends Only**. Test opening before testing account login, then
-   report each feature separately: login, Home, Stories, videos, Direct/groups,
-   and Home long-press filter settings.
+   while signed into GitHub, and extract `friends-only-personal.apk`.
+2. Open the APK through the phone's file manager and complete Android's normal
+   confirmation. Allow the selected source to request installation if asked.
+3. Open **Friends Only**. Test specific features separately and report the
+   version/artifact used rather than assuming all account behavior is verified.
 
-**You do not need to remove official Instagram, delete profiles, or reset the
-phone.** Official Instagram can remain installed, or be restored from Play
-Store. Its local account data is separate from the new Friends Only package.
-Instagram may still reject a modified client; successful Android installation
-would not prove login or account functionality.
+Alpha.4 is in development, with output version code **385806738**. Its new
+**Block Reels viewer from feed posts** setting will stop known Home video-post
+taps from opening the Reels viewer while retaining inline video. Its full
+four-patch bundle passed 139 Python tests, 160 Java policy assertions, 26 Kotlin
+identity assertions and 42 Kotlin feed-guard assertions. APK production and
+phone verification are pending. Use the same file-manager installation flow when that APK is ready.
 
-The current v2 diagnostic helper was built specifically for the older
-`com.instagram.android` output. Use normal file-manager installation for
-alpha.3; do not select the new package in that helper.
+**Alpha.3's signing key was disposable.** A new key cannot update that installed
+build. If Android rejects the alpha.4 update, uninstall only the older **Friends
+Only** native app, then install the new APK; that clears Friends Only's local
+session/settings. **Do not remove official Instagram, delete profiles or reset
+the phone.** Official Instagram can remain installed or be restored from Play
+Store. Its local data is separate. The workflow supports stable signing with
+three optional repository secrets, documented in the
+[native README](../native-patches/README.md); current integration permissions
+cannot set them automatically. No secrets or paid services are required to
+compile APKs. Successful installation and a visible authenticated Home do not
+establish that Instagram accepts every login/challenge or feature.
 
 ## Recorded installation history
 
@@ -56,7 +63,9 @@ alpha.3; do not select the new package in that helper.
 | Alpha.2, diagnostic v1 | `FAILURE (1)`, legacy `-110`: `INSTALL_FAILED_INTERNAL_ERROR: Session files in use` |
 | Alpha.2, file manager | About 30 seconds of installation, then generic not-installed dialog; no detailed code |
 | Alpha.2, diagnostic v2 | `FAILURE_CONFLICT (5)`, legacy `-7`: `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, signature mismatch |
-| Alpha.3 | Not yet tested on the phone |
+| Alpha.3, normal file manager | User confirmed installation/opening; screenshot shows logged-in Home/feed, Stories tray and Home/Messages/Profile navigation |
+| Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
+| Alpha.4 | Bundle build passed; APK production and phone verification pending |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:
@@ -106,6 +115,7 @@ crashes before and during installation killed services; ADB returned
 that emulator failure. No APK acceptance/rejection, app launch or login result
 was obtained. [Smoke logs](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627/artifacts/12096526389)
 record that failed infrastructure check. This is separate from the phone's
-exact alpha.2 `-7` result; alpha.3's phone outcome is still unknown.
+historical alpha.2 `-7` result. The user's subsequent alpha.3 file-manager
+installation and opening succeeded.
 See [native verification](../native-patches/VERIFICATION.md) for the evidence
 and limits.

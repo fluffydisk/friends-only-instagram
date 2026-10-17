@@ -80,6 +80,13 @@ public final class FocusHooks {
         }
     }
 
+    /** Called at the supported Reels-viewer entry; no inline playback or click listener changes. */
+    public static boolean shouldBlockFeedReelsOpen(Enum<?> source) {
+        FocusConfig current = config;
+        return current != null && source != null
+                && FocusPolicy.shouldBlockFeedReelsOpen(source.name(), current.blockFeedReelsOpen());
+    }
+
     static void refreshAll() {
         MAIN.post(new Runnable() {
             @Override public void run() {
@@ -150,10 +157,13 @@ public final class FocusHooks {
         addSwitch(content, current, FocusConfig.REELS, tr ? "Reels sekmesini gizle" : "Hide Reels tab", current.hideReels());
         addSwitch(content, current, FocusConfig.EXPLORE, tr ? "Keşfet / Arama sekmesini gizle" : "Hide Explore / Search tab", current.hideExplore());
         addSwitch(content, current, FocusConfig.EXTRAS, tr ? "Oluştur kısayolunu gizle" : "Hide Create shortcut", current.hideExtras());
+        addSwitch(content, current, FocusConfig.BLOCK_FEED_REELS,
+                tr ? "Gönderiden Reels ekranına geçişi engelle" : "Block Reels viewer from feed posts",
+                current.blockFeedReelsOpen());
         TextView note = new TextView(activity);
         note.setText(tr
-                ? "Keşfet filtresi aynı sekmedeki aramayı da gizler. Bu filtre akışın yalnızca takip ettiklerini içerdiğini garanti etmez. Değişiklikler için ekranı yeniden açman gerekebilir."
-                : "Explore filtering also hides search in that tab. These filters do not guarantee a following-only feed. You may need to reopen a screen after changing a filter.");
+                ? "Videolar akışın içinde oynatılmaya devam eder. Keşfet filtresi aynı sekmedeki aramayı da gizler. Bu filtre akışın yalnızca takip ettiklerini içerdiğini garanti etmez. Değişiklikler için ekranı yeniden açman gerekebilir."
+                : "Videos keep playing within the feed. Explore filtering also hides search in that tab. These filters do not guarantee a following-only feed. You may need to reopen a screen after changing a filter.");
         note.setPadding(0, padding / 2, 0, padding / 2);
         content.addView(note);
         final AlertDialog dialog = new AlertDialog.Builder(activity)

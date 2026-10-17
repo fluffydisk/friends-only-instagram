@@ -8,6 +8,7 @@ public final class FocusPolicy {
     public static final boolean DEFAULT_HIDE_REELS = true;
     public static final boolean DEFAULT_HIDE_EXPLORE = true;
     public static final boolean DEFAULT_HIDE_EXTRAS = true;
+    public static final boolean DEFAULT_BLOCK_FEED_REELS_OPEN = true;
 
     private static final String[] REELS_PATHS = {
             "/api/v1/clips/home/", "/clips/home/",
@@ -40,6 +41,20 @@ public final class FocusPolicy {
         return (hideReels && "clips_tab".equals(resourceName))
                 || (hideExplore && "search_tab".equals(resourceName))
                 || (hideExtras && "creation_tab".equals(resourceName));
+    }
+
+    /**
+     * Stop only supported Home-feed transitions into the Reels viewer. Inline media, Stories,
+     * conversations, profiles and unknown launch sources remain outside this navigation guard.
+     * This choice is independent of hiding the Reels navigation tab.
+     */
+    public static boolean shouldBlockFeedReelsOpen(String sourceName, boolean enabled) {
+        return enabled && ("FEED_TIMELINE".equals(sourceName)
+                || "FEED_TIMELINE_POST_TAP".equals(sourceName)
+                || "FEED_TIMELINE_FOLLOWING".equals(sourceName)
+                || "FEED_TIMELINE_FAVORITES".equals(sourceName)
+                || "FEED_TIMELINE_ALL".equals(sourceName)
+                || "FEED_TIMELINE_MIXED_UNCONNECTED".equals(sourceName));
     }
 
     private static boolean matchesExactEndpoint(String path, String[] endpoints) {

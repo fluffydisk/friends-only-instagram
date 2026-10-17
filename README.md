@@ -1,29 +1,30 @@
 # Friends Only
 
-**Current direction: native Instagram APK patches (0.3.0-alpha.3).** The
+**Current direction: native Instagram APK patches.** The
 [native-patches project](native-patches/README.md) adds native navigation and
-selective discovery filters to the compatible Instagram client. The new output
-uses its own package, `dev.friendsonly.instagram`, and **Friends Only** launcher
-name/icon to support coexistence with the official app under Android's normal
-installation rules. Instagram's interface is otherwise largely retained; this
-is not yet a complete minimalist redesign.
+selective discovery filters to the compatible Instagram client. It uses its own
+`dev.friendsonly.instagram` package and **Friends Only** launcher name/icon.
+Instagram's screens are otherwise largely retained; this is not yet a complete
+minimalist redesign.
 
-Earlier same-package test APKs failed to install on the user's Galaxy S24+
-(Android 17 / One UI 9). The latest phone test, using the working v2
-[installation diagnostics tool](install-diagnostics/README.md), confirmed
-`INSTALL_FAILED_UPDATE_INCOMPATIBLE` (legacy `-7`): Android rejected our signing
-key for `com.instagram.android`. No Instagram record was visible in the current
-profile; the retained record's location is unknown. Alpha.3 addresses this
-conflict by using our own app identity, without bypassing signature or account
-checks. Its local bundle build passed 138 Python tests, 113 Java policy
-assertions and 26 Kotlin identity assertions. Signed alpha.3 APKs passed local and
-[GitHub static build checks](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357).
-[Download the alpha.3 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541),
-extract the ZIP and open `friends-only-personal.apk` through the phone's file
-manager. Alpha.3 installation, launch and all native account features remain
-unverified. A hosted API 37 install check failed in emulator graphics/services
-without an Android package-install verdict. See
-[evidence and limits](native-patches/VERIFICATION.md).
+**The user installed and opened alpha.3 on their Galaxy S24+ (Android 17 /
+One UI 9).** Their screenshot shows a logged-in Home feed, Stories tray, and
+Home/Messages/Profile navigation. This confirms those visible screens, not
+Story playback, message sending, group-chat behavior or the login/challenge
+flow. [Download the working alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541),
+extract the ZIP and install `friends-only-personal.apk` through the file manager.
+The older v2 diagnostic helper targets `com.instagram.android` and rejects this
+new package with a package-hint mismatch; that helper error does not contradict
+the successful normal installation.
+
+**Alpha.4 is in development:** a separate, enabled-by-default setting will stop
+known Home video-post taps from opening Instagram's Reels viewer. Inline video
+playback is intended to remain available. The full four-patch bundle build
+passed its automated checks; APK production and phone behavior are pending. Alpha.4 uses output
+version code **385806738**. Clean CI builds currently use disposable signing keys;
+updating alpha.3 with a new key will require removing only the older **Friends
+Only** native app, clearing its local session/settings. Official Instagram does
+not need to be removed. See [evidence and limits](native-patches/VERIFICATION.md).
 
 The WebView implementation below is retained as an earlier working approach
 and fallback. Its APK is a separate product from the native patch experiment.

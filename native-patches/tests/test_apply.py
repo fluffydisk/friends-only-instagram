@@ -157,7 +157,13 @@ class PatchResultTest(unittest.TestCase):
 
     def test_identity_patch_is_required_in_addition_to_ui_and_discovery(self):
         self.result["appliedPatches"] = self.result["appliedPatches"][:2]
-        with self.assertRaisesRegex(ValidationError, "three Friends Only patches"):
+        with self.assertRaisesRegex(ValidationError, "configured Friends Only patches"):
+            module.validate_patch_result(self.result)
+
+    def test_feed_video_tap_patch_is_required_even_when_earlier_three_succeed(self):
+        self.result["appliedPatches"] = [entry for entry in self.result["appliedPatches"]
+                                          if entry["name"] != "Friends Only feed video taps"]
+        with self.assertRaisesRegex(ValidationError, "configured Friends Only patches"):
             module.validate_patch_result(self.result)
 
     def test_duplicate_requested_patch_is_not_a_complete_result(self):

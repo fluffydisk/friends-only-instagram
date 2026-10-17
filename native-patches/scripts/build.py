@@ -11,7 +11,8 @@ import sys
 import zipfile
 from common import BUILD, REPORTS, ROOT, VERSIONS, android_paths, bootstrap, java_tool, run, sha256, write_report
 
-PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking", "Friends Only app identity"]
+PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking", "Friends Only app identity",
+               "Friends Only feed video taps"]
 
 
 def main() -> None:
@@ -72,7 +73,7 @@ def main() -> None:
     if VERSIONS["instagram"]["supported_version"] not in listed:
         raise RuntimeError("Bundle did not expose the required Instagram version pin.")
     (REPORTS / "patch-list.txt").write_text(listed, encoding="utf-8")
-    checks = ["javac native runtime", "D8 native runtime", "Kotlin patches", "pinned engine loads all three patches"]
+    checks = ["javac native runtime", "D8 native runtime", "Kotlin patches", "pinned engine loads all four patches"]
     if args.check:
         test_classes = BUILD / "test-classes"
         test_classes.mkdir()
@@ -91,8 +92,11 @@ def main() -> None:
              *kotlin_sources, *patch_test_sources])
         run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
              "dev.friendsonly.patches.AppIdentityPolicyTest"])
+        run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
+             "dev.friendsonly.patches.FeedVideoTapPolicyTest"])
         run([sys.executable, "-m", "unittest", "discover", "-s", ROOT / "tests", "-v"])
-        checks += ["pure Java policy assertions", "Kotlin application identity policy assertions", "Python tooling unit tests"]
+        checks += ["pure Java policy assertions", "Kotlin application identity policy assertions",
+                   "Kotlin feed viewer fingerprint and guard assertions", "Python tooling unit tests"]
     final_bundle = BUILD / "friends-only.mpp"
     bundle.replace(final_bundle)
     bundle = final_bundle

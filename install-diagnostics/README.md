@@ -1,4 +1,8 @@
-# Local Android installation diagnostic
+# Legacy Android installation diagnostic v2
+
+**Use this helper only for the older `com.instagram.android` APKs.** Alpha.3
+and later use `dev.friendsonly.instagram`; install those through the normal file
+manager. The user has confirmed alpha.3 installs and opens that way.
 
 [Download the v2 diagnostics APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39017587861/artifacts/12094909613)
 from the successful cloud build. Sign into GitHub, extract the ZIP and install
@@ -22,12 +26,21 @@ selected-file permission and local report; it contains no Instagram account data
 **This v2 helper targets the older `com.instagram.android` test APKs.** Alpha.3
 uses `dev.friendsonly.instagram`; install it through the normal file manager
 rather than this helper. The package displayed by v2 is fixed to the older
-identity and is not a generic APK identity detector.
+identity and is not a generic APK identity detector. The user selected alpha.3
+in v2 and got legacy **-2**, because the APK's real package did not match its
+`com.instagram.android` session hint. The selected file's SHA-256 matched the
+correct alpha.3 CI output,
+`ab5d7814d353fb5d4f3541aa8b1655ee8ea656aeb971a24a97bcd7d046daa6c9`.
+That is a tool compatibility error, not evidence that alpha.3 cannot install:
+the normal file-manager installation succeeded.
 
 This small, separate app (`dev.friendsonly.installdiagnostics`) requests an ordinary, user-confirmed Android installation of a selected `com.instagram.android` APK. It captures the real `PackageInstaller` result when Samsung’s file manager shows only “App not installed”. It does not patch APKs, bypass security, silently install apps, use ADB/root, or access an Instagram account. It has no Internet permission, backend or analytics.
 
+The following historical test steps apply **only to a `com.instagram.android`
+APK**, such as alpha.1/alpha.2:
+
 1. Install and open **Friends Only Install Test** (Turkish: **Friends Only Kurulum Testi**).
-2. Choose the downloaded `friends-only-personal.apk` file, not its ZIP/APKM archive.
+2. Choose a compatible old `friends-only-personal.apk` file, not its ZIP/APKM archive; do not choose alpha.3 or later.
 3. Press **Test installation**. If Android asks, allow installation from this diagnostic app only, then return and press the button again.
 4. Confirm Android’s normal installation dialog.
 5. Return to this app. Press **Copy result** or **Share result** to send the diagnostic yourself. Nothing is sent automatically.

@@ -24,8 +24,8 @@
     "java_policy_assertions": 113,
     "kotlin_identity_assertions": 26,
     "local_signed_apk_and_static_output_validation": "passed",
-    "physical_installation": "not_tested",
-    "authentication_stories_feed_direct_groups": "not_tested",
+    "physical_installation": "passed_user_report_normal_file_manager",
+    "authentication_stories_feed_direct_groups": "Authenticated Home/feed and Stories tray visible in user screenshot; specific login flow, Story playback, Direct sending and groups not individually confirmed.",
     "python_tests_scope": "Current local working tree; successful APK CI commit ran 137 tests, before one additional version-code regression test."
   },
   "local_build_note": "revalidated_final_apk_after_manifest_normalization",
@@ -319,5 +319,29 @@
       "during_installation_utc": "2026-10-17T09:06:29Z"
     },
     "physical_phone_result": "not_tested"
+  },
+  "phone_followup": {
+    "device": "samsung SM-S926B",
+    "android": 17,
+    "sdk": 37,
+    "apk_sha256": "ab5d7814d353fb5d4f3541aa8b1655ee8ea656aeb971a24a97bcd7d046daa6c9",
+    "installation": "User explicitly confirms normal file-manager installation succeeds.",
+    "opening": "User confirms app opens and desired features look right; screenshot shows authenticated Home, feed video, Stories tray and Home/Direct/profile bottom tabs.",
+    "reported_issue": "Tapping a Home feed video post opens the Reels viewer; user requests a no-op instead.",
+    "unverified_individual_features": [
+      "Login/challenge procedure",
+      "Story media playback",
+      "Direct sending",
+      "Existing group conversation behavior"
+    ],
+    "old_diagnostic_v2_result": {
+      "session_id": 1783249907,
+      "status": "FAILURE_INVALID (4)",
+      "legacy_status": -2,
+      "message": "INSTALL_FAILED_INVALID_APK: android.content.pm.parsing.ApkLite@19bc846 specified package com.instagram.android inconsistent with dev.friendsonly.instagram",
+      "copied_bytes": 253154478,
+      "confirmation_launch_count": 0,
+      "cause": "The v2 helper forces the earlier com.instagram.android session package hint; it is incompatible with alpha.3 own-package APKs. Normal installation is confirmed successful."
+    }
   }
 }

@@ -160,6 +160,17 @@ jobs:
           trap collect_diagnostics_and_stop EXIT
           image="system-images;android-${SMOKE_ANDROID_API};google_apis;x86_64"
           printf 'no\n' | avdmanager create avd --force --name friends-only-smoke --package "$image" --device pixel_6 2>&1 | tee "$reports/avd-creation.txt"
+          python3 - <<'PY'
+          import os, pathlib
+          config = pathlib.Path(os.environ['ANDROID_AVD_HOME']) / 'friends-only-smoke.avd' / 'config.ini'
+          # Set userdata capacity before first boot; -partition-size alone is insufficient.
+          lines = [line for line in config.read_text().splitlines()
+                   if line.partition('=')[0].strip() != 'disk.dataPartition.size']
+          lines.append('disk.dataPartition.size=8G')
+          content = '\n'.join(lines) + '\n'
+          config.write_text(content)
+          pathlib.Path('native-install-reports/avd-config.ini').write_text(content)
+          PY
           "$adb_bin" start-server
           "$emulator_bin" -avd friends-only-smoke -port 5554 -cores 2 -memory 4096 \
             -accel on -no-window -gpu swiftshader_indirect -no-snapshot -noaudio \
@@ -223,6 +234,31 @@ jobs:
           abis = (reports / 'device-abis.txt').read_text().strip().split(',')
           if 'arm64-v8a' not in abis:
               raise SystemExit('The stock image does not advertise arm64-v8a support; this APK cannot be tested here.')
+          PY
+          timeout 15s "$adb_bin" -s "$serial" shell df -k /data > "$reports/device-data-disk-kib.txt"
+          python3 - <<'PY'
+          import json, pathlib
+          reports = pathlib.Path('native-install-reports')
+          required = 2 * 1024 ** 3
+          record = {'phase': 'emulator_storage_preflight', 'required_free_bytes': required}
+          try:
+              rows = [line.split() for line in (reports / 'device-data-disk-kib.txt').read_text().splitlines()]
+              data_rows = [row for row in rows if len(row) >= 6 and row[-1] == '/data']
+              if len(data_rows) != 1:
+                  raise ValueError('Expected one /data row from df -k.')
+              available = int(data_rows[0][3]) * 1024
+              if available < 0:
+                  raise ValueError('Negative available space.')
+              record['available_free_bytes'] = available
+              record['status'] = 'ready' if available >= required else 'insufficient_space'
+          except ValueError as error:
+              record.update(status='unreadable_free_space', detail=str(error))
+          if record['status'] != 'ready':
+              record['failure_scope'] = 'emulator_infrastructure'
+          (reports / 'storage-preflight.json').write_text(json.dumps(record, indent=2) + '\n')
+          print(json.dumps(record, indent=2))
+          if record['status'] != 'ready':
+              raise SystemExit('Emulator infrastructure lacks confirmed 2 GiB free /data space; no APK installation attempted.')
           PY
           # One ordinary install only: no retry, downgrade/reinstall flags, app launch, or login.
           timeout --signal=TERM --kill-after=15s 300s "$adb_bin" -s "$serial" install --no-streaming native-install-input/friends-only-personal.apk 2>&1 | tee "$reports/adb-install.txt"

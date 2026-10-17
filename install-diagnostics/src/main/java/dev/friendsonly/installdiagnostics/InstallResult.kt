@@ -24,7 +24,7 @@ internal data class InstallResult(
     }
 
     fun report(device: String): String = buildString {
-        appendLine("Friends Only installation diagnostic v1")
+        appendLine("Friends Only installation diagnostic v2")
         appendLine(device.take(1024))
         appendLine("Package: com.instagram.android")
         appendLine("Status: $outcome ($status)")

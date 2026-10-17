@@ -24,6 +24,7 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
     private lateinit var stateText: TextView
     private lateinit var install: Button
     private lateinit var choose: Button
+    private lateinit var cancel: Button
     private lateinit var copy: Button
     private lateinit var share: Button
     private var selected: Uri? = null
@@ -41,11 +42,13 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
 
     override fun onResume() {
         super.onResume()
+        Installer.foreground = true
         store.prefs.registerOnSharedPreferenceChangeListener(this)
         refresh()
     }
 
     override fun onPause() {
+        Installer.foreground = false
         store.prefs.unregisterOnSharedPreferenceChangeListener(this)
         super.onPause()
     }
@@ -70,6 +73,10 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
         fileText = TextView(this).also { it.textSize = 15f; root.addView(it) }
         choose = button(root, R.string.choose_apk) { chooseApk() }
         install = button(root, R.string.install_apk) { requestInstall() }
+        cancel = button(root, R.string.cancel_installation) {
+            Installer.cancel(applicationContext)
+            refresh()
+        }
         stateText = TextView(this).also { it.textSize = 15f; root.addView(it) }
         resultText = TextView(this).also { it.setTextIsSelectable(true); it.textSize = 14f; it.setPadding(0, dp(16), 0, dp(16)); root.addView(it) }
         copy = button(root, R.string.copy_result) {
@@ -92,6 +99,7 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     private fun chooseApk() {
+        if (store.state().active) return
         try {
             @Suppress("DEPRECATION")
             startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -107,6 +115,7 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode != REQUEST_FILE || resultCode != RESULT_OK) return
+        if (store.state().active) return
         val uri = data?.data ?: return
         try {
             if (uri.scheme != "content") throw IllegalArgumentException("A document provider is required")
@@ -138,13 +147,10 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     private fun requestInstall() {
-        if (Installer.busy.get()) return
-        Installer.confirmationIntent?.let {
-            try { startActivity(Intent(it)); return } catch (_: RuntimeException) {
-                Installer.confirmationIntent = null
-                toast(R.string.confirmation_unavailable)
-                return
-            }
+        if (store.state().active) {
+            Installer.launchConfirmation(this)
+            refresh()
+            return
         }
         if (!packageManager.canRequestPackageInstalls()) {
             toast(R.string.source_explanation)
@@ -164,19 +170,24 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
         resultText.text = report ?: getString(R.string.no_result)
         copy.isEnabled = report != null
         share.isEnabled = report != null
-        val busy = Installer.busy.get()
-        choose.isEnabled = !busy
-        install.isEnabled = !busy && (selected != null || Installer.confirmationIntent != null)
+        val state = store.state()
+        val canConfirm = Installer.hasConfirmation(this)
+        choose.isEnabled = !state.active
+        install.isEnabled = canConfirm || (!state.active && selected != null)
+        cancel.visibility = if (state.active) View.VISIBLE else View.GONE
+        cancel.isEnabled = state.active
         install.setText(when {
-            Installer.confirmationIntent != null -> R.string.confirm_installation
+            canConfirm -> R.string.confirm_installation
             !packageManager.canRequestPackageInstalls() -> R.string.allow_source
             else -> R.string.install_apk
         })
         stateText.visibility = View.VISIBLE
         stateText.text = when {
-            busy -> getString(R.string.working, store.prefs.getLong("copied", 0L) / (1024L * 1024L))
-            store.prefs.getBoolean("working", false) -> getString(R.string.waiting)
-            store.prefs.getInt("status", Int.MIN_VALUE) == -1 -> getString(R.string.pending)
+            state.phase == InstallSessionState.Phase.CANCELLING -> getString(R.string.cancelling)
+            state.copying -> getString(R.string.working, store.prefs.getLong("copied", 0L) / (1024L * 1024L))
+            state.phase == InstallSessionState.Phase.PENDING_CONFIRMATION && !canConfirm -> getString(R.string.pending_recovery)
+            state.phase == InstallSessionState.Phase.PENDING_CONFIRMATION -> getString(R.string.pending)
+            state.active -> getString(R.string.waiting)
             else -> ""
         }
     }

@@ -6,6 +6,9 @@
     <string name="allow_source">Allow installation from this tool</string>
     <string name="source_explanation">Android must allow this app to request installations. Enable “Allow from this source” for this tool only, then return here. Other security settings do not need to change.</string>
     <string name="confirm_installation">Continue Android confirmation</string>
+    <string name="cancel_installation">Cancel current test</string>
+    <string name="cancelling">Cancelling this tool’s current installation session…</string>
+    <string name="pending_recovery">This test is still awaiting Android confirmation. If the confirmation screen is unavailable, cancel this test before starting another.</string>
     <string name="copy_result">Copy result</string>
     <string name="share_result">Share result</string>
     <string name="share_title">Share installation diagnostic</string>
@@ -22,8 +25,8 @@
     <string name="file_too_large">APK must be between 1 byte and 1 GiB.</string>
     <string name="file_unavailable">The selected file could not be read. Please choose it again.</string>
     <string name="permission_unavailable">Android could not open the installation permission screen.</string>
-    <string name="confirmation_unavailable">Android’s confirmation screen could not open. Start a new test from this screen.</string>
+    <string name="confirmation_unavailable">Android’s confirmation screen could not open. Cancel the current test before starting another.</string>
     <string name="local_error">The request could not reach Android’s installer. See the local diagnostic below.</string>
     <string name="select_again">Select the downloaded APK to begin.</string>
-    <string name="privacy">Only device version and installer error details are included in the result. No passwords, chats, session cookies or account data are read.</string>
+    <string name="privacy">The result includes device version, installer details, copied byte count and the APK’s SHA-256 fingerprint. File locations, passwords, chats, session cookies and account data are not read into the diagnostic.</string>
 </resources>

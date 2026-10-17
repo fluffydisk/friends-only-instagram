@@ -362,8 +362,9 @@ necessary. Refresh after either direction of that setting change.
 The visual patch edits seven semantic light/dark style families plus neutral
 Story-ring gradients, **57 style attributes total**, and **14 launch-theme
 attributes** across default, night, Android 12+ and Android 12+ night
-configurations. Fourteen own palette color resources are explicitly registered.
-The patch supplies independent tab/splash assets instead of the source OS marks. Runtime decoration adds a Friends Only Home header and
+configurations. Fourteen palette values are written as typed inline hex colors;
+no new named color resources or resource-allocation step is used. The patch
+supplies independent tab/splash assets instead of the source OS marks. Runtime decoration adds a Friends Only Home header and
 Settings button, and **Friends / Chats / Me** labels (**Arkadaşlar / Sohbetler /
 Ben** in Turkish) over the existing bottom tab controls, covering their original
 icons and numeric/red badges. The exact supported internal startup-logo
@@ -383,18 +384,20 @@ and navigation filters without changing this separate appearance preference.
 The new decoration reuses the existing throttled (250 ms) bounded view update;
 no new polling timer or global observer is introduced.
 
-The full local `build.py --check` **passed**, loading all **six patches** with
-**140 Python tests**. Its actual compiled/runtime policy suites passed:
+The final inline-palette full `build.py --check` **passed**, loading all **six
+patches** with **140 Python tests**, Java Focus **180**, Feed **32**, Chrome **26**,
+and Kotlin Identity **26**, Tap **42**, Following **35**, QuietTheme **92**
+assertions. A separate actual-source audit passed **97 checks**, including all
+four launch configurations. An isolated AAPT2 harness also compiled/linked the
+new selectors and launch-background drawables against the real Android
+framework, using attribute stubs and a mock icon. That harness is not a full
+Instagram APK build or rendered phone test.
 
-- Java Focus **180**, Feed **32** and Chrome **26** assertions.
-- Kotlin Identity **26**, Tap **42**, Following **35** and QuietTheme **94** assertions.
-
-The frozen theme changes passed **94** standalone theme assertions and **101**
-separate actual-source audit checks, including all four launch configurations.
-The final full six-patch bundle recheck then **passed**, with the exact suite
-counts above. These are build/policy/source checks, not rendered phone
-tests. Actual-input APK application, output validation and phone verification
-are pending.
+The earlier named-color allocation path did not produce a deliverable APK; its
+[manual CI run 49](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39058668640)
+was cancelled after the local resource-build failure was identified. The final
+implementation uses typed inline palette values. Actual-input APK application,
+output validation and phone verification remain pending.
 
 ## Cloud installation attempts
 
@@ -430,8 +433,8 @@ PackageInstaller verdict for the APK:
 No physical Android device is attached to this cloud environment. Alpha.3's
 installation/opening and visible Home/feed/Stories tray are user-reported and
 shown in their screenshot. The user explicitly has not tested alpha.4.
-Alpha.5's full six-patch bundle checks passed; actual APK and phone checks are
-pending. Earlier emulator
+Alpha.5's final six-patch bundle checks passed; actual APK and phone checks
+remain pending. Earlier emulator
 infrastructure failures do not override alpha.3's real phone success and are
 not evidence about alpha.5.
 

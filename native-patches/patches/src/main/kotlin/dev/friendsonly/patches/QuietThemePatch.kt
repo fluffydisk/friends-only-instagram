@@ -2,8 +2,6 @@
 package dev.friendsonly.patches
 
 import app.morphe.patcher.patch.resourcePatch
-import app.morphe.patcher.resource.PublicXmlManager
-import java.io.File
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -28,32 +26,15 @@ internal val QUIET_TAB_IDS = linkedMapOf(
     "tab_profile_drawable" to "0x7f083067",
 )
 internal const val QUIET_LAUNCH_STYLE_ID = "0x7f1400a1"
-internal val QUIET_PALETTE_NAMES = listOf("light", "dark").flatMap { mode ->
-    listOf("canvas", "surface", "elevated", "text", "secondary_text", "link", "button").map {
-        "friends_only_${mode}_$it"
-    }
-}
-
-/**
- * The pinned encoder does not allocate values IDs for every newly created XML file. Register
- * palette entries explicitly through its own allocator before encoding, without guessing IDs or
- * reusing source entries. File-based drawables are separately discovered by the encoder.
- */
-internal fun registerQuietPaletteResources(publicXml: File): Map<String, Int> =
-    PublicXmlManager(publicXml).use { manager ->
-        val before = manager.getDefinedIds()
-        val highest = manager.getHighestResourceIds()["color"] ?: error("Missing source color resource type.")
-        check((highest and -0x10000) == 0x7f060000 && (highest and 0xffff) <= 0xffff - QUIET_PALETTE_NAMES.size) {
-            "Unsupported or exhausted source color resource namespace."
-        }
-        QUIET_PALETTE_NAMES.forEach { name ->
-            check(!manager.idExists("color", name)) { "Quiet palette entry already exists in source: $name." }
-            manager.createPublicId("color", name)
-        }
-        val after = manager.getDefinedIds()
-        check(before.all { (key, value) -> after[key] == value }) { "Existing resource IDs must not change." }
-        QUIET_PALETTE_NAMES.associateWith { name -> checkNotNull(after["color" to name]) }
-    }
+/** Literal typed colors avoid adding or reassigning any source color resource IDs. */
+internal val QUIET_PALETTE = linkedMapOf(
+    "light_canvas" to "#FFF8F7F4", "light_surface" to "#FFEDEEE9", "light_elevated" to "#FFFFFFFF",
+    "light_text" to "#FF242B27", "light_secondary_text" to "#FF626B65",
+    "light_link" to "#FF344D43", "light_button" to "#FF344D43",
+    "dark_canvas" to "#FF151A17", "dark_surface" to "#FF202722", "dark_elevated" to "#FF29312B",
+    "dark_text" to "#FFF2F3EE", "dark_secondary_text" to "#FFB3BDB5",
+    "dark_link" to "#FFC0CFC4", "dark_button" to "#FF375A49",
+)
 
 private fun Element.quietChildren(): List<Element> = buildList {
     for (index in 0 until childNodes.length) {
@@ -76,26 +57,6 @@ internal fun verifyQuietThemeResourceIds(document: Document) {
         }
     }
 }
-
-/** Palette values are intentionally independent of Instagram's media and notification colors. */
-internal fun quietThemeColorsXml(): String = """
-    <resources>
-        <color name="friends_only_light_canvas">#FFF8F7F4</color>
-        <color name="friends_only_light_surface">#FFEDEEE9</color>
-        <color name="friends_only_light_elevated">#FFFFFFFF</color>
-        <color name="friends_only_light_text">#FF242B27</color>
-        <color name="friends_only_light_secondary_text">#FF626B65</color>
-        <color name="friends_only_light_link">#FF344D43</color>
-        <color name="friends_only_light_button">#FF344D43</color>
-        <color name="friends_only_dark_canvas">#FF151A17</color>
-        <color name="friends_only_dark_surface">#FF202722</color>
-        <color name="friends_only_dark_elevated">#FF29312B</color>
-        <color name="friends_only_dark_text">#FFF2F3EE</color>
-        <color name="friends_only_dark_secondary_text">#FFB3BDB5</color>
-        <color name="friends_only_dark_link">#FFC0CFC4</color>
-        <color name="friends_only_dark_button">#FF375A49</color>
-    </resources>
-""".trimIndent()
 
 /**
  * Replace semantic UI surfaces, never image/video content, error states or legal/login wording.
@@ -122,7 +83,7 @@ internal fun applyQuietThemeStyles(document: Document): Int {
         themed.forEach { (attribute, value) ->
             val item = items.filter { it.getAttribute("name") == attribute }.singleOrNull()
                 ?: error("Unsupported quiet-theme attribute: $name/$attribute.")
-            item.textContent = "@color/friends_only_${mode}_$value"
+            item.textContent = QUIET_PALETTE.getValue("${mode}_$value")
             replacements++
         }
     }
@@ -152,7 +113,7 @@ internal fun applyQuietLaunchTheme(document: Document, android12: Boolean, dark:
     } ?: error("Missing or duplicate launch-only theme.")
     check(launcher.getAttribute("parent") == "@style/Theme.Instagram") { "Unexpected launch-theme parent." }
     val items = launcher.quietChildren().filter { it.tagName == "item" }
-    val canvas = "@color/friends_only_${if (dark) "dark" else "light"}_canvas"
+    val canvas = QUIET_PALETTE.getValue("${if (dark) "dark" else "light"}_canvas")
     val changes = if (android12) linkedMapOf(
         "android:windowSplashScreenBackground" to ("@color/ig_splash_screen_background" to canvas),
         "android:windowSplashScreenAnimatedIcon" to ("@drawable/instagram_padded" to "@drawable/friends_only_icon"),
@@ -174,7 +135,7 @@ internal fun applyQuietLaunchTheme(document: Document, android12: Boolean, dark:
 
 internal fun quietLaunchBackgroundXml(dark: Boolean = false): String = """
     <layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
-        <item android:drawable="@color/friends_only_${if (dark) "dark" else "light"}_canvas" />
+        <item><color android:color="${QUIET_PALETTE.getValue("${if (dark) "dark" else "light"}_canvas")}" /></item>
         <item android:drawable="@drawable/friends_only_icon" android:width="80dp" android:height="80dp" android:gravity="center" />
     </layer-list>
 """.trimIndent()
@@ -214,11 +175,6 @@ val quietVisualTheme = resourcePatch(
     dependsOn(appIdentity)
     execute {
         document("res/values/public.xml").use { verifyQuietThemeResourceIds(it) }
-        registerQuietPaletteResources(get("res/values/public.xml"))
-        get("res/values/friends_only_colors.xml").apply {
-            parentFile.mkdirs()
-            writeText(quietThemeColorsXml())
-        }
         document("res/values/styles.xml").use {
             check(applyQuietThemeStyles(it) == 57) { "Unsupported quiet-theme surface count." }
             check(applyQuietLaunchTheme(it, false) == 3) { "Unsupported legacy launch-only theme." }

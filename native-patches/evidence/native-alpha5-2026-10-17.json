@@ -30,14 +30,15 @@
       "app_identity": 26,
       "feed_profile_tap_guard": 42,
       "home_parser_and_following_contract": 35,
-      "quiet_theme": 94
+      "quiet_theme": 92
     },
-    "additional_original_resource_audit_assertions": 101,
+    "additional_original_resource_audit_assertions": 97,
     "local_apk_build": "pending",
     "github_apk_build": "pending",
     "physical_installation_and_new_features": "not_tested",
-    "fixed_build_issue": "New named color values need explicit PublicXmlManager allocation before the pinned resource encoder can resolve them. Source resource IDs are preserved; 14 own colors are allocated and tested.",
-    "independent_runtime_review": "No release-blocking code defect found in bounded chrome, lifecycle, input, theme, accessibility, config or Home filter; physical behavior untested."
+    "fixed_build_issue": "The pinned resource encoder rejected new named palette values even after PublicXmlManager allocation. Palette colors are now typed literals in the exact semantic/launch attributes and launch drawables; no new named color resources or existing color ID edits are needed.",
+    "independent_runtime_review": "No release-blocking code defect found in bounded chrome, lifecycle, input, theme, accessibility, config or Home filter; physical behavior untested.",
+    "aapt2_new_drawable_compile_and_link": "passed using Android 35 framework, actual selectors/day-night launch XML with a mock own icon and two source attribute stubs; not a full Instagram APK test"
   },
   "home_filter": {
     "default_enabled": true,
@@ -92,13 +93,13 @@
     "native_post_chat_profile_renderers": "retained",
     "disable_filters_keeps_runtime_appearance_preference": true,
     "runtime_appearance_toggle_does_not_undo_static_palette": true,
-    "palette_resources_explicitly_registered": 14,
     "launcher_style_configurations": [
       "default",
       "night",
       "v31",
       "night-v31"
-    ]
+    ],
+    "inline_palette_values": 14
   },
   "limits": [
     "Followed posts with missing relationship metadata may be hidden, producing a shorter or empty Home feed.",
@@ -110,9 +111,17 @@
     "Physical alpha.3 installation/Home are user-confirmed; user explicitly has not tested alpha.4, and alpha.5 is not phone-tested.",
     "Test builds use disposable signing unless stable repository secrets are configured; replacement can require removing only Friends Only."
   ],
+  "superseded_cloud_attempts": [
+    {
+      "run_id": 39058668640,
+      "run_number": 49,
+      "status": "cancelled_by_us_after_local_resource_encoding_failure",
+      "apk_delivered": false
+    }
+  ],
   "patch_bundle": {
     "file": "friends-only.mpp",
-    "sha256": "6c9d8cf724b51178e3b149a8a8d04c13cf74b4e67a24455fd72218415f3e2edd",
-    "size_bytes": 104609
+    "sha256": "be1b79ffd5cdc1fc9af8a57bbba9b974fe2fdeca6362c7aaf54d5a4e66cc96bf",
+    "size_bytes": 102608
   }
 }

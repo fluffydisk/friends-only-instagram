@@ -25,9 +25,10 @@ See [VERIFICATION.md](VERIFICATION.md) and
 
 **Alpha.5 is in development** with six patches in total. It adds a strict
 metadata-based Home filter and a quiet Friends Only shell/theme. Its output
-version code is **385806739**. The full six-patch bundle build passed 140 Python
-tests and all Java/Kotlin policy checks. APK production and phone checks are
-pending. The user explicitly has **not yet
+version code is **385806739**. The final six-patch bundle passed 140 Python tests
+and all Java/Kotlin suites, including 92 theme assertions. Its 97 actual-source
+audit checks and isolated drawable compile/link check passed separately. APK
+production and phone checks are pending. The user explicitly has **not yet
 tested alpha.4**; alpha.3 installation/opening remains the only confirmed native
 phone baseline. Alpha.4 is still the available test download below and does not
 contain the new alpha.5 features.
@@ -307,7 +308,7 @@ filter restores its controls and that unfamiliar layouts remain usable.
 | Visible phone UI | User screenshot: logged-in Home feed, Stories tray, Home/Messages/Profile navigation |
 | Story playback, Direct sending, groups, login/challenge flow | Not specifically tested/reported |
 | Alpha.4 combined bundle/guard | Local and GitHub APK builds passed: 139 Python tests, 180 Java policy assertions, 26 identity + 42 guard Kotlin assertions; user explicitly has not phone-tested it |
-| Alpha.5 strict feed/quiet shell | Full six-patch bundle passed 140 Python tests and all Java/Kotlin policy suites; 101 source-theme audit checks passed separately; APK/phone verification pending |
+| Alpha.5 strict feed/quiet shell | Full six-patch bundle passed Python 140, Java 180/32/26, Kotlin 26/42/35/92; source audit 97 and isolated drawable link passed; APK/phone verification pending |
 
 The exact alpha.3 CI APK reached the hosted API 37 installation step, but
 emulator graphics crashes killed services and ADB returned a broken pipe.
@@ -355,8 +356,10 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   baştan yazılmış değildir. Bilgi eksikse akış kısalabilir veya boş olabilir:
   **Yalnızca takip ettiğim hesaplar** ayarını kapatıp akışı yenile. Hikâyeler,
   mesajlar ve profil ayrıştırıcıları bu Home filtresinin dışında. Altı yama
-  derlendi; 140 Python testi ve tüm Java/Kotlin politika kontrolleri geçti.
-  APK üretimi ve cihaz testleri bekliyor; alpha.4 de henüz telefonda denenmedi.
+  son derlemede geçti: 140 Python testi, tüm Java/Kotlin kontrolleri (92 tema
+  kontrolü dahil), ayrıca 97 kaynak kontrolü ve ayrı drawable derleme kontrolü
+  başarılı. APK üretimi ve cihaz testleri bekliyor; alpha.4 de henüz telefonda
+  denenmedi.
 - Alpha.3'ün imzası geçiciydi. Yeni sürüm imza nedeniyle güncellenemezse yalnızca
   eski **Friends Only** uygulamasını kaldırıp yenisini kur; yerel oturum ve
   ayarlar silinir. Resmî Instagram'ı kaldırmak veya telefonu sıfırlamak gerekmez.

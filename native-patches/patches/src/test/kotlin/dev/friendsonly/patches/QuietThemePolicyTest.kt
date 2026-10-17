@@ -1,9 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 package dev.friendsonly.patches
 
-import app.morphe.patcher.resource.PublicXmlManager
 import java.io.ByteArrayInputStream
-import java.nio.file.Files
 import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Document
@@ -39,29 +37,10 @@ object QuietThemePolicyTest {
         verify(runCatching {
             verifyQuietThemeResourceIds(parse(publicFixture().replace("name=\"tab_direct_drawable\"", "name=\"other_drawable\"")))
         }.isFailure, "Missing scoped navigation resource must fail closed")
-        val registrationDir = Files.createTempDirectory("friends-only-palette-registration-")
-        try {
-            val publicFile = registrationDir.resolve("public.xml").toFile()
-            publicFile.writeText(publicFixture().replace("</resources>", """
-                <public type="color" name="existing_white" id="0x7f060001" />
-                <public type="color" name="existing_last" id="0x7f060456" />
-                </resources>
-            """.trimIndent()))
-            val original = PublicXmlManager(publicFile).use { it.getDefinedIds() }
-            val allocated = registerQuietPaletteResources(publicFile)
-            verify(allocated.size == 14 && allocated.values.toSet().size == 14, "Each new palette entry needs its own explicit ID")
-            verify(allocated.values.sorted() == (0x7f060457..0x7f060464).toList(), "Pinned encoder allocator must append inside the existing color type")
-            PublicXmlManager(publicFile).use { encoderIds ->
-                val emitted = encoderIds.getDefinedIds()
-                verify(original.all { (key, value) -> emitted[key] == value }, "Resource registration must preserve every source ID")
-                verify(allocated.all { (name, value) -> emitted["color" to name] == value }, "Pinned encoder must recognize all new colors from written public.xml")
-            }
-            verify(runCatching { registerQuietPaletteResources(publicFile) }.isFailure, "Source palette-name collision must fail closed")
-            publicFile.writeText(publicFixture().replace("</resources>", "<public type=\"color\" name=\"full\" id=\"0x7f06fffc\" /></resources>"))
-            verify(runCatching { registerQuietPaletteResources(publicFile) }.isFailure, "Color IDs must never overflow into another resource type")
-        } finally {
-            registrationDir.toFile().deleteRecursively()
-        }
+        val unchangedPublic = parse(publicFixture())
+        verifyQuietThemeResourceIds(unchangedPublic)
+        verify(unchangedPublic.documentElement.getElementsByTagName("public").length == QUIET_STYLE_IDS.size + QUIET_TAB_IDS.size + 1,
+            "Theme validation must not add or reassign source resource IDs")
 
         fun fixture(): String = "<resources><string name=\"login_provider\">Instagram</string>" +
             QUIET_STYLE_IDS.keys.map { name ->
@@ -88,7 +67,7 @@ object QuietThemePolicyTest {
             }
             if (name.endsWith("Dark") || name.endsWith("Light")) {
                 val mode = if (name.endsWith("Dark")) "dark" else "light"
-                verify(values["igds_color_primary_background"] == "@color/friends_only_${mode}_canvas", "Explicit $mode theme must retain its mode")
+                verify(values["igds_color_primary_background"] == QUIET_PALETTE.getValue("${mode}_canvas"), "Explicit $mode theme must retain its mode")
                 verify(values["igds_color_primary_text_on_media"] == "@color/original_igds_color_primary_text_on_media", "Do not recolor media overlays")
                 verify(values["igds_color_error_or_destructive"] == "@color/original_igds_color_error_or_destructive", "Do not obscure error/destructive states")
             } else {
@@ -126,7 +105,7 @@ object QuietThemePolicyTest {
             val values = (0 until launcher.getElementsByTagName("item").length).map {
                 launcher.getElementsByTagName("item").item(it) as Element
             }.associate { it.getAttribute("name") to it.textContent }
-            val expectedCanvas = "@color/friends_only_${if (dark) "dark" else "light"}_canvas"
+            val expectedCanvas = QUIET_PALETTE.getValue("${if (dark) "dark" else "light"}_canvas")
             verify(values[if (android12) "android:windowSplashScreenBackground" else "android:statusBarColor"] == expectedCanvas,
                 "Splash canvas must retain the specific light/dark configuration")
             verify(values["android:windowLightStatusBar"] == "true", "Preserve system status-bar icon legibility")
@@ -144,9 +123,13 @@ object QuietThemePolicyTest {
         }.isFailure, "Unexpected explicit source splash icon must fail closed")
         val ownSplash = parse(quietLaunchBackgroundXml())
         verify(ownSplash.elements("item").size == 2 && !quietLaunchBackgroundXml().contains("instagram_"), "Own legacy splash has only neutral canvas and independent icon")
-        verify(quietLaunchBackgroundXml(true).contains("@color/friends_only_dark_canvas"), "Night splash drawable must use own dark canvas")
+        verify(quietLaunchBackgroundXml(true).contains(QUIET_PALETTE.getValue("dark_canvas")), "Night splash drawable must inline own dark canvas")
 
-        val colors = parse(quietThemeColorsXml()).elements("color").associate { it.getAttribute("name") to it.textContent }
+        val colors = QUIET_PALETTE
+        verify(colors.size == 14 && colors.values.all { it.matches(Regex("#[A-F0-9]{8}")) }, "Palette must contain only literal ARGB colors with no resource allocation")
+        verify(styles.elements("item").filter { it.textContent.startsWith("#") }.size == 47, "All 47 semantic color attributes must inline typed colors")
+        verify(!quietLaunchBackgroundXml().contains("@color/friends_only_") && !quietLaunchBackgroundXml(true).contains("@color/friends_only_"),
+            "Launch drawable colors must not depend on new values resources")
         fun luminance(hex: String): Double {
             val color = hex.removePrefix("#").takeLast(6).toInt(16)
             fun channel(shift: Int): Double {
@@ -163,11 +146,11 @@ object QuietThemePolicyTest {
         listOf("light", "dark").forEach { mode ->
             listOf("canvas", "surface", "elevated").forEach { surface ->
                 listOf("text", "secondary_text", "link").forEach { text ->
-                    verify(contrast(colors.getValue("friends_only_${mode}_$surface"), colors.getValue("friends_only_${mode}_$text")) >= 4.5,
+                    verify(contrast(colors.getValue("${mode}_$surface"), colors.getValue("${mode}_$text")) >= 4.5,
                         "$mode $text on $surface needs readable contrast")
                 }
             }
-            verify(contrast(colors.getValue("friends_only_${mode}_button"), "#FFFFFF") >= 4.5, "$mode primary button must retain white-label contrast")
+            verify(contrast(colors.getValue("${mode}_button"), "#FFFFFF") >= 4.5, "$mode primary button must retain white-label contrast")
         }
         QUIET_TAB_IDS.keys.forEach { name ->
             val xml = quietTabSelectorXml(name)
@@ -180,20 +163,6 @@ object QuietThemePolicyTest {
         if (args.isNotEmpty()) {
             val res = Path.of(args[0])
             verifyQuietThemeResourceIds(parse(res.resolve("values/public.xml").toFile().readText()))
-            val realSourceRegistration = Files.createTempDirectory("friends-only-real-palette-registration-")
-            try {
-                val copiedPublic = realSourceRegistration.resolve("public.xml").toFile()
-                copiedPublic.writeText(res.resolve("values/public.xml").toFile().readText())
-                val oldIds = PublicXmlManager(copiedPublic).use { it.getDefinedIds() }
-                val allocated = registerQuietPaletteResources(copiedPublic)
-                PublicXmlManager(copiedPublic).use { manager ->
-                    val currentIds = manager.getDefinedIds()
-                    verify(allocated.size == 14 && oldIds.all { (key, value) -> currentIds[key] == value }, "Real source palette registration preserves source resource IDs")
-                    verify(allocated.all { (name, value) -> currentIds["color" to name] == value }, "Real encoder sees all explicitly registered palette entries")
-                }
-            } finally {
-                realSourceRegistration.toFile().deleteRecursively()
-            }
             verify(applyQuietThemeStyles(parse(res.resolve("values/styles.xml").toFile().readText())) == 57, "Pinned source semantic surface audit")
             verify(applyQuietLaunchTheme(parse(res.resolve("values/styles.xml").toFile().readText()), false) == 3, "Pinned source legacy splash audit")
             verify(applyQuietLaunchTheme(parse(res.resolve("values-v31/styles.xml").toFile().readText()), true) == 4, "Pinned source Android 12 splash audit")

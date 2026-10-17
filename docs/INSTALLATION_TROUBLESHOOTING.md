@@ -45,9 +45,10 @@ splash changes stay in the APK. **Disable filters / Filtreleri kapat** changes
 content/navigation filters and leaves that separate appearance preference
 unchanged. Native post/chat components remain Instagram's; some original
 features or chrome can remain outside the verified surfaces. All new alpha.5
-APK and phone behavior is still pending validation. Its full six-patch bundle
-build passed 140 Python tests and all Java/Kotlin policy suites; those checks do
-not prove its rendered UI or feed behavior.
+APK and phone behavior is still pending validation. The final palette fix
+passed its full six-patch bundle checks (Python 140; Java 180/32/26; Kotlin
+26/42/35/92), 97 actual-source audit checks and a separate drawable compile/link
+harness. These checks do not prove a full APK build, rendered UI or feed behavior.
 
 ## Install the alpha.4 test APK
 
@@ -95,7 +96,7 @@ establish that Instagram accepts every login/challenge or feature.
 | Alpha.3, normal file manager | User confirmed installation/opening; screenshot shows logged-in Home/feed, Stories tray and Home/Messages/Profile navigation |
 | Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
 | Alpha.4 | Combined Home/profile local and GitHub APK checks passed; user explicitly has not phone-tested it |
-| Alpha.5 | Full six-patch bundle checks passed; actual APK and phone verification pending |
+| Alpha.5 | Full inline-palette six-patch bundle checks passed; actual APK and phone verification pending |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

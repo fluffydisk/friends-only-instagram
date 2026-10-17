@@ -18,8 +18,8 @@ unknown Home units on the supported parser path. Missing following metadata may
 make Home short or empty. If that happens, disable **Only accounts I follow** in
 Settings and refresh Home. Cached content and alternate rendering paths remain
 unverified; there is no chronological-server-feed or fully friends-only runtime
-guarantee. Alpha.5's full six-patch bundle build passed its automated checks;
-APK production and phone checks are pending. Its output version code is
+guarantee. Alpha.5's final six-patch bundle build passed its checks; APK
+production and phone checks are pending. Its output version code is
 **385806739**.
 
 **The user has tested alpha.3 installation/opening only.** Their Galaxy S24+

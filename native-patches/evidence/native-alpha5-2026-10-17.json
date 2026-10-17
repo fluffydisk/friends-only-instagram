@@ -33,12 +33,14 @@
       "quiet_theme": 92
     },
     "additional_original_resource_audit_assertions": 97,
-    "local_apk_build": "final_wording_rebuild_pending; previous_inline_palette_APK_signed_and_statically_verified",
-    "github_apk_build": "pending",
+    "local_apk_build": "passed_final_delivery_source",
+    "github_apk_build": "passed_final_delivery_source",
     "physical_installation_and_new_features": "not_tested",
     "fixed_build_issue": "The pinned resource encoder rejected new named palette values even after PublicXmlManager allocation. Palette colors are now typed literals in the exact semantic/launch attributes and launch drawables; no new named color resources or existing color ID edits are needed.",
     "independent_runtime_review": "No release-blocking code defect found in bounded chrome, lifecycle, input, theme, accessibility, config or Home filter; physical behavior untested.",
-    "aapt2_new_drawable_compile_and_link": "passed using Android 35 framework, actual selectors/day-night launch XML with a mock own icon and two source attribute stubs; not a full Instagram APK test"
+    "aapt2_new_drawable_compile_and_link": "passed using Android 35 framework, actual selectors/day-night launch XML with a mock own icon and two source attribute stubs; not a full Instagram APK test",
+    "independent_emitted_dex_audit": "passed_on_exact_final_local_apk",
+    "independent_emitted_resource_audit": "passed_131_checks_on_exact_final_local_apk"
   },
   "home_filter": {
     "default_enabled": true,
@@ -138,6 +140,328 @@
     "size_bytes": 102616
   },
   "github_actions": {
-    "status": "pending_final_wording_source_push_and_build"
-  }
+    "run_id": 39059450948,
+    "run_number": 55,
+    "source_commit": "d2f8dbbbc14ea4a6337f6d59ce88ce22b2c89fa6",
+    "status": "success",
+    "apk_artifact_id": 12110373262,
+    "apk_artifact_name": "friends-only-personal-test-apk-55",
+    "apk_filename": "friends-only-personal.apk",
+    "apk_download": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262",
+    "report_artifact_id": 12110657364,
+    "patch_bundle_artifact_id": 12110917363,
+    "output": {
+      "manifest": {
+        "package": "dev.friendsonly.instagram",
+        "version_name": "451.0.0.20.80",
+        "version_code": "385806739",
+        "native_abis": [
+          "arm64-v8a"
+        ]
+      },
+      "sha256": "c9294c038a6727b5686b1bff8585630094f05ef2dae3a9444fb080775d32f646",
+      "size_bytes": 253171054,
+      "signer_sha256": "80b1750de99014b45ba84433462ea20d8557dc22158f1eaa9ccecf50c3c4e788",
+      "extension_present": true,
+      "manifest_namespace_order": "valid",
+      "application_identity": {
+        "package": "dev.friendsonly.instagram",
+        "application_label": "Friends Only",
+        "launcher_and_localized_labels_checked": 102,
+        "manifest_launchers": [
+          "com.instagram.android.activity.MainTabActivity"
+        ],
+        "own_provider_authorities": [
+          "dev.friendsonly.instagram.androidx-startup",
+          "dev.friendsonly.instagram.baselcontext",
+          "dev.friendsonly.instagram.contentprovider.users.loggedinusers",
+          "dev.friendsonly.instagram.hatch.chat.files",
+          "dev.friendsonly.instagram.hatch.files",
+          "dev.friendsonly.instagram.provider.AccessLibraryContentProvider",
+          "dev.friendsonly.instagram.provider.phoneid",
+          "dev.friendsonly.instagram.provider.phoneid_lite",
+          "dev.friendsonly.instagram.securefileprovider",
+          "dev.friendsonly.instagram_com.instagram.barcelona.feed.crossapp.contentprovider.ThreadsContentProvider",
+          "dev.friendsonly.instagram_com.instagram.barcelonaig.deferreddeeplink.TixuDeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.barcelonaig.tixu.directtransfer.TixuDirectTransferProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredCurrentUserProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.FamilyAppsUserValuesProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.InstallReferrerProvider",
+          "dev.friendsonly.instagram_com.instagram.creation.drafts.contentprovider.ClipsDraftProvider",
+          "dev.friendsonly.instagram_com.instagram.fileprovider",
+          "dev.friendsonly.instagram_com.instagram.foabackuptoken.FoaBackupTokenProvider",
+          "dev.friendsonly.instagram_com.instagram.growth.xav.fifudeferreddeeplink.FifuDeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.liteprovider.FirstPartyUserValuesLiteProviderV2",
+          "dev.friendsonly.instagram_com.instagram.liteprovider.usdid.UsdidValuesProvider",
+          "dev.friendsonly.instagram_com.instagram.quicksnap.seenstate"
+        ],
+        "own_permission_definitions": [
+          "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+          "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+          "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+        ],
+        "own_permission_references": [
+          "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+          "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+          "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+        ]
+      }
+    },
+    "patch_bundle_matches_independently_audited_local_bundle": true,
+    "exact_checks_confirmed_from_actual_ci_job_log": true,
+    "independent_binary_dex_resource_audits_scope": "Final local output only; cloud APK was signed and statically validated by the workflow, with identical patch bundle. Cloud APK bytes were not independently downloaded or phone-tested."
+  },
+  "local_output": {
+    "manifest": {
+      "package": "dev.friendsonly.instagram",
+      "version_name": "451.0.0.20.80",
+      "version_code": "385806739",
+      "native_abis": [
+        "arm64-v8a"
+      ]
+    },
+    "sha256": "64beb265fe13359149674f11d851e8a0ce2561469679cadb719cf9b2433a67d6",
+    "size_bytes": 252810488,
+    "signer_sha256": "288ff94d4d7fc347e7e0f673f06101dd3c3927511993ec16659179c59000ad2a",
+    "extension_present": true,
+    "manifest_namespace_order": "valid",
+    "application_identity": {
+      "package": "dev.friendsonly.instagram",
+      "application_label": "Friends Only",
+      "launcher_and_localized_labels_checked": 102,
+      "manifest_launchers": [
+        "com.instagram.android.activity.MainTabActivity"
+      ],
+      "own_provider_authorities": [
+        "dev.friendsonly.instagram.androidx-startup",
+        "dev.friendsonly.instagram.baselcontext",
+        "dev.friendsonly.instagram.contentprovider.users.loggedinusers",
+        "dev.friendsonly.instagram.hatch.chat.files",
+        "dev.friendsonly.instagram.hatch.files",
+        "dev.friendsonly.instagram.provider.AccessLibraryContentProvider",
+        "dev.friendsonly.instagram.provider.phoneid",
+        "dev.friendsonly.instagram.provider.phoneid_lite",
+        "dev.friendsonly.instagram.securefileprovider",
+        "dev.friendsonly.instagram_com.instagram.barcelona.feed.crossapp.contentprovider.ThreadsContentProvider",
+        "dev.friendsonly.instagram_com.instagram.barcelonaig.deferreddeeplink.TixuDeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.barcelonaig.tixu.directtransfer.TixuDirectTransferProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredCurrentUserProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.FamilyAppsUserValuesProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.InstallReferrerProvider",
+        "dev.friendsonly.instagram_com.instagram.creation.drafts.contentprovider.ClipsDraftProvider",
+        "dev.friendsonly.instagram_com.instagram.fileprovider",
+        "dev.friendsonly.instagram_com.instagram.foabackuptoken.FoaBackupTokenProvider",
+        "dev.friendsonly.instagram_com.instagram.growth.xav.fifudeferreddeeplink.FifuDeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.liteprovider.FirstPartyUserValuesLiteProviderV2",
+        "dev.friendsonly.instagram_com.instagram.liteprovider.usdid.UsdidValuesProvider",
+        "dev.friendsonly.instagram_com.instagram.quicksnap.seenstate"
+      ],
+      "own_permission_definitions": [
+        "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+        "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+        "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+      ],
+      "own_permission_references": [
+        "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+        "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+        "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+      ]
+    }
+  },
+  "independent_emitted_resource_audit": {
+    "schema_version": 1,
+    "status": "passed",
+    "scope": "Read-only emitted ARSC/AXML visual-resource audit; no physical device UI verification",
+    "sha256": "64beb265fe13359149674f11d851e8a0ce2561469679cadb719cf9b2433a67d6",
+    "checks_count": 131,
+    "semantic_attributes": 47,
+    "ring_attributes": 10,
+    "launch_attributes": 14,
+    "other_semantic_attributes_preserved": 1583,
+    "own_palette": {
+      "light_canvas": "0xfff8f7f4",
+      "light_surface": "0xffedeee9",
+      "light_elevated": "0xffffffff",
+      "light_text": "0xff242b27",
+      "light_secondary_text": "0xff626b65",
+      "light_link": "0xff344d43",
+      "light_button": "0xff344d43",
+      "dark_canvas": "0xff151a17",
+      "dark_surface": "0xff202722",
+      "dark_elevated": "0xff29312b",
+      "dark_text": "0xfff2f3ee",
+      "dark_secondary_text": "0xffb3bdb5",
+      "dark_link": "0xffc0cfc4",
+      "dark_button": "0xff375a49"
+    },
+    "tab_selector_paths": {
+      "tab_home_drawable": "res/2fg.xml",
+      "tab_prism_home_drawable": "res/2fi.xml",
+      "tab_direct_drawable": "res/2e-.xml",
+      "tab_profile_drawable": "res/2fk.xml"
+    },
+    "device_visual_tests": "not_run"
+  },
+  "independent_emitted_dex_audit": {
+    "audit": "independent final APK Home following DEX audit",
+    "apk_sha256": "64beb265fe13359149674f11d851e8a0ce2561469679cadb719cf9b2433a67d6",
+    "original_sha256": "b217f08e3639a3a7b68e95720f1e580643518aa0f91ace8f76671b90f09963e5",
+    "alpha4_comparison_sha256": "d7324c80fa592f0199707168b19c585c69f033f13803671236efc258a4a3b2a8",
+    "output_dex_count": 20,
+    "inserted_legacy_instructions": 3,
+    "inserted_wrapped_instructions": 9,
+    "exact_inserted_hook_shapes_verified": true,
+    "home_method": "LX/02xz;->unsafeParseFromJson(LX/0Gyx;)Ljava/lang/Object;",
+    "source_instruction_count": 519,
+    "output_instruction_count": 532,
+    "output_payload_alignment_nops": 1,
+    "native_instruction_count_after_normalization": 519,
+    "register_count": 9,
+    "try_block_count": 0,
+    "original_home_instructions_and_control_flow_preserved": true,
+    "shared_classes": {
+      "LX/032K;": {
+        "methods_compared": 4,
+        "all_unchanged_from_alpha4": true
+      },
+      "LX/04Cf;": {
+        "methods_compared": 5,
+        "all_unchanged_from_alpha4": true
+      },
+      "LX/06aP;": {
+        "methods_compared": 7,
+        "all_unchanged_from_alpha4": true
+      },
+      "LX/07at;": {
+        "methods_compared": 27,
+        "all_unchanged_from_alpha4": true
+      },
+      "LX/07au;": {
+        "methods_compared": 5,
+        "all_unchanged_from_alpha4": true
+      },
+      "Lcom/instagram/api/schemas/ImmutablePandoRelationshipInfoDict;": {
+        "methods_compared": 93,
+        "all_unchanged_from_alpha4": true
+      },
+      "Lcom/instagram/api/schemas/RelationshipInfoDict;": {
+        "methods_compared": 37,
+        "all_unchanged_from_alpha4": true
+      },
+      "Lcom/instagram/feed/media/Media;": {
+        "methods_compared": 1463,
+        "all_unchanged_from_alpha4": true
+      },
+      "Lcom/instagram/user/model/User;": {
+        "methods_compared": 1135,
+        "all_unchanged_from_alpha4": true
+      }
+    },
+    "shared_methods_compared": 2776,
+    "native_contract_getters_unchanged_from_original": {
+      "Lcom/instagram/api/schemas/ImmutablePandoRelationshipInfoDict;->CE9()Ljava/lang/Boolean;": true,
+      "Lcom/instagram/api/schemas/ImmutablePandoRelationshipInfoDict;->CEK()Ljava/lang/Boolean;": true,
+      "Lcom/instagram/api/schemas/RelationshipInfoDict;->CEK()Ljava/lang/Boolean;": true,
+      "Lcom/instagram/feed/media/Media;->A3F()LX/07jm;": true,
+      "Lcom/instagram/feed/media/Media;->A3U()Lcom/instagram/user/model/User;": true,
+      "Lcom/instagram/user/model/User;->A1E()Lcom/instagram/api/schemas/RelationshipInfoDict;": true
+    },
+    "home_profile_reels_launcher_unchanged_from_alpha4": true,
+    "fourteen_source_reels_policy_unchanged_from_alpha4": true,
+    "retained_reels_source_names": [
+      "FEED_CONTEXTUAL_PROFILE",
+      "FEED_CONTEXTUAL_SELF_PROFILE",
+      "FEED_TIMELINE",
+      "FEED_TIMELINE_ALL",
+      "FEED_TIMELINE_FAVORITES",
+      "FEED_TIMELINE_FOLLOWING",
+      "FEED_TIMELINE_MIXED_UNCONNECTED",
+      "FEED_TIMELINE_POST_TAP",
+      "OPAL_USER_PROFILE",
+      "OPAL_USER_SELF_PROFILE",
+      "PRIME_PROFILE",
+      "PRIME_SELF_PROFILE",
+      "PROFILE",
+      "SELF_PROFILE"
+    ],
+    "feed_hook_calls": [
+      {
+        "dex": "classes.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->filterHomeMedia(Ljava/lang/Object;)Ljava/lang/Object;",
+        "index": 315,
+        "caller": "LX/02xz;->unsafeParseFromJson(LX/0Gyx;)Ljava/lang/Object;"
+      },
+      {
+        "dex": "classes.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->isFollowingOnlyEnabled()Z",
+        "index": 420,
+        "caller": "LX/02xz;->unsafeParseFromJson(LX/0Gyx;)Ljava/lang/Object;"
+      },
+      {
+        "dex": "classes.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->filterHomeMedia(Ljava/lang/Object;)Ljava/lang/Object;",
+        "index": 424,
+        "caller": "LX/02xz;->unsafeParseFromJson(LX/0Gyx;)Ljava/lang/Object;"
+      },
+      {
+        "dex": "classes20.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->followingOnly:Z",
+        "index": 0,
+        "caller": "Ldev/friendsonly/patch/runtime/FeedHooks;->filterHomeMedia(Ljava/lang/Object;)Ljava/lang/Object;"
+      },
+      {
+        "dex": "classes20.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->cachedContract:Ldev/friendsonly/patch/runtime/FeedHooks$Contract;",
+        "index": 5,
+        "caller": "Ldev/friendsonly/patch/runtime/FeedHooks;->filterHomeMedia(Ljava/lang/Object;)Ljava/lang/Object;"
+      },
+      {
+        "dex": "classes20.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->cachedContract:Ldev/friendsonly/patch/runtime/FeedHooks$Contract;",
+        "index": 15,
+        "caller": "Ldev/friendsonly/patch/runtime/FeedHooks;->filterHomeMedia(Ljava/lang/Object;)Ljava/lang/Object;"
+      },
+      {
+        "dex": "classes20.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->followingOnly:Z",
+        "index": 0,
+        "caller": "Ldev/friendsonly/patch/runtime/FeedHooks;->isFollowingOnlyEnabled()Z"
+      },
+      {
+        "dex": "classes20.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->followingOnly:Z",
+        "index": 0,
+        "caller": "Ldev/friendsonly/patch/runtime/FeedHooks;->setFollowingOnly(Z)V"
+      },
+      {
+        "dex": "classes20.dex",
+        "target": "Ldev/friendsonly/patch/runtime/FeedHooks;->setFollowingOnly(Z)V",
+        "index": 26,
+        "caller": "Ldev/friendsonly/patch/runtime/FocusConfig;->reload()V"
+      }
+    ],
+    "global_native_filter_call_count": 2,
+    "feed_hooks_classes_present": [
+      "Ldev/friendsonly/patch/runtime/FeedHooks$Contract;",
+      "Ldev/friendsonly/patch/runtime/FeedHooks;"
+    ],
+    "forbidden_runtime_network_storage_session_log_references": [],
+    "issues": [],
+    "status": "passed"
+  },
+  "applied_patches": [
+    "Friends Only native controls",
+    "Friends Only discovery blocking",
+    "Friends Only app identity",
+    "Friends Only feed video taps",
+    "Friends Only following feed",
+    "Friends Only quiet visual theme"
+  ],
+  "signing": "Cloud output uses a disposable non-preserved key; removing only the old Friends Only native app is required for an incompatible signer, which clears that app local session and settings. Official Instagram removal is unnecessary."
 }

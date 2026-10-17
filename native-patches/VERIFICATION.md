@@ -1,7 +1,7 @@
 # Native patch evidence · updated 2026-10-17
 
-This module is a native-patching experiment. **Alpha.5 is in development;
-alpha.3 is the only native build the user has installed/opened.** They explicitly
+This module is a native-patching experiment. **Alpha.5's APK is ready for phone
+testing; alpha.3 is the only native build the user has installed/opened.** They explicitly
 have **not tested alpha.4** yet. Alpha.3's screenshot shows a logged-in Home
 feed, Stories tray and Home/Messages/Profile navigation. Story playback, Direct
 sending, groups and the login/challenge flow have not been separately verified.
@@ -337,8 +337,9 @@ Alpha.5 adds two patches, **Friends Only following feed** and **Friends Only
 quiet visual theme**, bringing the required set to **six**. The output remains
 `dev.friendsonly.instagram`, version code **385806739**. The original input
 continues to require Instagram `451.0.0.20.80 / 385709029` and verified signing
-provenance. No alpha.5 APK production, cloud APK build or phone behavior is yet
-claimed.
+provenance. Local and GitHub alpha.5 APK builds passed their checks; independent
+emitted-output audits passed on the final local APK. Phone installation, rendered
+UI, strict-feed and account behavior remain unverified.
 
 The following-feed patch targets the unique native Home response parser at its
 two array boundaries (`items` and `feed_items`). It checks an ordinary post's
@@ -404,8 +405,45 @@ Instagram APK build or rendered phone test.
 The earlier named-color allocation path did not produce a deliverable APK; its
 [manual CI run 49](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39058668640)
 was cancelled after the local resource-build failure was identified. The final
-implementation uses typed inline palette values. Actual-input APK application,
-output validation and phone verification remain pending.
+implementation uses typed inline palette values.
+
+Final source `d2f8dbb` passed the full bundle checks with the suite counts above.
+Applying all six patches to the verified original produced a signed local APK:
+**252,810,488 bytes**, SHA-256
+`64beb265fe13359149674f11d851e8a0ce2561469679cadb719cf9b2433a67d6`,
+package **`dev.friendsonly.instagram`**, version code **385806739**. Signature,
+package/version and alignment/static output checks passed.
+
+Independent read-only audits of that **exact final local APK** passed:
+
+- Emitted DEX: all **519 original Home-parser instructions and control flow**
+  retained, with **12 inserted instructions** for two filter boundaries and one
+  alignment NOP (532 total); **2,776 compared shared methods** unchanged from
+  alpha.4. The fourteen-source tap guard is unchanged. The new feed extension
+  introduces no network, storage or logging references.
+- Emitted resources: **131 checks**, covering **47 semantic color attributes,
+  10 Story-ring attributes and 14 launch attributes across four configurations**; **1,583 other
+  semantic attributes** were unchanged. This verifies compiled resources, not
+  their appearance on a phone.
+
+The [final GitHub APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948)
+(run **55**, source `d2f8dbb`) **succeeded**. Actual job logs and downloaded reports
+confirm **140 Python tests**, Java **180/32/26**, Kotlin **26/42/35/92**, all **six
+patches** applied, full rebuilding, personal signing and static output validation.
+Download [`friends-only-personal-test-apk-55`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262)
+and extract `friends-only-personal.apk`. Its CI output is **253,171,054 bytes**,
+SHA-256 `c9294c038a6727b5686b1bff8585630094f05ef2dae3a9444fb080775d32f646`.
+The [reports artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110657364)
+records its output metadata. Its clean-build signing key was disposable.
+
+The independently audited local bundle and the CI bundle have the **same
+SHA-256**, `02e677dcce7f61972ed38c2c44e6894562e892d3ff0d23a9cc8740fad2971edf`.
+The emitted DEX/resource audits above apply **only to the local APK**. The CI APK
+passed the workflow's application/signing/static checks; its bytes were not
+independently downloaded/audited or phone-tested. See
+[alpha.5 evidence](evidence/native-alpha5-2026-10-17.json) for exact metadata and
+audit scope. No alpha.5 phone installation, appearance, feed, Story, Direct or
+authentication success is claimed.
 
 ## Cloud installation attempts
 
@@ -441,20 +479,22 @@ PackageInstaller verdict for the APK:
 No physical Android device is attached to this cloud environment. Alpha.3's
 installation/opening and visible Home/feed/Stories tray are user-reported and
 shown in their screenshot. The user explicitly has not tested alpha.4.
-Alpha.5's final six-patch bundle checks passed; actual APK and phone checks
-remain pending. Earlier emulator
+Alpha.5's final local and GitHub APK builds passed; independent emitted-output
+audits passed on the local APK. Its phone checks remain pending. Earlier emulator
 infrastructure failures do not override alpha.3's real phone success and are
 not evidence about alpha.5.
 
-The [available alpha.4 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
-is an untested-on-phone earlier build; it does not contain alpha.5's strict Home
-filter or quiet shell. The [alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-is the only confirmed native phone build. Use normal file-manager installation,
-not the legacy v2 diagnostic helper, for own-package APKs. New signing keys may
-require uninstalling only Friends Only and clearing its local session/settings;
-no official Instagram removal is needed.
+Download the [alpha.5 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262),
+extract the ZIP and use normal file-manager installation. The older
+[alpha.4 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
+is untested on the phone and lacks the strict Home filter/quiet shell. The
+[alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+is the only confirmed native phone build. Do not use the legacy v2 diagnostic
+helper for these own-package APKs. If an update is rejected due to a new signing
+key, remove only Friends Only, clearing its local session/settings; official
+Instagram does not need removal.
 
-When alpha.5's APK is available, record each item separately:
+Record each alpha.5 device check separately:
 
 1. Installation/opening and light/dark Home appearance, Friends Only header,
    Settings button, text tab controls and restored original controls when the

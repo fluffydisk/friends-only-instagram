@@ -3,10 +3,11 @@
 **Use this helper only for the older `com.instagram.android` APKs.** Alpha.3
 and later use `dev.friendsonly.instagram`; install those through the normal file
 manager. The user has confirmed alpha.3 installs and opens that way.
-The [available alpha.4 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
-has not been tested by the user. Alpha.5's strict Home filter and quiet shell are
-in development; no alpha.5 APK/phone success is claimed. Neither version should
-be installed through this legacy helper.
+[Download the current alpha.5 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262)
+and install it through the file manager. Its local/GitHub builds passed, but its
+phone installation, UI, feed and account behavior are unverified. Alpha.3 is the
+only native phone-tested baseline; the user has not tested alpha.4. Do not use
+this legacy helper for either later build.
 
 [Download the v2 diagnostics APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39017587861/artifacts/12094909613)
 from the successful cloud build. Sign into GitHub, extract the ZIP and install

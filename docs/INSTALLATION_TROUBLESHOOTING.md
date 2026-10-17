@@ -6,7 +6,8 @@ shows a logged-in Home feed, Stories tray and Home/Messages/Profile navigation.
 Story playback, message sending, groups and the login/challenge flow have not
 been separately confirmed. The earlier alpha.1/alpha.2 installation errors
 remain recorded below as history. The user explicitly has **not tested
-alpha.4** yet. Alpha.5 is being implemented; its APK is not available yet.
+alpha.4** yet. Alpha.5's downloadable APK is ready; its installation, appearance,
+strict feed and account behavior on the phone are unverified.
 
 ## Legacy helper error on alpha.3
 
@@ -47,37 +48,33 @@ ve gezinme** toggles runtime decorations; the compiled palette, Story-ring and
 splash changes stay in the APK. **Disable filters / Filtreleri kapat** changes
 content/navigation filters and leaves that separate appearance preference
 unchanged. Native post/chat components remain Instagram's; some original
-features or chrome can remain outside the verified surfaces. All new alpha.5
-APK and phone behavior is still pending validation. The final palette fix
-passed its full six-patch bundle checks (Python 140; Java 180/32/26; Kotlin
-26/42/35/92), 97 actual-source audit checks and a separate drawable compile/link
-harness. These checks do not prove a full APK build, rendered UI or feed behavior.
+features or chrome can remain outside the verified surfaces. Alpha.5's local
+and GitHub APK builds passed all six patches, Python 140, Java 180/32/26 and
+Kotlin 26/42/35/92 checks. Independent emitted DEX/resource audits passed on the
+final local APK; those audits were not repeated on the CI APK bytes. These
+checks do not prove rendered phone UI or feed behavior.
 
-## Install the alpha.4 test APK
+## Install the alpha.5 test APK
 
-Alpha.4 uses **`dev.friendsonly.instagram`**, the **Friends Only** launcher name,
-our own icon and version code **385806738**. It uses Android's normal
+Alpha.5 uses **`dev.friendsonly.instagram`**, the **Friends Only** launcher name,
+our own icon and version code **385806739**. It uses Android's normal
 separate-package installation flow. No signature, authentication or integrity
 bypass is included.
 
-1. Download [the alpha.4 `friends-only-personal-test-apk-44` ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
+1. Download [the alpha.5 `friends-only-personal-test-apk-55` ZIP](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39059450948/artifacts/12110373262)
    while signed into GitHub, and extract `friends-only-personal.apk`.
 2. Open the APK through the phone's file manager and complete Android's normal
    confirmation. Allow the selected source to request installation if asked.
 3. Open **Friends Only**. Test specific features separately and report the
    version/artifact used rather than assuming all account behavior is verified.
 
-Alpha.4's new **Akış ve profilden Reels açılmasını engelle** setting defaults on
-and is intended to stop known video-post taps on Home and user profiles from
-opening the Reels viewer while retaining inline video. Its combined four-patch bundle passed 139 Python tests,
-180 Java policy assertions, 26 Kotlin identity assertions and 42 Kotlin guard
-assertions. A signed local APK and independent static guard audit also passed.
-The [GitHub APK build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923)
-also passed the same automated checks and produced the downloadable APK above.
-Its phone installation and tap behavior remain unverified.
+Alpha.5 also includes **Akış ve profilden Reels açılmasını engelle**, first
+introduced in alpha.4 and enabled by default. It is intended to stop known
+Home/user-profile video taps from opening Reels while retaining inline video.
+Neither version's tap behavior has been phone-tested.
 
 **Alpha.3's signing key was disposable.** A new key cannot update that installed
-build. If Android rejects the alpha.4 update, uninstall only the older **Friends
+build. If Android rejects the new update, uninstall only the older **Friends
 Only** native app, then install the new APK; that clears Friends Only's local
 session/settings. **Do not remove official Instagram, delete profiles or reset
 the phone.** Official Instagram can remain installed or be restored from Play
@@ -99,7 +96,7 @@ establish that Instagram accepts every login/challenge or feature.
 | Alpha.3, normal file manager | User confirmed installation/opening; screenshot shows logged-in Home/feed, Stories tray and Home/Messages/Profile navigation |
 | Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
 | Alpha.4 | Combined Home/profile local and GitHub APK checks passed; user explicitly has not phone-tested it |
-| Alpha.5 | Full inline-palette six-patch bundle checks passed; actual APK and phone verification pending |
+| Alpha.5 | Local and GitHub six-patch APK builds passed; independent emitted audits on local APK passed; phone installation/UI/feed/account verification pending |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

@@ -19,12 +19,16 @@ approaches are adapted from **FeurStagram**:
 
 Friends Only modifies that work into its own small patch set and native
 extension: scoped tab visibility, local settings, exact Reels/Explore
-collection-request suppression, and an independent app-identity adaptation.
+collection-request suppression, a scoped native Home-response filter, and an independent app-identity adaptation.
 The latter renames the package, declared provider authorities and owned
 permissions, their exact bytecode references, and launcher branding. It preserves
 component classes, native libraries and external visibility queries. We do not
 distribute upstream’s prepatched Instagram APKs or include its updater, debug
-bridge, broader feed filtering, or signature-check bypass patches.
+bridge, pagination-header rewriting, or signature-check bypass patches. The Home
+filter uses a separately verified native response boundary and public local
+model getters to retain only authors with explicit following metadata; it does
+not make additional requests. The neutral visual theme and Friends Only header
+and navigation are our own additions.
 
 ## Preserved upstream acknowledgements
 

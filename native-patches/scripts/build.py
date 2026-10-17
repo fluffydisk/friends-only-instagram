@@ -12,7 +12,7 @@ import zipfile
 from common import BUILD, REPORTS, ROOT, VERSIONS, android_paths, bootstrap, java_tool, run, sha256, write_report
 
 PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking", "Friends Only app identity",
-               "Friends Only feed video taps"]
+               "Friends Only feed video taps", "Friends Only following feed", "Friends Only quiet visual theme"]
 
 
 def main() -> None:
@@ -73,7 +73,7 @@ def main() -> None:
     if VERSIONS["instagram"]["supported_version"] not in listed:
         raise RuntimeError("Bundle did not expose the required Instagram version pin.")
     (REPORTS / "patch-list.txt").write_text(listed, encoding="utf-8")
-    checks = ["javac native runtime", "D8 native runtime", "Kotlin patches", "pinned engine loads all four patches"]
+    checks = ["javac native runtime", "D8 native runtime", "Kotlin patches", "pinned engine loads all selected patches"]
     if args.check:
         test_classes = BUILD / "test-classes"
         test_classes.mkdir()
@@ -81,6 +81,10 @@ def main() -> None:
         run([javac, "--release", "8", "-classpath", classes, "-d", test_classes, *tests])
         run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))),
              "dev.friendsonly.patch.runtime.FocusPolicyTest"])
+        run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))),
+             "dev.friendsonly.patch.runtime.FeedPolicyTest"])
+        run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))),
+             "dev.friendsonly.patch.runtime.QuietChromePolicyTest"])
         patch_test_sources = sorted((ROOT / "patches/src/test/kotlin").rglob("*.kt"))
         if not patch_test_sources:
             raise RuntimeError("Missing app identity policy tests.")
@@ -94,9 +98,14 @@ def main() -> None:
              "dev.friendsonly.patches.AppIdentityPolicyTest"])
         run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
              "dev.friendsonly.patches.FeedVideoTapPolicyTest"])
+        run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
+             "dev.friendsonly.patches.FollowingFeedPolicyTest"])
+        run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
+             "dev.friendsonly.patches.QuietThemePolicyTest"])
         run([sys.executable, "-m", "unittest", "discover", "-s", ROOT / "tests", "-v"])
         checks += ["pure Java policy assertions", "Kotlin application identity policy assertions",
-                   "Kotlin feed viewer fingerprint and guard assertions", "Python tooling unit tests"]
+                   "Kotlin feed viewer fingerprint and guard assertions", "Java strict Home feed and native chrome policy checks",
+                   "Kotlin Home response filter and quiet theme checks", "Python tooling unit tests"]
     final_bundle = BUILD / "friends-only.mpp"
     bundle.replace(final_bundle)
     bundle = final_bundle

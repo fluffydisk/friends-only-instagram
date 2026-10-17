@@ -166,6 +166,13 @@ class PatchResultTest(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "configured Friends Only patches"):
             module.validate_patch_result(self.result)
 
+    def test_following_feed_and_quiet_theme_are_both_required(self):
+        for required in ("Friends Only following feed", "Friends Only quiet visual theme"):
+            with self.subTest(required=required), self.assertRaises(ValidationError):
+                result = copy.deepcopy(self.result)
+                result["appliedPatches"] = [entry for entry in result["appliedPatches"] if entry["name"] != required]
+                module.validate_patch_result(result)
+
     def test_duplicate_requested_patch_is_not_a_complete_result(self):
         self.result["appliedPatches"][-1] = self.result["appliedPatches"][0]
         with self.assertRaises(ValidationError):

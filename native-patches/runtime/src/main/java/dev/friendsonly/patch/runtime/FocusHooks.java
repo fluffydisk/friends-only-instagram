@@ -6,6 +6,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -151,9 +155,13 @@ public final class FocusHooks {
         content.setPadding(padding, padding / 2, padding, 0);
         TextView intro = new TextView(activity);
         intro.setText(tr
-                ? "Native yama prototipi · Ana Sayfa'ya uzun basarak açılır. Hikâyeler ve sohbetler korunur."
-                : "Native patch prototype · Long-press Home to open. Stories and conversations are preserved.");
+                ? "Akışını ve görünümünü seç."
+                : "Choose your feed and appearance.");
         content.addView(intro);
+        addSwitch(content, current, FocusConfig.FOLLOWING_ONLY,
+                tr ? "Yalnızca takip ettiğim hesaplar" : "Only accounts I follow", current.followingOnly());
+        addSwitch(content, current, FocusConfig.QUIET_UI,
+                tr ? "Sade başlık ve gezinme" : "Minimal header and navigation", current.quietUi());
         addSwitch(content, current, FocusConfig.REELS, tr ? "Reels sekmesini gizle" : "Hide Reels tab", current.hideReels());
         addSwitch(content, current, FocusConfig.EXPLORE, tr ? "Keşfet / Arama sekmesini gizle" : "Hide Explore / Search tab", current.hideExplore());
         addSwitch(content, current, FocusConfig.EXTRAS, tr ? "Oluştur kısayolunu gizle" : "Hide Create shortcut", current.hideExtras());
@@ -162,15 +170,33 @@ public final class FocusHooks {
                 current.blockFeedReelsOpen());
         TextView note = new TextView(activity);
         note.setText(tr
-                ? "Videolar akışın içinde oynatılmaya devam eder. Bu ayar açıkken profildeki videolara dokunmak da Reels ekranını açmaz. Keşfet filtresi aynı sekmedeki aramayı da gizler. Bu filtre akışın yalnızca takip ettiklerini içerdiğini garanti etmez. Değişiklikler için ekranı yeniden açman gerekebilir."
-                : "Videos keep playing within the feed. With this setting on, tapping profile videos also leaves the Reels viewer closed. Explore filtering also hides search in that tab. These filters do not guarantee a following-only feed. You may need to reopen a screen after changing a filter.");
+                ? "Takip filtresi açıkken reklamlar ve takip bilgisi doğrulanamayan gönderiler gizlenir; bu yüzden akış daha kısa veya boş olabilir. Filtreyi değiştirince akışı yenile. Hikâyeler ve sohbetler bu filtreden etkilenmez. Videolar akışta kalır."
+                : "The follow filter hides ads and posts without confirmed following information, so the feed can be shorter or empty. Refresh the feed after changing it. Stories and chats are outside this filter. Videos stay in the feed.");
         note.setPadding(0, padding / 2, 0, padding / 2);
         content.addView(note);
+        boolean dark = QuietChrome.isDarkTheme(root);
+        int textColor = Color.parseColor(dark ? "#F2F3EE" : "#242B27");
+        for (int i = 0; i < content.getChildCount(); i++) {
+            View child = content.getChildAt(i);
+            if (child instanceof TextView) {
+                TextView text = (TextView) child;
+                text.setTextColor(textColor);
+                text.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+                text.setTextSize(child == note ? 13 : 15);
+            }
+        }
+        ScrollView scroll = new ScrollView(activity);
+        scroll.setFillViewport(false);
+        scroll.addView(content);
+        GradientDrawable panel = new GradientDrawable();
+        panel.setColor(Color.parseColor(dark ? "#151A17" : "#F8F7F4"));
+        panel.setCornerRadius(padding);
+        scroll.setBackground(panel);
         final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Friends Only")
-                .setView(content)
+                .setView(scroll)
                 .setPositiveButton(tr ? "Tamam" : "Done", null)
-                .setNeutralButton(tr ? "Tümünü geri göster" : "Show all", new DialogInterface.OnClickListener() {
+                .setNeutralButton(tr ? "Filtreleri kapat" : "Disable filters", new DialogInterface.OnClickListener() {
                     @Override public void onClick(DialogInterface ignored, int which) { current.restoreAll(); }
                 }).create();
         final WeakReference<Activity> owner = new WeakReference<>(activity);
@@ -233,6 +259,8 @@ public final class FocusHooks {
         @Override public void onViewAttachedToWindow(View view) { attach(); }
 
         @Override public void onViewDetachedFromWindow(View view) {
+            ViewGroup currentRoot = root.get();
+            if (currentRoot != null) QuietChrome.detach(currentRoot);
             attached = false;
             MAIN.removeCallbacks(this);
             queued = false;
@@ -302,6 +330,9 @@ public final class FocusHooks {
                     }
                 }
             }
+            QuietChrome.apply(tabBar, current.quietUi(), new Runnable() {
+                @Override public void run() { showSettings(TabController.this); }
+            });
         }
 
         private void installSettingsGesture(View home) {

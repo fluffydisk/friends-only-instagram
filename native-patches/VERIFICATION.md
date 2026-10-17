@@ -1,11 +1,12 @@
 # Native patch evidence · updated 2026-10-17
 
-This module is a native-patching experiment. **Alpha.3 is installed and opening
-on the user's phone; alpha.4's APK is ready for phone testing.** It targets only
-Instagram `451.0.0.20.80`; upstream compatibility claims are not evidence for our patches.
-The user-provided screenshot shows a logged-in Home feed, Stories tray and
-Home/Messages/Profile navigation. Story playback, Direct sending, group-chat
-behavior and the authentication/challenge flow have not been separately tested.
+This module is a native-patching experiment. **Alpha.5 is in development;
+alpha.3 is the only native build the user has installed/opened.** They explicitly
+have **not tested alpha.4** yet. Alpha.3's screenshot shows a logged-in Home
+feed, Stories tray and Home/Messages/Profile navigation. Story playback, Direct
+sending, groups and the login/challenge flow have not been separately verified.
+All patches target only Instagram `451.0.0.20.80`; upstream compatibility claims
+are not evidence that our exact changes work.
 
 ## Alpha.3 full build checks actually run in cloud
 
@@ -330,6 +331,71 @@ optional keystore secrets, but the current GitHub integration cannot configure
 those secrets automatically (HTTP 403). No secret setup is needed to compile
 an APK.
 
+## Alpha.5: strict Home feed and quiet native shell
+
+Alpha.5 adds two patches, **Friends Only following feed** and **Friends Only
+quiet visual theme**, bringing the required set to **six**. The output remains
+`dev.friendsonly.instagram`, version code **385806739**. The original input
+continues to require Instagram `451.0.0.20.80 / 385709029` and verified signing
+provenance. No alpha.5 APK production, cloud APK build or phone behavior is yet
+claimed.
+
+The following-feed patch targets the unique native Home response parser at its
+two array boundaries (`items` and `feed_items`). It checks an ordinary post's
+primary author's existing `friendship_status.following` value, requiring the
+boxed Boolean `TRUE`; `followed_by` is not used. Injected/sponsored posts,
+non-post wrappers and unknown units are rejected. The original null/skip guards
+handle the rejected entries. The shared Media, Stories, Direct and profile
+parsers are not modified. There is no new API client, request/header rewrite,
+following-list request, scraping, credential reading or outbound collection.
+
+`following_only` defaults true, including before preferences initialize.
+Reflection/metadata failure is strict: the item is rejected. That can remove
+followed-account posts too when their relationship metadata is absent, making
+Home short or empty. It does not purge already rendered/cached posts and does
+not establish that alternate parser/render paths are covered. Neither server
+ordering nor chronological Following is changed. The policy's acceptance rule
+is verified; a guaranteed runtime friends-only feed is **not** verified. Disable
+**Only accounts I follow / Yalnızca takip ettiğim hesaplar** and refresh Home if
+necessary. Refresh after either direction of that setting change.
+
+The visual patch edits seven semantic light/dark style families plus neutral
+Story-ring gradients, **57 style attributes total**, and **14 launch-theme
+attributes** across default, night, Android 12+ and Android 12+ night
+configurations. Fourteen own palette color resources are explicitly registered.
+The patch supplies independent tab/splash assets instead of the source OS marks. Runtime decoration adds a Friends Only Home header and
+Settings button, and **Friends / Chats / Me** labels (**Arkadaşlar / Sohbetler /
+Ben** in Turkish) over the existing bottom tab controls, covering their original
+icons and numeric/red badges. The exact supported internal startup-logo
+ImageView in MainActivity also receives our icon through bounded name matching.
+This does not alter authentication screens. Runtime color selection uses the
+native background/theme, including explicit in-app light/dark selection, rather
+than assuming the system theme always matches. The settings dialog uses that
+same palette. The existing native post, Story and chat components remain the
+content UI. Other layouts, features and Instagram chrome
+outside these scopes can remain; this is not a complete new native renderer.
+
+`quiet_ui` defaults true. It governs the runtime header/navigation decorations;
+turning it off does not undo compiled palette, Story-ring or launch-resource
+changes. The settings dialog is scrollable and opens from the Home Settings
+button or Home long-press. **Disable filters / Filtreleri kapat** disables content
+and navigation filters without changing this separate appearance preference.
+The new decoration reuses the existing throttled (250 ms) bounded view update;
+no new polling timer or global observer is introduced.
+
+The full local `build.py --check` **passed**, loading all **six patches** with
+**140 Python tests**. Its actual compiled/runtime policy suites passed:
+
+- Java Focus **180**, Feed **32** and Chrome **26** assertions.
+- Kotlin Identity **26**, Tap **42**, Following **35** and QuietTheme **94** assertions.
+
+The frozen theme changes passed **94** standalone theme assertions and **101**
+separate actual-source audit checks, including all four launch configurations.
+The final full six-patch bundle recheck then **passed**, with the exact suite
+counts above. These are build/policy/source checks, not rendered phone
+tests. Actual-input APK application, output validation and phone verification
+are pending.
+
 ## Cloud installation attempts
 
 These attempts are separate from the user's phone and none produced an Android
@@ -362,25 +428,35 @@ PackageInstaller verdict for the APK:
 ## Remaining device checks
 
 No physical Android device is attached to this cloud environment. Alpha.3's
-successful installation/opening and visible Home/feed/Stories tray come from
-the user's report and screenshot. Alpha.4's combined Home/profile bundle passed
-local and GitHub APK builds/checks; testing on that phone is pending.
-Older cloud emulator failures remain recorded above; they do not override the actual phone's successful normal installation.
+installation/opening and visible Home/feed/Stories tray are user-reported and
+shown in their screenshot. The user explicitly has not tested alpha.4.
+Alpha.5's full six-patch bundle checks passed; actual APK and phone checks are
+pending. Earlier emulator
+infrastructure failures do not override alpha.3's real phone success and are
+not evidence about alpha.5.
 
-Keep official Instagram installed, or restore it through Play Store if desired.
-The [alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-is the previous working version. Download the [alpha.4 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677),
-extract it and use the normal file-manager installation flow. The v2 diagnostic helper targets the
-old `com.instagram.android` package and should not be used for either.
-Record each remaining item separately:
+The [available alpha.4 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
+is an untested-on-phone earlier build; it does not contain alpha.5's strict Home
+filter or quiet shell. The [alpha.3 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
+is the only confirmed native phone build. Use normal file-manager installation,
+not the legacy v2 diagnostic helper, for own-package APKs. New signing keys may
+require uninstalling only Friends Only and clearing its local session/settings;
+no official Instagram removal is needed.
 
-1. Alpha.4 installation/opening, then tapping video posts on Home and user
-   profiles with the new guard enabled and disabled; inline playback must still
-   work. Check that Stories, Direct and group-profile launches are preserved.
-2. Story playback and ordinary photo/video interactions.
-3. Existing Direct/group conversations and sending a test message manually.
-4. Home long-press, every toggle, Show all and settings persistence.
-5. Rotation, background/foreground, offline/online and navigation recovery.
+When alpha.5's APK is available, record each item separately:
+
+1. Installation/opening and light/dark Home appearance, Friends Only header,
+   Settings button, text tab controls and restored original controls when the
+   appearance toggle is off. Some static resource styling remains in either mode.
+2. Strict Home filtering on/off with refresh: verify followed authors, ads,
+   unknown metadata, short/empty feed behavior and cold-start/cached content.
+   Do not infer verified following status only from the app's tab label.
+3. Video-post taps on Home/user profiles with the guard enabled/disabled, plus
+   inline playback. Stories, Direct and group-profile launches should stay usable.
+4. Story playback, ordinary photo/video interactions, existing Direct/groups
+   and manually sending a test message.
+5. Settings persistence, Disable filters versus appearance, rotation,
+   background/foreground, offline recovery and navigation.
 6. Login/challenge/session behavior when naturally encountered; stop on platform
    rejection. No authentication, signature or integrity bypass is included.
 

@@ -23,15 +23,16 @@ when given alpha.3 is a helper limitation, not a rejection of the normal install
 See [VERIFICATION.md](VERIFICATION.md) and
 [installation troubleshooting](../docs/INSTALLATION_TROUBLESHOOTING.md).
 
-**Alpha.4 is ready for phone testing.** It adds a guard for known video-post
-taps on Home and user profiles opening Reels. Local and
-[GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923)
-passed 139 Python tests, 180 Java policy assertions, 26 Kotlin identity assertions
-and 42 Kotlin guard assertions. Its signed local APK also passed an independent
-static guard audit. **Alpha.4 installation and tap behavior on the phone have
-not yet been verified.**
+**Alpha.5 is in development** with six patches in total. It adds a strict
+metadata-based Home filter and a quiet Friends Only shell/theme. Its output
+version code is **385806739**. The full six-patch bundle build passed 140 Python
+tests and all Java/Kotlin policy checks. APK production and phone checks are
+pending. The user explicitly has **not yet
+tested alpha.4**; alpha.3 installation/opening remains the only confirmed native
+phone baseline. Alpha.4 is still the available test download below and does not
+contain the new alpha.5 features.
 
-## Download the alpha.4 test APK
+## Available alpha.4 test APK · not yet phone-tested
 
 [Download `friends-only-personal-test-apk-44`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39037320923/artifacts/12103030677)
 from the successful combined Home/profile build. Sign into GitHub in a browser,
@@ -57,20 +58,23 @@ evidence only.
 
 ## Initial scope
 
-Alpha.3 includes three Friends Only patches; alpha.4 adds a fourth:
+Alpha.3 included three patches, alpha.4 added the fourth, and alpha.5 adds the
+following-feed and quiet-theme patches (six total):
 
 1. **Native navigation:** hide the Reels, Explore/Search, and Create tabs by
    default using exact resource names inside the supported bottom tab bar.
-   Home, Direct, and Profile stay available. Long-press Home opens a small
-   Friends Only settings dialog, replacing Instagram's existing Home long-press
-   gesture if present. Normal taps are preserved. Settings offer independent
-   switches and **Show all** to restore the affected controls.
+   Home, Direct and Profile stay available. Long-press Home opens Friends Only
+   settings, replacing Instagram's Home long-press gesture if present. Alpha.5
+   also adds an explicit Home **Settings / Ayarlar** button and a scrollable
+   native dialog. Normal tab click targets are retained.
 2. **Recommendation requests:** suppress only a small exact allowlist of Reels
    and Explore collection requests inside Instagram’s existing request path.
-   Unknown requests pass through. The extension does not read response bodies,
-   messages, feed items, credentials, cookies, or tokens; it creates no separate
-   API client or backend. The intended preserved paths include authentication,
-   Home feed, Stories, individual posts/videos, Direct, and group conversations.
+   Unknown requests pass through. This request hook does not inspect response
+   bodies, messages, credentials, cookies or tokens, and creates no separate
+   API client or backend. Alpha.5's separate Home parser hook reads only the
+   existing item/author relationship metadata described below. Intended
+   preserved paths include authentication, Home feed, Stories, individual
+   posts/videos, Direct and group conversations.
    Their actual behavior still needs APK/device testing.
 3. **App identity:** use `dev.friendsonly.instagram`, the Friends Only launcher
    label and our own vector icon. Re-scope app-defined permissions and declared
@@ -84,17 +88,58 @@ Alpha.3 includes three Friends Only patches; alpha.4 adds a fourth:
    user-profile sources, including your own profile. With its independent
    setting enabled, those transitions do nothing; unknown sources and launches
    from Stories, Direct and group profiles pass through. It does not remove
-   video posts or change inline video playback/network requests. Long-press Home and use
-   **Akış ve profilden Reels açılmasını engelle** (block the viewer from feed
-   and profiles)
-   to change it. The setting defaults on and **Show all** disables it too.
+   video posts or change inline video playback/network requests. Long-press Home
+   and use **Akış ve profilden Reels açılmasını engelle** (block the viewer from
+   feed and profiles) to change it. The setting defaults on; alpha.5's **Disable filters** also
+   disables this guard.
 
-Hiding Explore also hides the Search entry in that tab. This version does not
-remove suggested posts from Home, determine who you follow, force chronological
-Following, or guarantee a friends-only feed. Instagram's screens remain largely
-unchanged: our launcher identity and local settings are not a full reskin.
-There is no updater, added analytics, credential form, or
-signature/authentication/integrity bypass.
+5. **Following feed (alpha.5, APK/phone validation pending):** the
+   **Friends Only following feed** patch filters two ordinary-item array
+   boundaries inside the supported Home response parser. A post is kept only
+   when the primary author's existing `friendship_status.following` is exactly
+   `Boolean.TRUE` and the item is not marked injected/sponsored. Non-post,
+   recommendation and unknown units are dropped; absent or changed metadata is
+   rejected. It starts strict even before preferences load. No private API
+   client, new network request, request-header rewrite or following-list scrape
+   is added. Shared media, Stories, Direct and profile parsers are not patched.
+6. **Quiet visual theme (alpha.5, APK/phone validation pending):**
+   **Friends Only quiet visual theme** supplies warm neutral light/dark
+   surfaces, restrained Story rings, independent tab artwork and own OS splash
+   branding. Runtime decoration gives the supported Home toolbar a Friends Only
+   title and Settings button, replaces the exact supported internal startup
+   logo with our icon, and covers the original bottom icons/badge counts
+   with **Friends / Chats / Me** (Turkish: **Arkadaşlar / Sohbetler / Ben**).
+   Existing navigation click targets and native content views remain in place.
+   It uses the existing throttled bounded view updates, with no additional
+   polling timer or global observer. This is not a complete new post/chat
+   renderer; other Instagram chrome can remain outside these verified scopes.
+
+## Alpha.5 settings and limits
+
+**Only accounts I follow / Yalnızca takip ettiğim hesaplar** (`following_only`)
+defaults on. Missing relationship metadata is not treated as proof of following:
+Home can become partial or empty, even for accounts you follow. Disable the
+setting and refresh Home to recover the original feed. Enabling it does not
+purge already rendered/cached content; cache and alternate renderer behavior
+still require phone tests. The patch does not change server ordering or request
+a chronological feed, and cannot yet establish a fully friends-only experience.
+Ordinary photo/video posts with confirmed followed authors remain eligible.
+
+**Minimal header and navigation / Sade başlık ve gezinme** (`quiet_ui`) defaults
+on. Turning it off restores our runtime header/tab decorations; the compiled
+neutral palette, Story-ring styles and launch assets remain part of the APK.
+Runtime colors read the native app's selected theme/background, including its
+explicit light/dark selection; actual rendered appearance still needs phone tests.
+**Disable filters / Filtreleri kapat** turns off content/navigation filters and
+the feed guard, while preserving this separate appearance preference. Refresh
+Home after changing the following filter. Settings are local; Instagram account
+data is not persisted by our extension.
+
+Hiding Explore also hides Search in that tab. Alpha.4 did not remove Home
+recommendations; alpha.5 attempts that only at its verified Home parser
+boundaries. Other Instagram features, controls or branding can remain. There is
+no updater, added analytics, credential form, or signature/authentication/integrity
+bypass.
 
 Instagram's own networking, permissions, tracking and privacy terms remain in
 effect. Our small extension adds no permissions or third-party collection;
@@ -261,17 +306,20 @@ filter restores its controls and that unfamiliar layouts remain usable.
 | Hosted API 37 alpha.3 install check | Failed in emulator graphics/services; ADB broken pipe, no PackageManager verdict |
 | Visible phone UI | User screenshot: logged-in Home feed, Stories tray, Home/Messages/Profile navigation |
 | Story playback, Direct sending, groups, login/challenge flow | Not specifically tested/reported |
-| Alpha.4 combined bundle/guard | Local and GitHub APK builds passed: 139 Python tests, 180 Java policy assertions, 26 identity + 42 guard Kotlin assertions; local static guard audit passed; phone test pending |
+| Alpha.4 combined bundle/guard | Local and GitHub APK builds passed: 139 Python tests, 180 Java policy assertions, 26 identity + 42 guard Kotlin assertions; user explicitly has not phone-tested it |
+| Alpha.5 strict feed/quiet shell | Full six-patch bundle passed 140 Python tests and all Java/Kotlin policy suites; 101 source-theme audit checks passed separately; APK/phone verification pending |
 
 The exact alpha.3 CI APK reached the hosted API 37 installation step, but
 emulator graphics crashes killed services and ADB returned a broken pipe.
 [Run 39019676627](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019676627)
 failed without a PackageManager verdict; no app launch/login was attempted.
 The earlier WebView app’s phone report is not evidence about these native
-patches. The next milestone is validating alpha.4's narrow feed/profile-to-Reels guard
-and recording feature-specific account tests.
+patches. The next milestone is validating alpha.5's strict Home filter and
+native shell, then recording feature-specific phone tests. Alpha.4 remains untested on the
+user's phone.
 After that, refine the minimalist native appearance from observed layouts and
-establish stable signing for upgrades. Broader feed filtering and a full native redesign remain future work.
+establish stable signing for upgrades. Coverage of additional feed/render paths
+and a full native redesign remain future work.
 
 See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these results.
 
@@ -300,6 +348,15 @@ See [VERIFICATION.md](VERIFICATION.md) for commands and the limits of these resu
   APK'nin statik kontrolleri ve bağımsız guard kontrolü de geçti. GitHub APK
   derlemesi başarılı: yukarıdaki `friends-only-personal-test-apk-44` dosyasını
   indir. Yeni sürümün cihazdaki kurulumu ve dokunma davranışı henüz doğrulanmadı.
+- Alpha.5 hazırlanıyor: Ana Sayfa'da yalnızca gönderinin asıl yazarını takip
+  ettiğine dair açık bilgi varsa gönderiyi tutan katı filtre ve sade açık/koyu
+  tema ekleniyor. Friends Only başlığı, **Ayarlar** düğmesi ve
+  **Arkadaşlar / Sohbetler / Ben** gezinmesi var; tüm gönderi/sohbet bileşenleri
+  baştan yazılmış değildir. Bilgi eksikse akış kısalabilir veya boş olabilir:
+  **Yalnızca takip ettiğim hesaplar** ayarını kapatıp akışı yenile. Hikâyeler,
+  mesajlar ve profil ayrıştırıcıları bu Home filtresinin dışında. Altı yama
+  derlendi; 140 Python testi ve tüm Java/Kotlin politika kontrolleri geçti.
+  APK üretimi ve cihaz testleri bekliyor; alpha.4 de henüz telefonda denenmedi.
 - Alpha.3'ün imzası geçiciydi. Yeni sürüm imza nedeniyle güncellenemezse yalnızca
   eski **Friends Only** uygulamasını kaldırıp yenisini kur; yerel oturum ve
   ayarlar silinir. Resmî Instagram'ı kaldırmak veya telefonu sıfırlamak gerekmez.

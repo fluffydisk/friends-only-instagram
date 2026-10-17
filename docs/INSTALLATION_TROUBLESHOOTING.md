@@ -5,7 +5,8 @@
 shows a logged-in Home feed, Stories tray and Home/Messages/Profile navigation.
 Story playback, message sending, groups and the login/challenge flow have not
 been separately confirmed. The earlier alpha.1/alpha.2 installation errors
-remain recorded below as history.
+remain recorded below as history. The user explicitly has **not tested
+alpha.4** yet. Alpha.5 is being implemented; its APK is not available yet.
 
 ## Legacy helper error on alpha.3
 
@@ -21,6 +22,32 @@ The same APK installed and opened normally through the file manager.
 Do not use that helper for alpha.3 or later own-package APKs. The helper's
 printed `Package: com.instagram.android` field is fixed; it does not determine
 the selected APK's real identity.
+
+## Alpha.5: a short or empty Home feed
+
+Alpha.5 adds **Only accounts I follow / Yalnızca takip ettiğim hesaplar**, on by
+default. It uses existing metadata in the supported Home response parser:
+ordinary posts need the primary author's explicit `following = true`; injected,
+non-post and unknown units are discarded. Missing relationship metadata is
+rejected too, so even a followed account's post can be hidden and Home can be
+short or empty. Cached/alternate render paths and the actual phone behavior are
+unverified; this is not a server-side chronological-feed guarantee.
+
+If Home is unexpectedly empty, open the Home **Settings / Ayarlar** button or
+long-press Home, turn off that following filter, then refresh Home. Refresh
+again when enabling it. Stories, Direct and profile parsers are not filtered by
+this patch. The extension creates no new API requests or credential collection.
+
+Alpha.5 also adds neutral light/dark surfaces, restrained Story rings, an own
+Home header and text navigation. **Minimal header and navigation / Sade başlık
+ve gezinme** toggles runtime decorations; the compiled palette, Story-ring and
+splash changes stay in the APK. **Disable filters / Filtreleri kapat** changes
+content/navigation filters and leaves that separate appearance preference
+unchanged. Native post/chat components remain Instagram's; some original
+features or chrome can remain outside the verified surfaces. All new alpha.5
+APK and phone behavior is still pending validation. Its full six-patch bundle
+build passed 140 Python tests and all Java/Kotlin policy suites; those checks do
+not prove its rendered UI or feed behavior.
 
 ## Install the alpha.4 test APK
 
@@ -67,7 +94,8 @@ establish that Instagram accepts every login/challenge or feature.
 | Alpha.2, diagnostic v2 | `FAILURE_CONFLICT (5)`, legacy `-7`: `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, signature mismatch |
 | Alpha.3, normal file manager | User confirmed installation/opening; screenshot shows logged-in Home/feed, Stories tray and Home/Messages/Profile navigation |
 | Alpha.3, old diagnostic v2 | Legacy -2 package-hint mismatch from helper hardcoded for another package; normal install works |
-| Alpha.4 | Combined Home/profile local and GitHub APK checks passed; phone installation/tap verification pending |
+| Alpha.4 | Combined Home/profile local and GitHub APK checks passed; user explicitly has not phone-tested it |
+| Alpha.5 | Full six-patch bundle checks passed; actual APK and phone verification pending |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "version": "0.3.0-alpha.5",
+  "date_utc": "2026-10-17",
+  "goals": [
+    "Friends Only identity and quieter native Home/navigation",
+    "Home posts from followed authors only according to explicit native relationship metadata"
+  ],
+  "source": {
+    "package": "com.instagram.android",
+    "version_name": "451.0.0.20.80",
+    "version_code": 385709029,
+    "apkm_sha256": "7f1dc7549a3d970124983935e977447de6d3dee41e7334278d0821b5472089ad",
+    "publisher_certificate_sha256": "3a10c50c18ba937506c2875e9047be74f8fd8b86fae2ff9feaa50a81fcb4c014"
+  },
+  "application": {
+    "package": "dev.friendsonly.instagram",
+    "label": "Friends Only",
+    "output_version_code": 385806739
+  },
+  "checks": {
+    "full_bundle_build": "passed",
+    "python_tests": 140,
+    "java_assertions": {
+      "existing_focus_policy": 180,
+      "strict_home_feed": 32,
+      "quiet_chrome_surfaces": 26
+    },
+    "kotlin_assertions": {
+      "app_identity": 26,
+      "feed_profile_tap_guard": 42,
+      "home_parser_and_following_contract": 35,
+      "quiet_theme": 94
+    },
+    "additional_original_resource_audit_assertions": 101,
+    "local_apk_build": "pending",
+    "github_apk_build": "pending",
+    "physical_installation_and_new_features": "not_tested",
+    "fixed_build_issue": "New named color values need explicit PublicXmlManager allocation before the pinned resource encoder can resolve them. Source resource IDs are preserved; 14 own colors are allocated and tested.",
+    "independent_runtime_review": "No release-blocking code defect found in bounded chrome, lifecycle, input, theme, accessibility, config or Home filter; physical behavior untested."
+  },
+  "home_filter": {
+    "default_enabled": true,
+    "setting": "following_only",
+    "pre_configuration_behavior": "strict",
+    "response_parser": "LX/02xz;->unsafeParseFromJson(LX/0Gyx;)Ljava/lang/Object;",
+    "arrays": [
+      "items",
+      "feed_items"
+    ],
+    "matched_source_parsers": 1,
+    "original_parser_try_blocks": 0,
+    "source_register_count": 9,
+    "result_register": 0,
+    "scratch_register": 1,
+    "primary_author_getter": "com.instagram.feed.media.Media.A3U()",
+    "injected_metadata_getter": "com.instagram.feed.media.Media.A3F()",
+    "relationship_getter": "com.instagram.user.model.User.A1E()",
+    "following_interface_getter": "com.instagram.api.schemas.RelationshipInfoDict.CEK()",
+    "following_native_field_hash": 765915793,
+    "followed_by_not_used": true,
+    "decision": "Keep ordinary Home media only with following == Boolean.TRUE and injected == null. Missing, false, inaccessible or unexpected metadata is hidden. Wrapped non-post units lacking primary media are skipped by the existing native null guard.",
+    "shared_media_story_direct_profile_parsers_modified": false,
+    "new_requests_or_header_rewrites": false,
+    "private_field_reflection": false,
+    "local_metadata_logging_or_storage": false
+  },
+  "quiet_design": {
+    "default_enabled_runtime_header_navigation": true,
+    "runtime_preference": "quiet_ui",
+    "home_header_class": "instagram.features.feed.mainfeed.actionbar.MainFeedActionBar",
+    "home_header": "Friends Only plus visible local settings button",
+    "navigation": [
+      "Friends / Arkada\u015flar",
+      "Chats / Sohbetler",
+      "Me / Ben"
+    ],
+    "native_glyphs_and_bottom_numeric_badges": "covered or hidden only on the three known native tabs",
+    "ordinary_click_and_long_click_listeners": "preserved",
+    "new_global_observers_or_timers": false,
+    "existing_controller_throttle_ms": 250,
+    "header_discovery_max_views": 256,
+    "header_discovery_max_depth": 8,
+    "prunes_content_lists": true,
+    "semantic_theme_families": 7,
+    "theme_and_story_ring_attributes_changed": 57,
+    "launcher_style_attributes_changed": 14,
+    "os_splash_branding": "own icon and neutral canvas, original Meta branding image removed from launcher style",
+    "internal_startup_logo": "own icon replacement only for exact named MainActivity startup ImageView within bounded main-wrapper scan",
+    "dark_light": "own neutral families and actual native theme-background resolution for runtime chrome",
+    "authentication_and_legal_text": "unchanged",
+    "native_post_chat_profile_renderers": "retained",
+    "disable_filters_keeps_runtime_appearance_preference": true,
+    "runtime_appearance_toggle_does_not_undo_static_palette": true,
+    "palette_resources_explicitly_registered": 14,
+    "launcher_style_configurations": [
+      "default",
+      "night",
+      "v31",
+      "night-v31"
+    ]
+  },
+  "limits": [
+    "Followed posts with missing relationship metadata may be hidden, producing a shorter or empty Home feed.",
+    "Changing follow filter requires refreshing already displayed items.",
+    "A stored disabled following filter can briefly use the strict default until native tab/preferences initialization on cold start; refresh may be needed.",
+    "Disk-cache and alternate-render bypasses are not verified.",
+    "No chronology, completeness or live server/account feed guarantee is established by static tests.",
+    "Original post, Story, Direct and profile components remain; unfamiliar or unverified native surfaces keep original behavior.",
+    "Physical alpha.3 installation/Home are user-confirmed; user explicitly has not tested alpha.4, and alpha.5 is not phone-tested.",
+    "Test builds use disposable signing unless stable repository secrets are configured; replacement can require removing only Friends Only."
+  ],
+  "patch_bundle": {
+    "file": "friends-only.mpp",
+    "sha256": "6c9d8cf724b51178e3b149a8a8d04c13cf74b4e67a24455fd72218415f3e2edd",
+    "size_bytes": 104609
+  }
+}

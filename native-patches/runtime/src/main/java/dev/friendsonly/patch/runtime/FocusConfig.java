@@ -9,12 +9,16 @@ final class FocusConfig implements SharedPreferences.OnSharedPreferenceChangeLis
     static final String EXPLORE = "hide_explore";
     static final String EXTRAS = "hide_extra_shortcuts";
     static final String BLOCK_FEED_REELS = "block_feed_reels_open";
+    static final String FOLLOWING_ONLY = "following_only";
+    static final String QUIET_UI = "quiet_ui";
 
     private final SharedPreferences preferences;
     private volatile boolean hideReels;
     private volatile boolean hideExplore;
     private volatile boolean hideExtras;
     private volatile boolean blockFeedReelsOpen;
+    private volatile boolean followingOnly;
+    private volatile boolean quietUi;
 
     FocusConfig(Context applicationContext) {
         preferences = applicationContext.getSharedPreferences("friends_only_focus", Context.MODE_PRIVATE);
@@ -26,17 +30,20 @@ final class FocusConfig implements SharedPreferences.OnSharedPreferenceChangeLis
     boolean hideExplore() { return hideExplore; }
     boolean hideExtras() { return hideExtras; }
     boolean blockFeedReelsOpen() { return blockFeedReelsOpen; }
+    boolean followingOnly() { return followingOnly; }
+    boolean quietUi() { return quietUi; }
 
     void set(String key, boolean enabled) {
         if (REELS.equals(key) || EXPLORE.equals(key) || EXTRAS.equals(key)
-                || BLOCK_FEED_REELS.equals(key)) {
+                || BLOCK_FEED_REELS.equals(key) || FOLLOWING_ONLY.equals(key) || QUIET_UI.equals(key)) {
             preferences.edit().putBoolean(key, enabled).apply();
         }
     }
 
     void restoreAll() {
         preferences.edit().putBoolean(REELS, false).putBoolean(EXPLORE, false)
-                .putBoolean(EXTRAS, false).putBoolean(BLOCK_FEED_REELS, false).apply();
+                .putBoolean(EXTRAS, false).putBoolean(BLOCK_FEED_REELS, false)
+                .putBoolean(FOLLOWING_ONLY, false).apply();
     }
 
     @Override public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
@@ -49,6 +56,9 @@ final class FocusConfig implements SharedPreferences.OnSharedPreferenceChangeLis
         hideExplore = read(EXPLORE, FocusPolicy.DEFAULT_HIDE_EXPLORE);
         hideExtras = read(EXTRAS, FocusPolicy.DEFAULT_HIDE_EXTRAS);
         blockFeedReelsOpen = read(BLOCK_FEED_REELS, FocusPolicy.DEFAULT_BLOCK_FEED_REELS_OPEN);
+        followingOnly = read(FOLLOWING_ONLY, FeedPolicy.DEFAULT_FOLLOWING_ONLY);
+        quietUi = read(QUIET_UI, true);
+        FeedHooks.setFollowingOnly(followingOnly);
     }
 
     private boolean read(String key, boolean fallback) {

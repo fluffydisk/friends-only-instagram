@@ -6,8 +6,26 @@ Reels. Alpha.7 addresses that native navigation path and simplifies Settings;
 its phone behavior is not yet verified. Opening is separate from Story
 playback, Direct/groups, login/challenges and following-filter success.
 
+<!-- ALPHA8_DELIVERY_START -->
+**[Download alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041)** — extract the ZIP and open
+`friends-only-personal.apk` with the normal file manager. Version code:
+**385806742**. Feed videos now use the existing inline loop instead of opening
+**View in Reels / Watch again** end cards. No fullscreen viewer, timer or
+synthetic replay tap is added.
+
+Local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905) passed all **ten patches**, **163 Python
+tests and 615 Java/Kotlin assertions**, signatures/identity, 16 KiB alignment
+and the emitted-theme guard. **Phone playback is still unverified.** Remove
+only the older **Friends Only** app for this new CI signing key; its local
+session/settings are cleared. Official Instagram may stay installed. Do not
+use the legacy v2 installation helper.
+<!-- ALPHA8_DELIVERY_END -->
+
+The end-card issue report does not name the installed APK/run; it is not
+version-specific confirmation that alpha.7 was installed or tested.
+
 <!-- ALPHA7_DELIVERY_START -->
-**[Download alpha.7, artifact 67](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)**, then extract
+**Previous version: [alpha.7, artifact 67](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)**, then extract
 `friends-only-personal.apk`. Version code: **385806741**. Both local and
 [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all **nine patches**, **163 Python tests and 558
 Java/Kotlin assertions**, signatures/identity, 16 KiB alignment and the
@@ -27,7 +45,7 @@ local-only. Alpha.6's later opening report is user evidence.
 
 ## Install a new-key Friends Only build
 
-1. Sign into GitHub, download [alpha.7 artifact 67](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829) and extract
+1. Sign into GitHub, download [alpha.8 artifact 72](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041) and extract
    `friends-only-personal.apk` from the ZIP.
 2. Remove only the older **Friends Only** native app when updating between
    these disposable-signature builds. This clears its local session/settings;
@@ -90,6 +108,15 @@ checked on the phone too, including scrolling away and background/resume. The
 dedicated feed gate also keeps the existing background cleanup path enabled;
 global configuration getters and Story/Direct players are unchanged.
 There is no speed setting, fullscreen requirement or Reels transition.
+
+## Alpha.8 video-end check
+
+After installing the identified new build, let a playing feed video reach its
+end. **View in Reels** and **Watch again** should both stay hidden; the same
+video should restart inline without opening Reels. Check multiple cycles,
+scroll-away/return, background/resume and hold-to-2× around the video boundary.
+Story/Direct playback remains a separate regression check. These are intended
+results, not reported phone successes.
 
 ## Recorded installation history
 

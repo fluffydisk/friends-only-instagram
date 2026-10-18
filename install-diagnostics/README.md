@@ -5,6 +5,16 @@ It supports only old `com.instagram.android` builds; alpha.3 and later use
 `dev.friendsonly.instagram`. The helper's legacy -2 package-hint mismatch does
 not diagnose normal installation or startup.
 
+<!-- ALPHA8_DELIVERY_START -->
+The [current native alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041) (code **385806742**) repeats inline feed
+videos without the supported **View in Reels / Watch again** end card. Its local
+and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905) passed ten patches, 163 Python tests and 615 Java/Kotlin
+assertions; phone playback remains unverified. Install the extracted APK with
+the normal file manager. Remove only an older Friends Only app for the changed
+signing key (local session/settings are lost). **This old helper is incompatible
+with the own-package APK and must not be used for its installation.**
+<!-- ALPHA8_DELIVERY_END -->
+
 **[Download the current alpha.7 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)** and extract
 `friends-only-personal.apk`. Both its local and GitHub builds passed nine
 patches, **163 Python tests and 558 Java/Kotlin assertions**, signatures,

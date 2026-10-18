@@ -11,6 +11,24 @@ native navigation list and viewer entry point to address that defect. Opening
 is user-reported evidence, not a separate verification of Stories, messages,
 login/challenges or following-only filtering.
 
+<!-- ALPHA8_DELIVERY_START -->
+**[Download alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041)** — extract the ZIP and open
+`friends-only-personal.apk` with the normal file manager. Version code:
+**385806742**. Feed videos now use the existing inline loop instead of opening
+**View in Reels / Watch again** end cards. No fullscreen viewer, timer or
+synthetic replay tap is added.
+
+Local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905) passed all **ten patches**, **163 Python
+tests and 615 Java/Kotlin assertions**, signatures/identity, 16 KiB alignment
+and the emitted-theme guard. **Phone playback is still unverified.** Remove
+only the older **Friends Only** app for this new CI signing key; its local
+session/settings are cleared. Official Instagram may stay installed. Do not
+use the legacy v2 installation helper.
+<!-- ALPHA8_DELIVERY_END -->
+
+The user's end-card report does not identify its APK/run. It supplies an
+issue to reproduce, not version-specific alpha.7 success evidence.
+
 <!-- ALPHA7_DELIVERY_START -->
 **[Download alpha.7: `friends-only-personal-test-apk-67`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)**. Extract the
 ZIP and install `friends-only-personal.apk` through the normal file manager.

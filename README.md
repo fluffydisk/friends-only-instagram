@@ -5,8 +5,26 @@ under our own name and icon. **The user confirms alpha.6 opens on their Galaxy
 S24+ / Android 17 / One UI 9.** Its Home swipe still reaches Reels; alpha.7
 addresses that navigation path and further simplifies the interface.
 
+<!-- ALPHA8_DELIVERY_START -->
+**[Download alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041)** — extract the ZIP and open
+`friends-only-personal.apk` with the normal file manager. Version code:
+**385806742**. Feed videos now use the existing inline loop instead of opening
+**View in Reels / Watch again** end cards. No fullscreen viewer, timer or
+synthetic replay tap is added.
+
+Local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905) passed all **ten patches**, **163 Python
+tests and 615 Java/Kotlin assertions**, signatures/identity, 16 KiB alignment
+and the emitted-theme guard. **Phone playback is still unverified.** Remove
+only the older **Friends Only** app for this new CI signing key; its local
+session/settings are cleared. Official Instagram may stay installed. Do not
+use the legacy v2 installation helper.
+<!-- ALPHA8_DELIVERY_END -->
+
+The latest issue report describes those two end-card actions but does not
+identify an APK/run, so it is not recorded as alpha.7 phone verification.
+
 <!-- ALPHA7_DELIVERY_START -->
-**[Download the alpha.7 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)** — extract the ZIP and install
+**Previous version: [alpha.7 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)** — extract the ZIP and install
 `friends-only-personal.apk`. The local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all
 nine patches, **163 Python tests and 558 Java/Kotlin assertions**, including
 signature/identity, 16 KiB alignment and compiled-theme checks. Version code:

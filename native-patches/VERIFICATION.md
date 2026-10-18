@@ -7,6 +7,77 @@ one following filter, and enables the existing in-feed hold-to-2× path.
 Alpha.5 remains withdrawn after its confirmed phone startup failure; alpha.4
 remains phone-untested. Alpha.3 is an older known-to-open fallback.
 
+<!-- ALPHA8_DELIVERY_START -->
+**[Download alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041)** — extract the ZIP and open
+`friends-only-personal.apk` with the normal file manager. Version code:
+**385806742**. Feed videos now use the existing inline loop instead of opening
+**View in Reels / Watch again** end cards. No fullscreen viewer, timer or
+synthetic replay tap is added.
+
+Local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905) passed all **ten patches**, **163 Python
+tests and 615 Java/Kotlin assertions**, signatures/identity, 16 KiB alignment
+and the emitted-theme guard. **Phone playback is still unverified.** Remove
+only the older **Friends Only** app for this new CI signing key; its local
+session/settings are cleared. Official Instagram may stay installed. Do not
+use the legacy v2 installation helper.
+<!-- ALPHA8_DELIVERY_END -->
+
+The latest user report describes those end-card actions without naming an
+APK/run. Do not infer alpha.7 installation or feature success from it.
+
+## Alpha.8 source contracts · phone playback unverified
+
+The version-pinned feed coordinator has two separate controls:
+
+- `LX/02Ag.A0C(Media,state,Integer)Z` pauses for `preview_end`, changes the
+  end-card state to `ANIMATING`, then notifies its renderer. A two-instruction
+  false-return prefix prevents both the pause and the supported **View in
+  Reels / Watch again** cards. Its 92 original instructions remain intact.
+  All three callers are in the same native feed coordinator.
+- `LX/02Ag.A01(Media,state,controller)` also creates a preview configuration
+  with a false-loop override. Only instruction 86 changes from `v13=1` to
+  `v13=0`, disabling that feed-only override. The remaining 119 instructions
+  and default branch are retained. This is necessary for previews to repeat.
+
+The original feed player already defaults to looping; native playback applies
+that setting before playing. Shared players, Story/Direct handlers, lifecycle
+pause, mute, manual carousel/scroll, hold-to-2× and Reels blocking are unchanged.
+No new play/seek call, timer, touch listener or network request is added. Failed
+network/media playback and its retry controls remain native.
+
+The loop patch passes **57 standalone assertions**, plus **13** checks on the
+actual original APK (**70 total**). Both full local and GitHub builds passed
+**163 Python tests, 155 Java assertions and 460 Kotlin assertions** (615 total
+Java/Kotlin). Counts were confirmed from the completed CI job logs. All ten
+patches were applied to the verified original APKM; signed output passed
+identity, signature, 16 KiB alignment and the 7-style/47-reference/14-palette
+resource guard. These checks do not establish Samsung playback.
+
+The independent local final-APK comparison against alpha.7 inspected **53**
+native/runtime classes: exactly the two planned methods changed; **575** other
+methods and all **3,166 assets / 18 native libraries** were unchanged. Both
+changed methods passed static Dexlib analysis. The compiled resource audit
+also preserved all **1,097** original color IDs and values. The cloud pipeline
+independently ran its output guards; these broader binary comparisons were on
+the local APK, not the separately signed cloud APK.
+
+- Source: `f3edb305c63b308e0494a3ea17a85f7888828153`; version code **385806742**.
+- Local APK: `0cb7f7b9ba7fe19db98b7c9a6ac0e454e46381e51f85730b22aa6d0d5f23df6c`, 252,810,488 bytes;
+  signer `05351b9285a9d34ed0d29cf78d0006a6101e653eff5b6f8e04b02c9862de47b2`.
+- [Cloud run 72](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905), APK artifact **12132185041**:
+  `7a9168b00f1bd96d3daaf96bc071b4e3f413747374f52891c611b5808f611970`, 253,171,054 bytes;
+  signer `530dd48d9e65397ff09e9220aedfb6125d307a1001d44a41f6db37a96f743341`.
+- Report artifact **12131458959**; bundle artifact **12130983890**.
+  The cloud and local patch bundle match:
+  `c8561212c505fd40aa2b83c0d644683f69477f74cc977b531bc657f3e2e80c45` (168,608 bytes).
+- Full metadata and explicit limits:
+  [alpha.8 evidence](evidence/native-alpha8-2026-10-18.json).
+
+Phone installation, repeated playback/end-card absence, scrolling/background
+pause, hold-to-2×/release and Story/Direct behavior remain unverified. Live,
+unsupported or new server-selected playback variants can behave differently;
+native error/retry controls remain available.
+
 <!-- ALPHA7_DELIVERY_START -->
 **[Alpha.7's APK is available, artifact 67](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829).** Both the full local build
 and the [GitHub APK run](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all nine patches, **163 Python tests and
@@ -695,7 +766,8 @@ PackageInstaller verdict for the APK:
 ## Remaining device checks
 
 Alpha.6 opening is user-confirmed; its Home-to-Reels swipe is a reported defect.
-Alpha.7 has no phone installation, opening or feature result yet. Alpha.5 is
+Alpha.7 has no version-identified phone installation, opening or feature result
+yet. Alpha.8 playback/replay checks are also pending. Alpha.5 is
 withdrawn; do not reinstall artifact 55. Alpha.3 remains an older known-to-open
 fallback. The previous legacy v2 installer helper is incompatible with the
 independent package and is not a startup diagnostic.
@@ -718,10 +790,15 @@ Record the exact APK/run identifier and these results separately:
    reset on release, cancel, scroll, background/resume and item recycle. Normal
    photo taps, carousel swipes and other native long-press behavior need
    separate checks for regressions.
-5. Followed-account photo/video posts, incomplete metadata/empty-feed recovery,
+5. Let a feed video finish: neither **View in Reels** nor **Watch again**
+   should appear, and the same video should restart inline. Repeat for several
+   cycles; then scroll away, return and test hold-to-2× near the end. Background
+   playback, Story/Direct videos and off-screen items must not start looping
+   because of this change.
+6. Followed-account photo/video posts, incomplete metadata/empty-feed recovery,
    upper Stories-tray playback, in-feed Story cards, Direct text sending and
    existing group conversations.
-6. Light/dark appearance, rotation, back navigation, offline recovery and
+7. Light/dark appearance, rotation, back navigation, offline recovery and
    remaining original branding outside the explicitly patched layouts.
 
 When reporting issues, include APK/run identifier, S24+ Android/One UI versions,

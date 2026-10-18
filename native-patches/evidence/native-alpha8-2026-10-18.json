@@ -1,0 +1,561 @@
+{
+  "schema_version": 1,
+  "version": "0.3.0-alpha.8",
+  "date_utc": "2026-10-18",
+  "source_commit": "f3edb305c63b308e0494a3ea17a85f7888828153",
+  "application": {
+    "version": "0.3.0-alpha.8",
+    "package_name": "dev.friendsonly.instagram",
+    "application_label": "Friends Only",
+    "output_version_code": 385806742
+  },
+  "trigger": "User reports current feed ends with View in Reels and Watch again actions. Requests removal of both and automatic replay of the same inline video. Installed version/hash was not supplied; this is not alpha7 phone verification.",
+  "baseline_evidence": "native-alpha7-2026-10-18.json",
+  "source_contracts": {
+    "feed_preview_end_transition": {
+      "method": "LX/02Ag;->A0C(Media,04cG,Integer)Z",
+      "source_instructions": 92,
+      "registers": 12,
+      "change": "Prefix const/4 v0,0; return v0 (2 instructions); original body retained.",
+      "reason": "Native method pauses feed player for preview_end and changes end-card state to ANIMATING before renderer callback. Returning false prevents both pause paths and card activation.",
+      "actual_native_callers": 3,
+      "caller_scope": "02Ag completion A0E plus two progress-preview paths in A0I; native feed wrapper01zH callbacks."
+    },
+    "feed_preview_loop_configuration": {
+      "method": "LX/02Ag;->A01(Media,04cG,02Ag)09XA",
+      "source_instructions": 120,
+      "registers": 20,
+      "change": "Only instruction86 CONST_4 v13,1 becomes CONST_4 v13,0.",
+      "reason": "Preview branch forced09XA.A0A=true override with09XA.A09=false loop. Disable only that feed override so playback inherits existing true loop. Hiding cards alone would leave some preview videos stopped."
+    },
+    "native_loop": "01zI constructor setsA0N=true; only other APK reference is feed bind forwarding to09ZA.A0l. Native play applies09XA.A0A?A09:A0n before playing. Audio-focus clones preserve flags; alternate feed restart configs inherit looping.",
+    "button_binding": "Native feed end-card views contain keepWatchingbutton/text and watchAgain; disabling the shared ANIMATING transition prevents the supported Watch in Reels/Watch again cards without localized text matching.",
+    "preserved": "Generic/native players, foreground/lifecycle pause, mute/audio, ordinary manual carousel/scroll, Stories, Direct, existing hold2x/reset, permanent Reels navigation guards, following filter and identity/theme remain unchanged in audited scopes.",
+    "no_new_play_seek_calls_touch_listeners_timers_requests_permissions_backend_or_credential_collection": true
+  },
+  "checks": {
+    "bundle_build": "passed",
+    "python_tests": 163,
+    "java_assertions": {
+      "focus": 97,
+      "feed": 32,
+      "chrome": 26
+    },
+    "kotlin_assertions": {
+      "identity": 26,
+      "tap": 46,
+      "following": 35,
+      "theme": 145,
+      "navigation": 32,
+      "settings": 63,
+      "speed": 56,
+      "loop": 57
+    },
+    "loop_actual_source_additional_assertions": 13,
+    "loop_tests_with_actual_source_total": 70,
+    "full_local_apk": "passed including signature, identity,16KiB alignment,7-style47-reference14-palette guard",
+    "local_final_native_comparison": "passed; see audit for all unchanged method/payload counts",
+    "alpha8_phone_installation_opening_repeated_playback_end_card_2x_stories_dm": "not_tested",
+    "full_github_apk": "passed",
+    "ci_metrics_confirmed_from_completed_job_logs": true
+  },
+  "patch_bundle": {
+    "file": "friends-only.mpp",
+    "sha256": "c8561212c505fd40aa2b83c0d644683f69477f74cc977b531bc657f3e2e80c45",
+    "size_bytes": 168608
+  },
+  "applied_patches": [
+    "Friends Only native controls",
+    "Friends Only discovery blocking",
+    "Friends Only app identity",
+    "Friends Only feed video taps",
+    "Friends Only following feed",
+    "Friends Only quiet visual theme",
+    "Friends Only Reels navigation",
+    "Friends Only local settings",
+    "Friends Only feed hold speed",
+    "Friends Only feed video loop"
+  ],
+  "local_output": {
+    "manifest": {
+      "package": "dev.friendsonly.instagram",
+      "version_name": "451.0.0.20.80",
+      "version_code": "385806742",
+      "native_abis": [
+        "arm64-v8a"
+      ]
+    },
+    "sha256": "0cb7f7b9ba7fe19db98b7c9a6ac0e454e46381e51f85730b22aa6d0d5f23df6c",
+    "size_bytes": 252810488,
+    "signer_sha256": "05351b9285a9d34ed0d29cf78d0006a6101e653eff5b6f8e04b02c9862de47b2",
+    "extension_present": true,
+    "manifest_namespace_order": "valid",
+    "identity": {
+      "package": "dev.friendsonly.instagram",
+      "application_label": "Friends Only",
+      "launcher_and_localized_labels_checked": 102
+    },
+    "theme_color_resources": {
+      "status": "passed",
+      "semantic_style_count": 7,
+      "semantic_attribute_reference_count": 47,
+      "palette_color_resource_count": 14,
+      "compiled_color_reference_contract": "TYPE_REFERENCE to nonzero own color resource IDs"
+    }
+  },
+  "final_local_compiled_resource_audit": {
+    "schema_version": 1,
+    "status": "passed",
+    "scope": "Read-only compiled ARSC color-resource contract audit, not device startup test",
+    "apk": "native-patches/private/friends-only-native-0.3.0-alpha.8.apk",
+    "sha256": "0cb7f7b9ba7fe19db98b7c9a6ac0e454e46381e51f85730b22aa6d0d5f23df6c",
+    "semantic_reference_count": 47,
+    "own_allocated_color_count": 14,
+    "source_color_ids_and_values_preserved": 1097,
+    "own_palette_ids": {
+      "friends_only_light_canvas": "0x7f0604c1",
+      "friends_only_light_surface": "0x7f0604c2",
+      "friends_only_light_elevated": "0x7f0604c3",
+      "friends_only_light_text": "0x7f0604c4",
+      "friends_only_light_secondary_text": "0x7f0604c5",
+      "friends_only_light_link": "0x7f0604c6",
+      "friends_only_light_button": "0x7f0604c7",
+      "friends_only_dark_canvas": "0x7f0604c8",
+      "friends_only_dark_surface": "0x7f0604c9",
+      "friends_only_dark_elevated": "0x7f0604ca",
+      "friends_only_dark_text": "0x7f0604cb",
+      "friends_only_dark_secondary_text": "0x7f0604cc",
+      "friends_only_dark_link": "0x7f0604cd",
+      "friends_only_dark_button": "0x7f0604ce"
+    },
+    "references": [
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604cd",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604ce",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c1",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c2",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604c3",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604c4",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604c5",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604c6",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604c7",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604cd",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604ce",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c1",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c2",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604c3",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604c4",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604c5",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604c6",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604c7",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604cd",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604ce",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c1",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c2",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604c3",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604c4",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604c5",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604c6",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604c7",
+        "typed_value": "TYPE_REFERENCE"
+      }
+    ],
+    "native_contract": "LX/00RQ.A0b(Context,I) returns TypedValue.resourceId; InstagramMainActivity.A1y passes it to Context.getColor(I)",
+    "device_startup": "not_tested"
+  },
+  "final_local_feed_loop_and_preservation_audit": {
+    "audit": "Independent alpha.7 to alpha.8 final-APK feed loop and preservation audit",
+    "baseline_sha256": "97cc5aafd613fc14c18993d9bfb19079f4a9ccb4528ed37e12211e9252d8f227",
+    "output_sha256": "0cb7f7b9ba7fe19db98b7c9a6ac0e454e46381e51f85730b22aa6d0d5f23df6c",
+    "compared_native_and_runtime_classes": 53,
+    "modified_native_methods": {
+      "LX/02Ag;->A01(Lcom/instagram/feed/media/Media;LX/04cG;LX/02Ag;)LX/09XA;": {
+        "replaced_instruction_index": 86,
+        "existing_register_count": 20,
+        "native_body_controlflow_preserved_except_preview_loop_override": true,
+        "preview_override_uses_existing_feed_loop_state": true,
+        "source_instruction_count": 120
+      },
+      "LX/02Ag;->A0C(Lcom/instagram/feed/media/Media;LX/04cG;Ljava/lang/Integer;)Z": {
+        "existing_register_count": 12,
+        "inserted_instruction_count": 2,
+        "original_body_and_controlflow_preserved": true,
+        "original_instruction_count": 92,
+        "entrypoint_returns_false_before_all_native_side_effects": true
+      }
+    },
+    "other_native_and_runtime_methods_compared_unchanged": 575,
+    "native_player_speed_navigation_and_runtime_scopes": [
+      "LX/00PT;",
+      "LX/00PU;",
+      "LX/00QI;",
+      "LX/00QJ;",
+      "LX/01lS;",
+      "LX/01m7;",
+      "LX/01o6;",
+      "LX/01zH;",
+      "LX/01zI;",
+      "LX/01zR;",
+      "LX/01zY;",
+      "LX/02Ag;",
+      "LX/02Ah;",
+      "LX/04cV;",
+      "LX/05b6;",
+      "LX/06b1;",
+      "LX/07JA;",
+      "LX/07Z1;",
+      "LX/09XA;",
+      "LX/09ZA;",
+      "LX/09bL;",
+      "LX/09by;",
+      "LX/09xn;",
+      "LX/0AU6;",
+      "LX/0Eoo;",
+      "Ldev/friendsonly/patch/runtime/FeedHooks$Contract;",
+      "Ldev/friendsonly/patch/runtime/FeedHooks;",
+      "Ldev/friendsonly/patch/runtime/FeedPolicy;",
+      "Ldev/friendsonly/patch/runtime/FocusConfig;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$$ExternalSyntheticLambda0;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$1;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$2;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$3;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$4;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$5;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$Node;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$TabController$1;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$TabController$2;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks$TabController;",
+      "Ldev/friendsonly/patch/runtime/FocusHooks;",
+      "Ldev/friendsonly/patch/runtime/FocusPolicy;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$1;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$AccessibilityState;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$BadgeState;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$Controller;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$HeaderDecoration$1;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$HeaderDecoration;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$Node;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$Palette;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$TabDecoration;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome$TabLabelDrawable;",
+      "Ldev/friendsonly/patch/runtime/QuietChrome;",
+      "Ldev/friendsonly/patch/runtime/QuietChromePolicy;"
+    ],
+    "source_analyzer": {
+      "LX/02Ag;->A0C": "passed",
+      "LX/02Ag;->A01": "passed"
+    },
+    "output_analyzer": {
+      "LX/02Ag;->A0C": "passed",
+      "LX/02Ag;->A01": "passed"
+    },
+    "no_new_analysis_failure": true,
+    "preserved_payloads": {
+      "native_library_entries_compared_unchanged": 18,
+      "asset_entries_compared_unchanged": 3166
+    },
+    "runtime_test": false,
+    "issues": [],
+    "status": "passed"
+  },
+  "limits": [
+    "Successful builds and static checks do not establish actual Android17/Samsung playback. Need at least two cycles of short/long feed videos, no end actions, hold2x/release, scroll and background pause tests.",
+    "Scope is supported native inline feed preview/end-card path; live/unsupported media, new server-driven player variants and network errors may behave differently. Native error/retry UI is not suppressed.",
+    "Original Instagram service/auth/challenges/legal screens/permissions/tracking/platform terms remain. No authentication or platform restriction bypass added.",
+    "Strict following metadata can hide legitimate posts or empty the feed; cache/alternate renderers/chronology and Story/DM/group actions remain separately unverified.",
+    "Clean CI builds use disposable signing keys until stable secrets configured. Remove only old Friends Only before new-key installation; its local session/settings are lost. Official Instagram may remain. Do not use old v2 installer helper."
+  ],
+  "github_actions": {
+    "run_id": 39114270905,
+    "run_number": 72,
+    "source_commit": "f3edb305c63b308e0494a3ea17a85f7888828153",
+    "status": "success",
+    "apk_artifact_id": 12132185041,
+    "apk_artifact_name": "friends-only-personal-test-apk-72",
+    "apk_filename": "friends-only-personal.apk",
+    "apk_download": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041",
+    "report_artifact_id": 12131458959,
+    "patch_bundle_artifact_id": 12130983890,
+    "ci_metrics_confirmed_from_completed_job_logs": true,
+    "output": {
+      "manifest": {
+        "package": "dev.friendsonly.instagram",
+        "version_name": "451.0.0.20.80",
+        "version_code": "385806742",
+        "native_abis": [
+          "arm64-v8a"
+        ]
+      },
+      "sha256": "7a9168b00f1bd96d3daaf96bc071b4e3f413747374f52891c611b5808f611970",
+      "size_bytes": 253171054,
+      "signer_sha256": "530dd48d9e65397ff09e9220aedfb6125d307a1001d44a41f6db37a96f743341",
+      "extension_present": true,
+      "manifest_namespace_order": "valid",
+      "identity": {
+        "package": "dev.friendsonly.instagram",
+        "application_label": "Friends Only",
+        "launcher_and_localized_labels_checked": 102
+      },
+      "theme_color_resources": {
+        "status": "passed",
+        "semantic_style_count": 7,
+        "semantic_attribute_reference_count": 47,
+        "palette_color_resource_count": 14,
+        "compiled_color_reference_contract": "TYPE_REFERENCE to nonzero own color resource IDs"
+      }
+    },
+    "patch_bundle_matches_local": true,
+    "binary_audit_scope": "Cloud independently validates identity/signature/alignment/theme7/47/14. Full native/payload preservation and1097 original color IDs/values independently audited only on local APK; full cloud APK bytes not downloaded here."
+  }
+}

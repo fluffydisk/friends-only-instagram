@@ -83,3 +83,38 @@ class WordmarkOutputTest(unittest.TestCase):
             with self.subTest(resource=resource), tempfile.TemporaryDirectory() as root:
                 with self.assertRaises(ValidationError):
                     inspect_wordmark_assets(self.archive(root, changed=resource))
+
+class LoginBrandOutputTest(unittest.TestCase):
+    def archive(self, root, skip=None, changed=None):
+        from validate_design import LOGIN_MARK_PATHS
+        target = Path(root) / 'login.apk'
+        with zipfile.ZipFile(target, 'w') as output:
+            for resource, asset in LOGIN_MARK_PATHS.items():
+                if resource == skip:
+                    continue
+                payload = (ROOT / 'design' / asset).read_bytes()
+                if resource == changed:
+                    payload = bytes([payload[0] ^ 1]) + payload[1:]
+                output.writestr(resource, payload)
+        return target
+
+    def test_both_native_login_marks_are_present(self):
+        from validate_design import inspect_login_assets
+        with tempfile.TemporaryDirectory() as root:
+            result = inspect_login_assets(self.archive(root))
+            self.assertEqual(result['density_variants'], 2)
+            self.assertEqual(result['rendered_login_test'], 'not_run')
+
+    def test_missing_native_login_mark_is_rejected(self):
+        from validate_design import LOGIN_MARK_PATHS, inspect_login_assets
+        for resource in LOGIN_MARK_PATHS:
+            with self.subTest(resource=resource), tempfile.TemporaryDirectory() as root:
+                with self.assertRaises(ValidationError):
+                    inspect_login_assets(self.archive(root, skip=resource))
+
+    def test_unchanged_size_altered_login_mark_is_rejected(self):
+        from validate_design import LOGIN_MARK_PATHS, inspect_login_assets
+        for resource in LOGIN_MARK_PATHS:
+            with self.subTest(resource=resource), tempfile.TemporaryDirectory() as root:
+                with self.assertRaises(ValidationError):
+                    inspect_login_assets(self.archive(root, changed=resource))

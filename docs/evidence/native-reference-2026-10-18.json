@@ -177,8 +177,8 @@
     "ci_report_download": "Not independently downloaded in this environment; run success, patch application, checks and artifact publication confirmed through completed job logs and GitHub metadata. ZIP digest is not the contained APK digest; local APK hash is not presented as the CI APK hash."
   },
   "phone_tests": {
-    "installation": "not_run",
-    "opening": "not_run",
+    "installation": "user_confirmed",
+    "opening": "user_reports_repeated_closing_after_credential_submission",
     "rendering": "not_run",
     "authentication": "not_run",
     "stories": "not_run",
@@ -195,5 +195,16 @@
     "Server-rendered/Bloks or unsupported screens can still show Instagram branding; all-provider-reference removal not claimed.",
     "Screenshot reference is visual only; existing Friends/Chats/Me destinations remain."
   ],
-  "signing": "Disposable local and CI keys differ. If an update conflicts, removing only old Friends Only clears its local session/settings; official Instagram may stay installed."
+  "signing": "Disposable local and CI keys differ. If an update conflicts, removing only old Friends Only clears its local session/settings; official Instagram may stay installed.",
+  "subsequent_user_report": {
+    "installed_artifact": 81,
+    "device": "Samsung SM-S926B / Android 17 / One UI 9",
+    "installation": "user_confirmed",
+    "signed_out_screen": "user_screenshot_original_colored_logo_and_blue_gray_UI",
+    "after_credential_submission": "user_reports_closing_and_repeated_crash_dialog",
+    "authentication_success": "unverified",
+    "phone_exception_trace": "not_available",
+    "distribution_status": "withdrawn",
+    "confirmed_local_defect": "CircularImageView.onDraw branch at code address 18 targets address 10 inside a native instruction; new static final-APK guard rejects it."
+  }
 }

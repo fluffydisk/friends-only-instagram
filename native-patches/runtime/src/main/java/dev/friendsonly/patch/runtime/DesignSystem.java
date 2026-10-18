@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 /** Shared native design tokens. No account, media or network access. */
 final class DesignSystem {
-    static final String VERSION = "0.4.0-alpha.2";
+    static final String VERSION = "0.4.0-alpha.3";
     private static Typeface font;
     private static Typeface regular;
     private static Typeface semibold;

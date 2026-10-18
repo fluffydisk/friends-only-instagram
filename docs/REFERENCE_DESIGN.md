@@ -1,6 +1,8 @@
-# Screenshot-led native design · 0.4.0-alpha.2
+# Screenshot-led native design · 0.4.0-alpha.2 (withdrawn)
 
-[Download APK · artifact 81](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444) · [successful GitHub build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593)
+**Withdrawn:** see [the sign-in/crash correction](AUTH_RECOVERY.md).
+
+[Historical artifact 81](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444) · [successful GitHub build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593)
 
 Local and CI builds passed **170 Python tests and 951 Java/Kotlin assertions**,
 all 12 patches and signed-output guards. **Phone rendering and interaction tests

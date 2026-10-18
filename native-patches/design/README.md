@@ -29,3 +29,13 @@ environment, then run `python3 native-patches/design/generate_wordmark.py`.
 Normal APK/CI builds use checked-in rasters and need neither dependency.
 Provider/legal disclosures and native authentication are retained; this resource
 replacement does not guarantee all server-rendered marks have been replaced.
+
+## Native account-login mark
+
+`login-mark-xhdpi.png` and `login-mark-xxhdpi.png` are new neutral FO monograms
+created from Manrope, not edits of Instagram artwork. They replace the separate
+`ig_logo` resource at its original ID and 192×192 / 288×288 intrinsic sizes.
+`login-mark-manifest.json` pins size and SHA-256; the final APK guard verifies both
+native resource payloads. Optional offline reproduction (Pillow required):
+`python3 native-patches/design/generate_login_mark.py`. The APK/CI build uses the
+checked-in files. Provider/legal notices and genuine authentication remain.

@@ -83,6 +83,7 @@ object ReferenceVisualPolicyTest {
         verify(nativePrefix.indices.all { avatar.instructions[it] === nativePrefix[it] }, "Native draw/callback prefix retained in order")
         verify((avatar.instructions[4] as BuilderOffsetInstruction).target.location.instruction === avatar.instructions[6], "Original branch reaches post-draw appearance hook")
         verify(avatar.instructions.last().opcode == Opcode.RETURN_VOID && avatar.instructions.count { it.opcode == Opcode.RETURN_VOID } == 1, "No early return before native image draw")
+        verify((avatar.instructions[8] as BuilderOffsetInstruction).target.location.instruction === avatar.instructions.last(), "Story fallback must branch to the final RETURN, not the middle of a native instruction")
         verify(avatar.implementation!!.registerCount == 3, "Avatar register layout retained")
         verify(!isAvatarDraw(avatar, avatarOwner), "Avatar duplicate guard")
         if (args.isNotEmpty()) {
@@ -117,6 +118,17 @@ object ReferenceVisualPolicyTest {
                 }
                 for (name in listOf("Lcom/instagram/common/ui/widget/imageview/CircularImageView;", "Lcom/instagram/ui/widget/gradientspinner/GradientSpinner;")) {
                     val draw = out.getValue(name).methods.single { it.name == "onDraw" }
+                    if (name.contains("CircularImageView")) {
+                        val code = draw.implementation!!.instructions.toList()
+                        val addresses = mutableSetOf<Int>()
+                        var address = 0
+                        code.forEach { addresses.add(address); address += it.codeUnits }
+                        address = 0
+                        code.forEach { instruction ->
+                            if (instruction is OffsetInstruction) verify(address + instruction.codeOffset in addresses, "Emitted draw branch targets an instruction boundary")
+                            address += instruction.codeUnits
+                        }
+                    }
                     verify(draw.implementation!!.instructions.any { ((it as? ReferenceInstruction)?.reference as? MethodReference)?.definingClass == "Ldev/friendsonly/patch/runtime/ReferenceChrome;" }, "Real output scoped draw hook")
                 }
             }

@@ -145,7 +145,12 @@ public final class DesignDexAudit {
         for (String method : before.keySet()) if (!Arrays.equals(before.get(method), after.get(method))) changed.add(method);
         System.out.println("Native methods compared: " + before.size());
         System.out.println("Changed native methods: " + changed);
-        if (!changed.equals(args.length == 3 && "reference".equals(args[2]) ? REFERENCE : EXPECTED)) throw new IllegalStateException("Unexpected native method difference");
+        Set<String> expected = args.length == 2 ? EXPECTED : switch (args[2]) {
+            case "reference" -> REFERENCE;
+            case "auth-recovery" -> Set.of("Lcom/instagram/common/ui/widget/imageview/CircularImageView;->onDraw(Landroid/graphics/Canvas;)V");
+            default -> throw new IllegalArgumentException("Unknown audit scope");
+        };
+        if (!changed.equals(expected)) throw new IllegalStateException("Unexpected native method difference");
         int preservedAssets = 0, preservedLibraries = 0;
         try (ZipFile old = new ZipFile(args[0]); ZipFile current = new ZipFile(args[1])) {
             var entries = old.entries();

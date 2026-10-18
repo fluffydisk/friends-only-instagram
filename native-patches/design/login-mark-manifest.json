@@ -1,0 +1,18 @@
+{
+  "login-mark-xhdpi.png": {
+    "size": 3038,
+    "sha256": "af117641658987fcdf914e3a33d65681a15f370c0df0b072775649f183202689",
+    "dimensions": [
+      192,
+      192
+    ]
+  },
+  "login-mark-xxhdpi.png": {
+    "size": 4750,
+    "sha256": "e48ae60e8dd2ee91e547e115d3b13f61f0d6a6123e751b89ee96a20116c12406",
+    "dimensions": [
+      288,
+      288
+    ]
+  }
+}

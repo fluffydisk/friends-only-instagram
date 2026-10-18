@@ -65,7 +65,7 @@ def main() -> None:
             if path.is_file():
                 add(path.relative_to(patches).as_posix(), path.read_bytes())
         add("extensions/extension.mpe", (dex / "classes.dex").read_bytes())
-        for asset in ("Manrope.ttf", "OFL-Manrope.txt", "wordmark-xhdpi.webp", "wordmark-night-xhdpi.webp", "wordmark-xxhdpi.webp", "wordmark-night-xxhdpi.webp"):
+        for asset in ("Manrope.ttf", "OFL-Manrope.txt", "wordmark-xhdpi.webp", "wordmark-night-xhdpi.webp", "wordmark-xxhdpi.webp", "wordmark-night-xxhdpi.webp", "login-mark-xhdpi.png", "login-mark-xxhdpi.png"):
             add("design/" + asset, (ROOT / "design" / asset).read_bytes())
         add("LICENSE", (ROOT / "LICENSE").read_bytes())
         add("NOTICE.md", (ROOT / "NOTICE.md").read_bytes())
@@ -91,6 +91,7 @@ def main() -> None:
              "dev.friendsonly.patch.runtime.QuietChromePolicyTest"])
         run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))),
              "dev.friendsonly.patch.runtime.ScreenDesignPolicyTest"])
+        run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))), "dev.friendsonly.patch.runtime.RuntimeSafetyPolicyTest"])
         patch_test_sources = sorted((ROOT / "patches/src/test/kotlin").rglob("*.kt"))
         if not patch_test_sources:
             raise RuntimeError("Missing app identity policy tests.")
@@ -111,6 +112,10 @@ def main() -> None:
         for test in ("ReelsNavigationPolicyTest", "SettingsRoutesPolicyTest", "FeedSpeedPolicyTest", "FeedLoopPolicyTest", "FriendsDesignPolicyTest", "ReferenceVisualPolicyTest"):
             run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
                  "dev.friendsonly.patches." + test])
+        guard_tests = BUILD / "guard-test-classes"
+        guard_tests.mkdir()
+        run([javac, "-cp", cli, "-d", guard_tests, ROOT / "scripts/NativeVisualDexGuard.java", ROOT / "tests/NativeVisualDexGuardTest.java"])
+        run([java, "-cp", os.pathsep.join(map(str, (guard_tests, cli))), "NativeVisualDexGuardTest"])
         run([sys.executable, "-m", "unittest", "discover", "-s", ROOT / "tests", "-v"])
         checks += ["pure Java policy assertions", "Kotlin application identity policy assertions",
                    "Kotlin feed viewer fingerprint and guard assertions", "Java strict Home feed and native chrome policy checks",

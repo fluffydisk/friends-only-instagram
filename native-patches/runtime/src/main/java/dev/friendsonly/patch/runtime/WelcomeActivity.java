@@ -17,6 +17,9 @@ public final class WelcomeActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        CrashSafe.install(this);
+        LoginAppearance.register(getApplication());
+        if (!CrashSafe.saved(this).isEmpty()) { recovery(); return; }
         if (!Intent.ACTION_MAIN.equals(getIntent().getAction()) || getIntent().getData() != null
                 || (getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("seen", false)
                 && !getIntent().getBooleanExtra("show_welcome", false))) {
@@ -60,6 +63,34 @@ public final class WelcomeActivity extends Activity {
         });
         setContentView(scroll);
         scroll.requestApplyInsets();
+    }
+
+    private void recovery() {
+        DesignSystem.Colors colors = new DesignSystem.Colors(QuietChrome.isDarkTheme(getWindow().getDecorView()));
+        DesignSystem.window(getWindow(), colors);
+        ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true); scroll.setBackgroundColor(colors.canvas);
+        LinearLayout body = new LinearLayout(this); body.setOrientation(LinearLayout.VERTICAL); body.setGravity(Gravity.CENTER_VERTICAL);
+        int padding = DesignSystem.dp(this, 28); body.setPadding(padding, padding * 2, padding, padding * 2);
+        DesignSystem.add(body, DesignSystem.label(this, "Friends Only", 22, colors.text, true), 0);
+        DesignSystem.add(body, DesignSystem.label(this, DesignSystem.text(this,
+            "Önceki açılışta uygulama kapandı. Teknik raporu kopyalayıp paylaşabilir veya yeniden deneyebilirsin. Hesabın silinmez.",
+            "The previous launch closed unexpectedly. Copy the technical report or try again. Your account is kept.",
+            "Der letzte Start wurde unerwartet beendet. Kopiere den technischen Bericht oder versuche es erneut. Dein Konto bleibt erhalten."), 17, colors.secondary, false), 24);
+        TextView copy = DesignSystem.button(this, DesignSystem.text(this, "Teknik raporu kopyala", "Copy technical report", "Technischen Bericht kopieren"), colors, true);
+        copy.setOnClickListener(view -> {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Friends Only diagnostic", CrashSafe.saved(this)));
+            android.widget.Toast.makeText(this, DesignSystem.text(this, "Rapor kopyalandı", "Report copied", "Bericht kopiert"), android.widget.Toast.LENGTH_SHORT).show();
+        });
+        DesignSystem.add(body, copy, 32);
+        TextView retry = DesignSystem.button(this, DesignSystem.text(this, "Yeniden dene", "Try again", "Erneut versuchen"), colors, false);
+        retry.setOnClickListener(view -> { CrashSafe.clear(this); continueToInstagram(false); });
+        DesignSystem.add(body, retry, 12);
+        DesignSystem.add(body, DesignSystem.label(this, DesignSystem.text(this,
+            "Rapor yalnızca hata türü, kod konumları ve sürüm bilgisini içerir. Parola, kullanıcı adı ve mesajlar alınmaz. Kendiliğinden gönderilmez.",
+            "The report contains exception types, code locations and build information only. No passwords, usernames or messages. Nothing is sent automatically.",
+            "Der Bericht enthält nur Fehlertypen, Codestellen und Versionsdaten. Keine Passwörter, Nutzernamen oder Nachrichten. Nichts wird automatisch gesendet."), 14, colors.secondary, false), 24);
+        scroll.addView(body); setContentView(scroll);
     }
 
     private void continueToInstagram(boolean markSeen) {

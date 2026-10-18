@@ -46,3 +46,20 @@ def inspect_wordmark_assets(apk: Path) -> dict:
             checked.append(resource)
     return {"status": "passed", "density_night_variants": 4, "resource_paths": checked,
             "original_intrinsic_dimensions_preserved": True, "rendered_ui_test": "not_run"}
+
+
+LOGIN_MARK_PATHS = {"res/ow5.png": "login-mark-xhdpi.png", "res/tk0.png": "login-mark-xxhdpi.png"}
+
+
+def inspect_login_assets(apk: Path) -> dict:
+    import json
+    manifest = json.loads((Path(__file__).resolve().parents[1] / "design/login-mark-manifest.json").read_text())
+    with zipfile.ZipFile(apk) as source:
+        for resource, asset in LOGIN_MARK_PATHS.items():
+            spec = manifest[asset]
+            if source.namelist().count(resource) != 1:
+                raise ValidationError("Missing or duplicate native login brand resource.")
+            info = source.getinfo(resource)
+            if info.file_size != spec["size"] or hashlib.sha256(source.read(info)).hexdigest() != spec["sha256"]:
+                raise ValidationError("Native login brand replacement is missing or changed.")
+    return {"status": "passed", "density_variants": 2, "resource_id": "0x7f0820ec", "rendered_login_test": "not_run"}

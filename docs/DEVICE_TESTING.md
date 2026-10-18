@@ -1,7 +1,7 @@
 # Galaxy S24+ / account compatibility checklist
 
-For the **current native 0.4.0-alpha.2 design APK**, use the
-[reference-design device checklist](REFERENCE_DESIGN.md#phone-check) and
+For the **current native 0.4.0-alpha.3 APK**, use the
+[sign-in/recovery checklist](AUTH_RECOVERY.md#phone-test) and
 [native installation guide](INSTALLATION_TROUBLESHOOTING.md). It has no WebView
 and its discovery blocks cannot be toggled back on. The checklist below is
 retained only for the **earlier WebView app on main**, not the native redesign.

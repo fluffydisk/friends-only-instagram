@@ -163,6 +163,18 @@ val friendsDesign = resourcePatch(
                 writeBytes(bytes)
             }
         }
+        document("res/values/public.xml").use { doc ->
+            check(doc.documentElement.elements().single { it.tagName == "public" &&
+                it.getAttribute("type") == "drawable" && it.getAttribute("name") == "ig_logo" }
+                .getAttribute("id").lowercase() == "0x7f0820ec")
+        }
+        for (qualifier in listOf("xhdpi", "xxhdpi")) {
+            val bytes = checkNotNull(DesignAssets.javaClass.getResourceAsStream("/design/login-mark-$qualifier.png")).use { it.readBytes() }
+            get("res/drawable-$qualifier/ig_logo.png").apply {
+                check(isFile) { "Missing pinned native login logo density." }
+                writeBytes(bytes)
+            }
+        }
         document("AndroidManifest.xml").use { installWelcome(it) }
         for ((name, digest) in mapOf(
             "Manrope.ttf" to "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6",

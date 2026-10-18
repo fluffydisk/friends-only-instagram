@@ -1,7 +1,10 @@
 # Friends Only · native app prototype
 
 <!-- REFERENCE_ALPHA2_DELIVERY_START -->
-**Latest native design: [download 0.4.0-alpha.2 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444)**
+User-confirmed repeated closing after credential submission; a malformed avatar
+draw branch was subsequently found. Do not install this version.
+
+**WITHDRAWN · 0.4.0-alpha.2: [historical artifact 81](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444)**
 (code **385806744**, personal-test artifact **81**). Sign into GitHub, extract the
 ZIP and install `friends-only-personal.apk` through Files. Retained for 7 days.
 The CI signing key changed: remove only the previous **Friends Only** first;

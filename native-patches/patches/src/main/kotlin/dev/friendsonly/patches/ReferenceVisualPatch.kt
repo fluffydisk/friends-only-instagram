@@ -4,10 +4,12 @@ package dev.friendsonly.patches
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
+import app.morphe.patcher.util.smali.ExternalLabel
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -68,15 +70,16 @@ internal fun installAvatarDraw(method: MutableMethod, owner: ClassDef) {
     // Keep native rendering/image-loaded callbacks. Replacing the RETURN location also
     // makes the native IF_EQZ target enter our post-draw hook, rather than skip it.
     method.replaceInstruction(6, "invoke-static { v1 }, $APPEARANCE->storyAvatar(Landroid/view/View;)Z")
-    method.addInstructions(7, """
+    // The assembler's block-local label resolves incorrectly when this block is
+    // inserted after existing code. Anchor the branch to a real method location.
+    method.addInstruction(7, "return-void")
+    method.addInstructionsWithLabels(7, """
         move-result v0
         if-eqz v0, :finish_avatar
         invoke-virtual { v1 }, $IMAGE->getBitmap()Landroid/graphics/Bitmap;
         move-result-object v0
         invoke-static { v1, v2, v0 }, $APPEARANCE->drawStoryAvatar(Landroid/widget/ImageView;Landroid/graphics/Canvas;Landroid/graphics/Bitmap;)Z
-        :finish_avatar
-        return-void
-    """.trimIndent())
+    """.trimIndent(), ExternalLabel("finish_avatar", method.instructions[7]))
 }
 internal fun isRingDraw(method: Method, owner: ClassDef): Boolean {
     if (owner.type != SPINNER || owner.superclass != "Landroid/view/View;" || method.name != "onDraw" ||

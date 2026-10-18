@@ -125,19 +125,12 @@ final class QuietChrome {
             }
             // One bounded scan also removes two exact promotional controls.
             // Content lists, account/login, Story viewers and generic back/edit controls stay out.
+            restoreHeader(); // Retire the old opaque toolbar that discarded native actions.
             FrameLayout discoveredHeader = findMainChrome(tabBar);
-            if (home == null || !selectedWithin(home) || !tabBar.isShown()) {
-                restoreHeader();
-                return;
-            }
-            FrameLayout nativeHeader = header == null ? null : header.host.get();
-            if (nativeHeader == null || !nativeHeader.isAttachedToWindow() || !nativeHeader.isShown()) {
-                restoreHeader();
-                nativeHeader = discoveredHeader;
-            }
-            if (nativeHeader == null || !nativeHeader.isShown() || nativeHeader.getHeight() == 0) return;
-            if (header == null) header = new HeaderDecoration(nativeHeader, settingsAction);
-            header.update(palette);
+            if (discoveredHeader != null) ReferenceChrome.homeHeader(discoveredHeader);
+            ReferenceChrome.refreshHeaders();
+            referenceNavigation(tabBar, palette);
+
         }
 
         private TabDecoration decorationFor(View view) {
@@ -227,6 +220,34 @@ final class QuietChrome {
             }
             badges.clear();
         }
+    }
+
+    private static final WeakHashMap<ViewGroup, Boolean> NAVIGATION = new WeakHashMap<>();
+    private static void referenceNavigation(ViewGroup bar, Palette palette) {
+        if (!NAVIGATION.containsKey(bar)) {
+            bar.setOutlineProvider(new android.view.ViewOutlineProvider() {
+                @Override public void getOutline(View view, android.graphics.Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(view, 26));
+                }
+            });
+            bar.setClipToOutline(true);
+            NAVIGATION.put(bar, Boolean.TRUE);
+        }
+        bar.setBackgroundColor(palette.selected);
+        int height = dp(bar, 64);
+        if (bar.getMinimumHeight() != height) bar.setMinimumHeight(height);
+        ViewGroup.LayoutParams params = bar.getLayoutParams();
+        boolean changed = false;
+        if (params != null && params.height > 0 && params.height < height) { params.height = height; changed = true; }
+        if (params instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) params;
+            int gutter = dp(bar, 12);
+            if (margins.leftMargin != gutter || margins.rightMargin != gutter) {
+                margins.leftMargin = gutter; margins.rightMargin = gutter; changed = true;
+            }
+            // Preserve native bottom/gesture inset instead of replacing it with a fixed value.
+        }
+        if (changed) bar.setLayoutParams(params);
     }
 
     private static final class BadgeState {
@@ -372,6 +393,8 @@ final class QuietChrome {
     private static final class TabLabelDrawable extends Drawable {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final float density;
+        private final String destination;
+        private final boolean showIcon;
         private final float textSize;
         private String text = "";
         private boolean selected;
@@ -379,6 +402,8 @@ final class QuietChrome {
 
         TabLabelDrawable(View view) {
             density = view.getResources().getDisplayMetrics().density;
+            destination = nameOf(view);
+            showIcon = view.getResources().getConfiguration().fontScale <= 1.3f;
             textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12.5f,
                     view.getResources().getDisplayMetrics());
             paint.setTypeface(DesignSystem.font(view.getContext(), true));
@@ -398,7 +423,7 @@ final class QuietChrome {
 
         @Override public void draw(Canvas canvas) {
             if (palette == null) return;
-            paint.setColor(palette.background);
+            paint.setColor(palette.selected);
             canvas.drawRect(getBounds(), paint);
             float centerX = getBounds().exactCenterX();
             float centerY = getBounds().exactCenterY();
@@ -409,6 +434,9 @@ final class QuietChrome {
                 canvas.drawRect(centerX - halfWidth, getBounds().bottom - 4 * density,
                         centerX + halfWidth, getBounds().bottom - 2 * density, paint);
             }
+            boolean icon = showIcon && getBounds().height() >= 56 * density;
+            if (icon) drawDestination(canvas, centerX, centerY - 9 * density);
+            paint.setStyle(Paint.Style.FILL);
             paint.setTextSize(textSize);
             float availableWidth = Math.max(0, getBounds().width() - 16 * density);
             float measuredWidth = paint.measureText(text);
@@ -417,7 +445,35 @@ final class QuietChrome {
             }
             paint.setColor(selected ? palette.text : palette.secondary);
             Paint.FontMetrics metrics = paint.getFontMetrics();
-            canvas.drawText(text, centerX, centerY - (metrics.ascent + metrics.descent) / 2f, paint);
+            canvas.drawText(text, centerX, centerY + (icon ? 17 * density : 0) - (metrics.ascent + metrics.descent) / 2f, paint);
+        }
+
+        private void drawDestination(Canvas canvas, float x, float y) {
+            int save = canvas.save();
+            canvas.translate(x - 11 * density, y - 11 * density);
+            canvas.scale(density, density);
+            paint.setColor(selected ? palette.text : palette.secondary);
+            paint.setStrokeWidth(1.7f);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStyle(Paint.Style.STROKE);
+            android.graphics.Path shape = new android.graphics.Path();
+            if ("feed_tab".equals(destination)) {
+                shape.moveTo(1, 10); shape.lineTo(11, 1); shape.lineTo(21, 10);
+                shape.lineTo(21, 22); shape.lineTo(14, 22); shape.lineTo(14, 15);
+                shape.lineTo(8, 15); shape.lineTo(8, 22); shape.lineTo(1, 22); shape.close();
+                if (selected) paint.setStyle(Paint.Style.FILL);
+                canvas.drawPath(shape, paint);
+            } else if ("direct_tab".equals(destination)) {
+                canvas.drawRoundRect(1, 2, 21, 18, 5, 5, paint);
+                shape.moveTo(5, 18); shape.lineTo(5, 23); shape.lineTo(11, 18);
+                canvas.drawPath(shape, paint);
+                canvas.drawLine(6, 8, 16, 8, paint); canvas.drawLine(6, 12, 13, 12, paint);
+            } else {
+                canvas.drawCircle(11, 6, 4, paint);
+                canvas.drawArc(2, 13, 20, 29, 180, 180, false, paint);
+            }
+            canvas.restoreToCount(save);
         }
 
         @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); invalidateSelf(); }
@@ -436,11 +492,11 @@ final class QuietChrome {
 
         Palette(View view) {
             dark = isDarkTheme(view);
-            background = dark ? 0xff151a17 : 0xfff8f7f4;
-            text = dark ? 0xfff2f3ee : 0xff242b27;
-            secondary = dark ? 0xffa2ada6 : 0xff626f67;
-            selected = dark ? 0xff29332e : 0xffe5ebe3;
-            outline = dark ? 0xff3c4841 : 0xffd6ddd4;
+            background = dark ? 0xff0d0e10 : 0xfff8f7f4;
+            text = dark ? 0xffededef : 0xff28292c;
+            secondary = dark ? 0xffa5a6aa : 0xff68696d;
+            selected = dark ? 0xff17181b : 0xffeeeff0;
+            outline = dark ? 0xff323338 : 0xffd9dadd;
         }
     }
 

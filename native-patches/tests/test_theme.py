@@ -28,10 +28,10 @@ ATTRS = [
 ]
 COLORS = {
     "light_canvas": "fff8f7f4", "light_surface": "ffedeee9", "light_elevated": "ffffffff",
-    "light_text": "ff242b27", "light_secondary_text": "ff626b65", "light_link": "ff344d43",
-    "light_button": "ff344d43", "dark_canvas": "ff151a17", "dark_surface": "ff202722",
-    "dark_elevated": "ff29312b", "dark_text": "fff2f3ee", "dark_secondary_text": "ffb3bdb5",
-    "dark_link": "ffc0cfc4", "dark_button": "ff375a49",
+    "light_text": "ff28292c", "light_secondary_text": "ff68696d", "light_link": "ff424449",
+    "light_button": "ff424449", "dark_canvas": "ff0d0e10", "dark_surface": "ff151618",
+    "dark_elevated": "ff1d1e21", "dark_text": "ffededef", "dark_secondary_text": "ffa5a6aa",
+    "dark_link": "ffd4d5d8", "dark_button": "ff3e4045",
 }
 COLOR_IDS = {name: 0x7F0604C1 + index for index, name in enumerate(COLORS)}
 PACKAGE = "dev.friendsonly.instagram"
@@ -76,7 +76,7 @@ class CompiledThemeTests(unittest.TestCase):
         self.assertEqual(len(indexes), 47)
         for index in indexes:
             bad = lines.copy()
-            bad[index] = bad[index].split(": (reference)")[0] + ": (color) #ff151a17\n"
+            bad[index] = bad[index].split(": (reference)")[0] + ": (color) #ff0d0e10\n"
             with self.subTest(index=index), self.assertRaisesRegex(ValidationError, "nonzero resource references"):
                 theme.inspect_theme_resources(bad)
 

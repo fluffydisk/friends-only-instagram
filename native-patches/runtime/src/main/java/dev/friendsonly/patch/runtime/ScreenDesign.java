@@ -16,8 +16,32 @@ public final class ScreenDesign {
     private static final int MAX_DEPTH = 8;
     private ScreenDesign() {}
 
+    public static void managed(View root, int layout) { inflated(root, layout, false); }
+    public static void story(View root) { bind(root, ScreenDesignPolicy.STORY); }
+    public static void mediaCard(View root) { bind(root, 10); }
+    private static void bind(View root, int surface) {
+        if (root == null) return;
+        if (Looper.myLooper() != Looper.getMainLooper()) { root.post(() -> bind(root, surface)); return; }
+        try {
+            WeakReference<Binding> known = BOUND.get(root);
+            if (known != null && known.get() != null) {
+                Binding previous = known.get();
+                if (surface >= 10) {
+                    previous.surface = ReferenceDesignPolicy.merge(previous.surface, surface);
+                    previous.queue();
+                }
+                return;
+            }
+            Binding binding = new Binding(root, surface);
+            BOUND.put(root, new WeakReference<>(binding));
+            root.addOnAttachStateChangeListener(binding);
+            root.addOnLayoutChangeListener(binding);
+            if (root.isAttachedToWindow()) binding.queue();
+        } catch (RuntimeException ignored) { /* Native row stays usable. */ }
+    }
+
     /** Native UFI-holder hook covers rows built without the resource inflater. */
-    public static void feedActions(View root) { inflated(root, 0x7f0e1498, false); }
+    public static void feedActions(View root) { bind(root, 11); }
 
     /** Injected at the normal return of the two pinned resource-ID inflaters only. */
     public static void inflated(View root, int layout, boolean attachedToParent) {
@@ -45,7 +69,7 @@ public final class ScreenDesign {
     private static final class Binding implements View.OnAttachStateChangeListener,
             View.OnLayoutChangeListener, Runnable {
         private final WeakReference<View> root;
-        private final int surface;
+        private int surface;
         private boolean pending;
         private long lastUpdate;
         Binding(View view, int surface) { root = new WeakReference<>(view); this.surface = surface; }
@@ -72,7 +96,15 @@ public final class ScreenDesign {
 
     private static void decorate(View root, int surface) {
         DesignSystem.Colors colors = new DesignSystem.Colors(QuietChrome.isDarkTheme(root));
-        if (surface == ScreenDesignPolicy.FEED_HEADER) {
+        if (surface == 12) {
+            card(root, colors, 3);
+        } else if (surface == 10) {
+            card(root, colors, 1);
+            return;
+        } else if (surface == 11) {
+            card(root, colors, 2);
+        } else if (surface == ScreenDesignPolicy.FEED_HEADER) {
+            card(root, colors, 0);
             padding(root, 20, 12, 20, 12);
             minimum(root, 68);
         } else if (surface == ScreenDesignPolicy.INBOX) {
@@ -92,10 +124,11 @@ public final class ScreenDesign {
                 if (view.getVisibility() != View.GONE) view.setVisibility(View.GONE);
                 continue;
             }
-            if (surface == ScreenDesignPolicy.FEED_BODY) FeedActionLabel.apply(view, name, colors);
+
             if (view instanceof TextView) {
                 TextView text = (TextView) view;
-                boolean title = ScreenDesignPolicy.title(name);
+                android.graphics.Typeface original = text.getTypeface();
+                boolean title = ScreenDesignPolicy.title(name) || (original != null && original.isBold());
                 android.graphics.Typeface desired = DesignSystem.font(view.getContext(), title);
                 if (!desired.equals(text.getTypeface())) text.setTypeface(desired);
                 if (title) text.setTextSize(surface == ScreenDesignPolicy.PROFILE ? 22 : 16);
@@ -109,6 +142,39 @@ public final class ScreenDesign {
                 nodes.addLast(new Node(group.getChildAt(i), node.depth + 1));
             }
         }
+    }
+
+    private static final WeakHashMap<View, Long> CARDS = new WeakHashMap<>();
+    private static void card(View view, DesignSystem.Colors colors, int part) {
+        if (!CARDS.containsKey(view)) {
+            view.setOutlineProvider(new android.view.ViewOutlineProvider() {
+                @Override public void getOutline(View target, android.graphics.Outline outline) {
+                    outline.setRoundRect(0, 0, target.getWidth(), target.getHeight(), DesignSystem.dp(target.getContext(), 14));
+                }
+            });
+            if (part == 1 || part == 3) view.setClipToOutline(true);
+        }
+        Long previous = CARDS.get(view);
+        long signature = ((long) colors.surface << 32) | part;
+        if (previous == null || previous != signature) {
+            android.graphics.drawable.GradientDrawable background = DesignSystem.surface(view.getContext(), colors.surface, 18);
+            float r = DesignSystem.dp(view.getContext(), 18);
+            if (part == 0) background.setCornerRadii(new float[]{r,r,r,r,0,0,0,0});
+            if (part == 2) background.setCornerRadii(new float[]{0,0,0,0,r,r,r,r});
+            view.setBackground(background);
+            CARDS.put(view, signature);
+        }
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (params instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) params;
+            int gutter = DesignSystem.dp(view.getContext(), 12);
+            boolean changed = margins.leftMargin != gutter || margins.rightMargin != gutter;
+            margins.leftMargin = gutter; margins.rightMargin = gutter;
+            if (part == 2 && margins.bottomMargin < gutter) { margins.bottomMargin = gutter; changed = true; }
+            if (changed) view.setLayoutParams(margins);
+        }
+        if (part == 1) padding(view, 8, 0, 8, 0);
+        else if (part == 3) padding(view, 8, 8, 8, 12);
     }
 
     private static void minimum(View view, int height) {

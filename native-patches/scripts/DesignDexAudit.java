@@ -16,6 +16,13 @@ public final class DesignDexAudit {
         "LX/01Mq;->inflate(ILandroid/view/ViewGroup;Z)Landroid/view/View;",
         "LX/0A3y;->inflate(ILandroid/view/ViewGroup;Z)Landroid/view/View;",
         "LX/07bY;-><init>(Landroid/view/View;)V");
+    static final Set<String> REFERENCE = Set.of(
+        "Linstagram/features/feed/mainfeed/actionbar/MainFeedActionBar;-><init>(Landroid/content/Context;Landroid/util/AttributeSet;I)V",
+        "LX/06hD;-><init>(Landroid/content/Context;)V",
+        "LX/07Ah;->A05(Landroid/content/Context;Landroid/view/ViewGroup;)Landroid/view/View;",
+        "LX/00gJ;->A07(Landroid/view/LayoutInflater;Landroid/view/ViewGroup$LayoutParams;Landroid/view/ViewGroup;I)Landroid/view/View;",
+        "Lcom/instagram/common/ui/widget/imageview/CircularImageView;->onDraw(Landroid/graphics/Canvas;)V",
+        "Lcom/instagram/ui/widget/gradientspinner/GradientSpinner;->onDraw(Landroid/graphics/Canvas;)V");
     static void update(MessageDigest digest, Object value) {
         digest.update(String.valueOf(value).getBytes(StandardCharsets.UTF_8)); digest.update((byte) 0);
     }
@@ -78,7 +85,7 @@ public final class DesignDexAudit {
         return result;
     }
     public static void main(String[] args) throws Exception {
-        if (args.length != 2) throw new IllegalArgumentException("Supply previous and design APK paths");
+        if (args.length != 2 && args.length != 3) throw new IllegalArgumentException("Supply previous and design APK paths, optionally reference");
         var before = methods(Path.of(args[0]));
         var after = methods(Path.of(args[1]));
         if (!before.keySet().equals(after.keySet())) throw new IllegalStateException("Native method inventory changed");
@@ -86,7 +93,7 @@ public final class DesignDexAudit {
         for (String method : before.keySet()) if (!Arrays.equals(before.get(method), after.get(method))) changed.add(method);
         System.out.println("Native methods compared: " + before.size());
         System.out.println("Changed native methods: " + changed);
-        if (!changed.equals(EXPECTED)) throw new IllegalStateException("Unexpected native method difference");
+        if (!changed.equals(args.length == 3 && "reference".equals(args[2]) ? REFERENCE : EXPECTED)) throw new IllegalStateException("Unexpected native method difference");
         int preservedAssets = 0, preservedLibraries = 0;
         try (ZipFile old = new ZipFile(args[0]); ZipFile current = new ZipFile(args[1])) {
             var entries = old.entries();

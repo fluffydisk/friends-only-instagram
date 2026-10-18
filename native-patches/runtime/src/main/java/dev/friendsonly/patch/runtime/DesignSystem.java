@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 /** Shared native design tokens. No account, media or network access. */
 final class DesignSystem {
-    static final String VERSION = "0.4.0-alpha.1";
+    static final String VERSION = "0.4.0-alpha.2";
     private static Typeface font;
     private static Typeface regular;
     private static Typeface semibold;
@@ -52,12 +52,12 @@ final class DesignSystem {
         final int canvas, surface, text, secondary, accent, line;
         Colors(boolean dark) {
             this.dark = dark;
-            canvas = dark ? 0xff151a17 : 0xfff8f7f4;
-            surface = dark ? 0xff202722 : 0xffedeee9;
-            text = dark ? 0xfff2f3ee : 0xff242b27;
-            secondary = dark ? 0xffb3bdb5 : 0xff626b65;
-            accent = dark ? 0xffc0cfc4 : 0xff344d43;
-            line = dark ? 0xff3c4841 : 0xffd6ddd4;
+            canvas = dark ? 0xff0d0e10 : 0xfff8f7f4;
+            surface = dark ? 0xff151618 : 0xffedeee9;
+            text = dark ? 0xffededef : 0xff28292c;
+            secondary = dark ? 0xffa5a6aa : 0xff68696d;
+            accent = dark ? 0xffd4d5d8 : 0xff424449;
+            line = dark ? 0xff323338 : 0xffd9dadd;
         }
     }
 

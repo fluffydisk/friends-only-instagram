@@ -44,7 +44,7 @@ public final class WelcomeActivity extends Activity {
                 "People you follow, stories and conversations.\nAt your own pace.",
                 "Menschen, denen du folgst, Stories und Gespräche.\nIn deinem Tempo."), 17, colors.secondary, false), 20);
         TextView connect = DesignSystem.button(this, DesignSystem.text(this,
-                "Instagram ile bağlan", "Connect with Instagram", "Mit Instagram verbinden"), colors, true);
+                "Hesabınla devam et", "Continue with your account", "Mit deinem Konto fortfahren"), colors, true);
         connect.setOnClickListener(view -> continueToInstagram(true));
         DesignSystem.add(body, connect, 40);
         DesignSystem.add(body, DesignSystem.label(this, DesignSystem.text(this,

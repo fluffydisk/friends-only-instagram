@@ -48,3 +48,38 @@ class DesignAssetsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             with self.assertRaises(ValidationError):
                 inspect_design_assets(self.archive(root, items))
+
+class WordmarkOutputTest(unittest.TestCase):
+    def archive(self, root, skip=None, changed=None):
+        from validate_design import WORDMARK_PATHS
+        target = Path(root) / "marks.apk"
+        with zipfile.ZipFile(target, "w") as output:
+            for resource, asset in WORDMARK_PATHS.items():
+                if resource == skip:
+                    continue
+                payload = (ROOT / "design" / asset).read_bytes()
+                if resource == changed:
+                    payload = bytes([payload[0] ^ 1]) + payload[1:]
+                output.writestr(resource, payload)
+        return target
+
+    def test_all_density_and_night_payloads_survive(self):
+        from validate_design import inspect_wordmark_assets
+        with tempfile.TemporaryDirectory() as root:
+            result = inspect_wordmark_assets(self.archive(root))
+            self.assertEqual(result["density_night_variants"], 4)
+            self.assertEqual(result["rendered_ui_test"], "not_run")
+
+    def test_one_missing_density_is_not_a_complete_rebrand(self):
+        from validate_design import WORDMARK_PATHS, inspect_wordmark_assets
+        for resource in WORDMARK_PATHS:
+            with self.subTest(resource=resource), tempfile.TemporaryDirectory() as root:
+                with self.assertRaises(ValidationError):
+                    inspect_wordmark_assets(self.archive(root, skip=resource))
+
+    def test_same_size_different_wordmark_is_rejected(self):
+        from validate_design import WORDMARK_PATHS, inspect_wordmark_assets
+        for resource in WORDMARK_PATHS:
+            with self.subTest(resource=resource), tempfile.TemporaryDirectory() as root:
+                with self.assertRaises(ValidationError):
+                    inspect_wordmark_assets(self.archive(root, changed=resource))

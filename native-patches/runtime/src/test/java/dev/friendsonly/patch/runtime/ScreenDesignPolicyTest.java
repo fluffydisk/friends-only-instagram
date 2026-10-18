@@ -32,6 +32,19 @@ public final class ScreenDesignPolicyTest {
         verify(ScreenDesignPolicy.title("profile_header_full_name"));
         verify(!ScreenDesignPolicy.title("profile_header_full_name_error"));
         verify(!ScreenDesignPolicy.title(null));
+        verify(ReferenceDesignPolicy.header("instagram.features.feed.mainfeed.actionbar.MainFeedActionBar"));
+        verify(!ReferenceDesignPolicy.header("com.instagram.login.LoginActivity"));
+        verify(ReferenceDesignPolicy.storyContainer("X.06hD"));
+        for (String unknown : new String[]{null, "", "X.06hDExtra", "instagram.features.stories.viewer.StoryViewer", "com.instagram.login.LoginActivity", "X.06hZ"}) {
+            verify(!ReferenceDesignPolicy.storyContainer(unknown));
+        }
+        verify(ReferenceDesignPolicy.merge(2, 10) == 10);
+        verify(ReferenceDesignPolicy.merge(2, 11) == 11);
+        verify(ReferenceDesignPolicy.merge(10, 11) == 12);
+        verify(ReferenceDesignPolicy.merge(11, 10) == 12);
+        verify(ReferenceDesignPolicy.merge(12, 10) == 12);
+        verify(ReferenceDesignPolicy.merge(10, 10) == 10);
+        verify(ReferenceDesignPolicy.merge(10, 2) == 10);
         System.out.println("ScreenDesignPolicyTest: " + checks + " assertions passed");
     }
 }

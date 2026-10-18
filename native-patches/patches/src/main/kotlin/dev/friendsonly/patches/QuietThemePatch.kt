@@ -31,11 +31,11 @@ internal const val QUIET_LAUNCH_STYLE_ID = "0x7f1400a1"
  */
 internal val QUIET_PALETTE = linkedMapOf(
     "light_canvas" to "#FFF8F7F4", "light_surface" to "#FFEDEEE9", "light_elevated" to "#FFFFFFFF",
-    "light_text" to "#FF242B27", "light_secondary_text" to "#FF626B65",
-    "light_link" to "#FF344D43", "light_button" to "#FF344D43",
-    "dark_canvas" to "#FF151A17", "dark_surface" to "#FF202722", "dark_elevated" to "#FF29312B",
-    "dark_text" to "#FFF2F3EE", "dark_secondary_text" to "#FFB3BDB5",
-    "dark_link" to "#FFC0CFC4", "dark_button" to "#FF375A49",
+    "light_text" to "#FF28292C", "light_secondary_text" to "#FF68696D",
+    "light_link" to "#FF424449", "light_button" to "#FF424449",
+    "dark_canvas" to "#FF0D0E10", "dark_surface" to "#FF151618", "dark_elevated" to "#FF1D1E21",
+    "dark_text" to "#FFEDEDEF", "dark_secondary_text" to "#FFA5A6AA",
+    "dark_link" to "#FFD4D5D8", "dark_button" to "#FF3E4045",
 )
 
 /** Append to the tracked source values file so Morphe allocates real, nonzero color IDs. */

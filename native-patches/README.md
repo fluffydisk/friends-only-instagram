@@ -1,7 +1,7 @@
 # Friends Only · native app prototype
 
 <!-- DESIGN_ALPHA1_DELIVERY_START -->
-**Latest native test build: [download design 0.4.0-alpha.1 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996)**
+**Previous native test build: [download design 0.4.0-alpha.1 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996)**
 (code **385806743**). Sign into GitHub, download/extract the ZIP, then open
 `friends-only-personal.apk` through Files. The artifact is retained for 7 days.
 
@@ -16,12 +16,12 @@ not the legacy fixed-package helper.
 <!-- DESIGN_ALPHA1_DELIVERY_END -->
 
 
-**Native design 0.4.0-alpha.1 (code 385806743):** own first-run welcome/full-page
-settings, bundled Manrope, flat text navigation and scoped feed/Direct/profile
-styling. Read the [implementation and remaining design work](../docs/REDESIGN_IMPLEMENTATION.md).
-This iteration adds an eleventh selected patch and keeps the existing theme
-resource-ID guard. Compilation/static checks do not establish phone rendering,
-login or interaction success.
+**Native design 0.4.0-alpha.2 (code 385806744):** neutral charcoal palette,
+rounded feed cards/navigation, supported square Story avatars and four native
+Friends Only wordmark variants. Existing native features/authentication remain.
+Read the [current implementation and phone checklist](../docs/REFERENCE_DESIGN.md).
+Twelve selected patches retain the mandatory theme resource-ID guard.
+Compilation/static checks do not establish phone appearance or login success.
 
 
 Friends Only keeps Instagram's native post, Story and chat components beneath

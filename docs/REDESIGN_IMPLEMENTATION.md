@@ -1,4 +1,8 @@
-# Friends Only native design — 0.4.0-alpha.1
+# Friends Only native design — 0.4.0-alpha.1 (previous iteration)
+
+**Current changes:** see [the screenshot-led alpha.2 implementation](REFERENCE_DESIGN.md).
+The account disclosure and incomplete native-screen coverage described here still apply.
+Alpha.2 replaces the palette, navigation treatment and supported feed-action text styling.
 
 [Download the built APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996) · [successful GitHub run 78](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766)
 

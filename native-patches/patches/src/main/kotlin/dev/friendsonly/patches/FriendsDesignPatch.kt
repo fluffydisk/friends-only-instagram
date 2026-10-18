@@ -151,6 +151,18 @@ val friendsDesign = resourcePatch(
                 }
             }
         }
+        document("res/values/public.xml").use { doc ->
+            check(doc.documentElement.elements().single { it.tagName == "public" &&
+                it.getAttribute("type") == "drawable" && it.getAttribute("name") == "instagram_wordmark_ig_wordmark_r3_finalize_v1" }
+                .getAttribute("id").lowercase() == "0x7f082a13")
+        }
+        for (qualifier in listOf("xhdpi", "night-xhdpi", "xxhdpi", "night-xxhdpi")) {
+            val bytes = checkNotNull(DesignAssets.javaClass.getResourceAsStream("/design/wordmark-$qualifier.webp")).use { it.readBytes() }
+            get("res/drawable-$qualifier/instagram_wordmark_ig_wordmark_r3_finalize_v1.webp").apply {
+                check(isFile) { "Missing expected wordmark density: $qualifier." }
+                writeBytes(bytes)
+            }
+        }
         document("AndroidManifest.xml").use { installWelcome(it) }
         for ((name, digest) in mapOf(
             "Manrope.ttf" to "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6",

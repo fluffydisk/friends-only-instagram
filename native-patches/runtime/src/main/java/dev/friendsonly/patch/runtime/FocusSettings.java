@@ -73,7 +73,7 @@ final class FocusSettings {
         account.setOnClickListener(view -> openBrowser(activity, "https://accountscenter.instagram.com/"));
         DesignSystem.add(body, account, 16);
         TextView privacy = DesignSystem.button(activity, DesignSystem.text(activity,
-                "Instagram gizlilik bilgisi", "Instagram privacy information", "Instagram-Datenschutzinformationen"), colors, false);
+                "Bağlı hesabın gizliliği", "Connected account privacy", "Datenschutz des verbundenen Kontos"), colors, false);
         privacy.setOnClickListener(view -> openBrowser(activity, "https://privacycenter.instagram.com/"));
         DesignSystem.add(body, privacy, 8);
         section(body, colors, DesignSystem.text(activity, "Bu sürüm", "This build", "Diese Version"));

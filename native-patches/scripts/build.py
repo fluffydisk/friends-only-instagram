@@ -14,7 +14,7 @@ from common import BUILD, REPORTS, ROOT, VERSIONS, android_paths, bootstrap, jav
 PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking", "Friends Only app identity",
                "Friends Only feed video taps", "Friends Only following feed", "Friends Only quiet visual theme",
                "Friends Only Reels navigation", "Friends Only local settings", "Friends Only feed hold speed",
-               "Friends Only feed video loop", "Friends Only native design"]
+               "Friends Only feed video loop", "Friends Only native design", "Friends Only reference appearance"]
 
 
 def main() -> None:
@@ -65,7 +65,7 @@ def main() -> None:
             if path.is_file():
                 add(path.relative_to(patches).as_posix(), path.read_bytes())
         add("extensions/extension.mpe", (dex / "classes.dex").read_bytes())
-        for asset in ("Manrope.ttf", "OFL-Manrope.txt"):
+        for asset in ("Manrope.ttf", "OFL-Manrope.txt", "wordmark-xhdpi.webp", "wordmark-night-xhdpi.webp", "wordmark-xxhdpi.webp", "wordmark-night-xxhdpi.webp"):
             add("design/" + asset, (ROOT / "design" / asset).read_bytes())
         add("LICENSE", (ROOT / "LICENSE").read_bytes())
         add("NOTICE.md", (ROOT / "NOTICE.md").read_bytes())
@@ -108,7 +108,7 @@ def main() -> None:
              "dev.friendsonly.patches.FollowingFeedPolicyTest"])
         run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
              "dev.friendsonly.patches.QuietThemePolicyTest"])
-        for test in ("ReelsNavigationPolicyTest", "SettingsRoutesPolicyTest", "FeedSpeedPolicyTest", "FeedLoopPolicyTest", "FriendsDesignPolicyTest"):
+        for test in ("ReelsNavigationPolicyTest", "SettingsRoutesPolicyTest", "FeedSpeedPolicyTest", "FeedLoopPolicyTest", "FriendsDesignPolicyTest", "ReferenceVisualPolicyTest"):
             run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
                  "dev.friendsonly.patches." + test])
         run([sys.executable, "-m", "unittest", "discover", "-s", ROOT / "tests", "-v"])

@@ -1,15 +1,64 @@
-# Native patch evidence · updated 2026-10-17
+# Native patch evidence · updated 2026-10-18
 
-This module is a native-patching experiment. **[Alpha.6's test APK is available](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982)
-and passed local/GitHub output checks; its phone installation/opening is
-unverified. Alpha.5 is withdrawn:** it installs but immediately closes on the
-user's S24+ / SDK 37. Alpha.3 is the only build known to open on that phone;
-alpha.4 remains untested. Story playback, Direct sending, groups and the
-login/challenge flow were not separately verified.
+**The user now confirms alpha.6 opens on the Galaxy S24+ / Android 17 / One UI
+9.** They also report that a horizontal Home swipe still reaches Reels. Alpha.7
+addresses the native pager and central viewer paths, reduces Settings to our
+one following filter, and enables the existing in-feed hold-to-2× path.
+Alpha.5 remains withdrawn after its confirmed phone startup failure; alpha.4
+remains phone-untested. Alpha.3 is an older known-to-open fallback.
 
-All patches target Instagram `451.0.0.20.80`. Static build/audit success is not
-runtime validation. The color-resource fix corrects a confirmed code contract,
-but no phone stack trace proves that defect was the sole alpha.5 crash cause.
+<!-- ALPHA7_DELIVERY_START -->
+**Alpha.7 build/audit evidence is pending.** Source changes and intended
+behavior below do not establish installation, startup or feature success. The
+[alpha.6 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) remains the latest delivered build known to open.
+<!-- ALPHA7_DELIVERY_END -->
+
+All patches target the verified original Instagram `451.0.0.20.80`; output
+identity is `dev.friendsonly.instagram` / Friends Only. Story playback, Direct
+sending, groups, login/challenges and strict feed completeness have not been
+separately verified. Historical sections below retain their original test
+counts and behavior; old discovery toggles and fourteen-source exceptions are
+superseded by alpha.7's permanent source-level restrictions.
+
+## Alpha.7 source contracts · runtime unverified
+
+- The shared native tab factory returns `FEED`, `DIRECT`, `PROFILE` for both
+  initial construction and later refreshes, before tab/pager consumers use it.
+  Default selection is `FEED`; both supported selection entry points normalize other destinations to Home. The intended
+  result is no Reels/Explore/Create page on a horizontal Home swipe, without
+  globally swallowing horizontal gestures or breaking carousel dispatch.
+- The three supported central Clips/Reels viewer launchers return without
+  opening for every source, including the Direct/result-returning variants.
+  The earlier source-enum exceptions and preference switch are removed. No setting or stale preference can re-enable discovery. Shared
+  Reels links in Direct cannot open the blocked immersive viewer either.
+- Home Settings, Home long-press and two supported native own-profile settings
+  routes open our dialog: optional following-only filter (default on), hold-to-2× hint
+  and Done. Appearance/discovery switches and Disable filters are removed.
+  The own-profile branch of `LX/0AU6.A02(View)` opens our dialog and returns
+  before the original settings menus; its other-person profile branch remains
+  native. The `LX/07Z1.A02` settings-action hook is the fallback. No generic
+  `profile_menu` view binding is installed, preserving other-person follow,
+  report and block menus. The bounded scan decorates the own Home header and
+  startup logo; only `profile_header_barcelona_app_switcher_button` (Threads)
+  and `direct_composer_meta_ai_composer_upsell` promotions are hidden if found.
+  Content lists are not traversed. Login/challenge/legal screens and generic
+  fragment routing remain native.
+- The existing native feed-video long-press handler's speed gates are enabled
+  locally, including center holds. Its dedicated feed-only gate
+  (`LX/07JA.A00`) is enabled for the existing feed gesture/binding/badge and
+  lifecycle-cleanup paths, keeping native background reset enabled as well.
+  Live-player/matching-media checks, gesture timing and native
+  stop/cancel/recycle reset are preserved. Story/Direct players and global
+  configuration getters are not patched.
+- Alpha.6's mandatory emitted-color guard remains: seven semantic style
+  families, 47 nonzero color-resource references and 14 exact palette values.
+  The known inline-color startup defect must not return.
+
+These statements describe narrowly selected code paths, not a fully new native
+renderer or removal of every original mark. Genuine Instagram authentication,
+necessary legal text, service/networking, terms and original platform checks
+remain. The extension adds no new private API client, scraping, backend,
+credential/message collection, permissions or authentication bypass.
 
 ## Alpha.3 full build checks actually run in cloud
 
@@ -472,13 +521,12 @@ with the reported crash**. No actual phone crash stack trace has been captured,
 so it is not proved to be the phone's sole failure cause.
 
 Alpha.5 is withdrawn from recommended use despite its successful static checks.
-Do not redownload/reinstall artifact 55 or reset the phone. The alpha.6 candidate
-is now available for a new startup test; **do not use the broken artifact 55**. Alpha.3 remains the known-to-open
+Do not redownload/reinstall artifact 55 or reset the phone. The subsequent alpha.6 phone report confirms opening; **do not use the broken artifact 55**. Alpha.3 remains an older known-to-open
 fallback. Returning to it may require removing only Friends Only, losing its
 local session/settings and signing in again; no official Instagram removal is
 needed.
 
-## Alpha.6: resource-reference contract fix · phone validation pending
+## Alpha.6: resource-reference contract fix · opening user-confirmed
 
 Source **`91ce031`**, version code **385806740**, changes all **47 semantic
 attributes** back to `@color` references instead of inline ARGB. Fourteen own
@@ -524,10 +572,11 @@ bundles have the identical SHA-256 shown above.
 
 The independent **1,097-original-color ID/value preservation audit applies to
 the local APK only**; the CI APK passed its own mandatory emitted-theme guard,
-but its full original-color inventory was not independently audited. No
-alpha.6 phone installation, opening, UI, feed, Story, Direct or authentication
-success is claimed. Passing these checks is not proof of phone startup. No phone stack trace is available to establish the
-identified contract bug as the sole cause of the user's crash.
+but its full original-color inventory was not independently audited. The user subsequently confirmed that alpha.6 opens, but reported that swiping
+from Home still enters Reels. This supplies opening evidence; it does not
+separately validate Stories, Direct, groups, authentication/challenges or strict
+following behavior. No phone stack trace establishes the identified contract
+bug as the sole cause of the earlier alpha.5 crash.
 
 ## Cloud installation attempts
 
@@ -560,27 +609,37 @@ PackageInstaller verdict for the APK:
 
 ## Remaining device checks
 
-Alpha.5 installed normally but failed startup; its strict feed, shell, Stories
-and messaging were not reached. Alpha.6's source/local/GitHub checks passed,
-including the new mandatory compiled-theme guard, but **phone installation and
-opening remain unverified**. Alpha.4 is untested, and alpha.3 is the only native
-build known to open on this phone.
+Alpha.6 opening is user-confirmed; its Home-to-Reels swipe is a reported defect.
+Alpha.7 has no phone installation, opening or feature result yet. Alpha.5 is
+withdrawn; do not reinstall artifact 55. Alpha.3 remains an older known-to-open
+fallback. The previous legacy v2 installer helper is incompatible with the
+independent package and is not a startup diagnostic.
 
-Download the [alpha.6 candidate](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982),
-extract it and install through the normal file manager. Remove only the older
-**Friends Only** native app first because the disposable CI signing key changed;
-this clears its local session/settings and may require signing in again. Do not
-use the old v2 helper, remove official Instagram or reset the phone. Do not
-reinstall broken artifact 55. The
-[alpha.3 fallback](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541)
-remains available if needed.
+For a verified new build, remove only the older **Friends Only** native app if
+its disposable CI signature differs, clearing local session/settings, then
+extract the artifact ZIP and install `friends-only-personal.apk` through the
+normal file manager. Do not remove official Instagram or reset the phone.
 
-Record alpha.6 startup separately before testing themes, settings, Home
-filtering, in-feed/top-tray Stories, ordinary posts, the tap guard, Direct/groups
-or authentication. If it still closes, a phone stack trace is needed to identify
-the remaining cause; the existing record does not establish the color-contract
-defect as the phone's sole cause.
+Record the exact APK/run identifier and these results separately:
 
-When reporting issues, include APK/run identifier, Instagram version, S24+
-Android/One UI version, steps and a screenshot with names/messages redacted.
-Do not send passwords, two-factor codes, cookies, tokens or unredacted chats.
+1. Installation and cold opening; login or any account challenge if needed.
+2. Home horizontal swipes and all three tabs; ordinary photo-carousels must
+   still scroll. Video taps from Home/profile and Reels shares from Direct
+   must not enter the immersive Reels viewer.
+3. Own Settings from Home and profile, with only the following filter, speed
+   hint and Done. Changing that filter must never restore discovery/settings
+   hubs; check refresh after both filter directions.
+4. A playing inline feed video held at its center and edges: 2× while held,
+   reset on release, cancel, scroll, background/resume and item recycle. Normal
+   photo taps, carousel swipes and other native long-press behavior need
+   separate checks for regressions.
+5. Followed-account photo/video posts, incomplete metadata/empty-feed recovery,
+   upper Stories-tray playback, in-feed Story cards, Direct text sending and
+   existing group conversations.
+6. Light/dark appearance, rotation, back navigation, offline recovery and
+   remaining original branding outside the explicitly patched layouts.
+
+When reporting issues, include APK/run identifier, S24+ Android/One UI versions,
+steps and a screenshot with names/messages redacted. If the app closes, a
+phone stack trace may be needed; never send passwords, two-factor codes,
+cookies, tokens or unredacted chats.

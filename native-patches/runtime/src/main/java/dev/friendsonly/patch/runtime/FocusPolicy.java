@@ -5,11 +5,6 @@ import java.util.Locale;
 
 /** Pure decisions shared by the injected hooks and host-side tests. */
 public final class FocusPolicy {
-    public static final boolean DEFAULT_HIDE_REELS = true;
-    public static final boolean DEFAULT_HIDE_EXPLORE = true;
-    public static final boolean DEFAULT_HIDE_EXTRAS = true;
-    public static final boolean DEFAULT_BLOCK_FEED_REELS_OPEN = true;
-
     private static final String[] REELS_PATHS = {
             "/api/v1/clips/home/", "/clips/home/",
             "/api/v1/clips/discover/", "/clips/discover/"
@@ -26,43 +21,18 @@ public final class FocusPolicy {
      * The raw path is deliberately not decoded, normalized or matched by substring. An individual
      * clip, ordinary video, story, message, authentication request or query never matches here.
      */
-    public static boolean shouldBlock(URI request, boolean hideReels, boolean hideExplore) {
+    public static boolean shouldBlock(URI request) {
         if (request == null || !"https".equalsIgnoreCase(request.getScheme())
                 || request.getRawUserInfo() != null || !isInstagramHost(request.getHost())) {
             return false;
         }
         String path = request.getRawPath();
-        return (hideReels && matchesExactEndpoint(path, REELS_PATHS))
-                || (hideExplore && matchesExactEndpoint(path, EXPLORE_PATHS));
+        return matchesExactEndpoint(path, REELS_PATHS) || matchesExactEndpoint(path, EXPLORE_PATHS);
     }
 
-    public static boolean shouldHideTab(String resourceName, boolean hideReels,
-            boolean hideExplore, boolean hideExtras) {
-        return (hideReels && "clips_tab".equals(resourceName))
-                || (hideExplore && "search_tab".equals(resourceName))
-                || (hideExtras && "creation_tab".equals(resourceName));
-    }
-
-    /**
-     * Stop only supported Home-feed and personal-profile transitions into the Reels viewer.
-     * Inline media, Stories, conversations and unknown launch sources stay outside this guard.
-     * This choice is independent of hiding the Reels navigation tab.
-     */
-    public static boolean shouldBlockFeedReelsOpen(String sourceName, boolean enabled) {
-        return enabled && ("FEED_TIMELINE".equals(sourceName)
-                || "FEED_TIMELINE_POST_TAP".equals(sourceName)
-                || "FEED_TIMELINE_FOLLOWING".equals(sourceName)
-                || "FEED_TIMELINE_FAVORITES".equals(sourceName)
-                || "FEED_TIMELINE_ALL".equals(sourceName)
-                || "FEED_TIMELINE_MIXED_UNCONNECTED".equals(sourceName)
-                || "PROFILE".equals(sourceName)
-                || "SELF_PROFILE".equals(sourceName)
-                || "FEED_CONTEXTUAL_PROFILE".equals(sourceName)
-                || "FEED_CONTEXTUAL_SELF_PROFILE".equals(sourceName)
-                || "OPAL_USER_PROFILE".equals(sourceName)
-                || "OPAL_USER_SELF_PROFILE".equals(sourceName)
-                || "PRIME_PROFILE".equals(sourceName)
-                || "PRIME_SELF_PROFILE".equals(sourceName));
+    public static boolean shouldHideTab(String resourceName) {
+        return "clips_tab".equals(resourceName) || "search_tab".equals(resourceName)
+                || "creation_tab".equals(resourceName);
     }
 
     private static boolean matchesExactEndpoint(String path, String[] endpoints) {

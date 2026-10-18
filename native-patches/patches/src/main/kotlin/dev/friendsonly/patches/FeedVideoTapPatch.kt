@@ -2,11 +2,10 @@
 package dev.friendsonly.patches
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
-import app.morphe.patcher.util.smali.ExternalLabel
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -60,29 +59,54 @@ internal fun hasFeedViewerSourceContract(config: ClassDef, source: ClassDef): Bo
 
 internal fun installFeedViewerGuard(method: MutableMethod) {
     val implementation = checkNotNull(method.implementation) { "Missing native viewer implementation." }
-    val configRegister = implementation.registerCount - LAUNCH_PARAMETERS.size + 2
     val first = method.instructions.first()
+    val configRegister = implementation.registerCount - LAUNCH_PARAMETERS.size + 2
     check(AccessFlags.STATIC.isSet(method.accessFlags) && configRegister in 3..15 &&
         first.opcode in setOf(Opcode.CONST_STRING, Opcode.CONST_STRING_JUMBO) &&
         (first as? OneRegisterInstruction)?.registerA == 0) { "Unsafe native viewer scratch registers." }
-    // Allowed paths rejoin the original first instruction, which overwrites v0 before using it.
-    // Do not cancel touch dispatch, suppress media playback, or intercept other destinations.
-    method.addInstructionsWithLabels(0, """
-        if-eqz v$configRegister, :friends_only_original_viewer
-        iget-object v0, v$configRegister, $CONFIG->A00:$SOURCE
-        invoke-static { v0 }, Ldev/friendsonly/patch/runtime/FocusHooks;->shouldBlockFeedReelsOpen(Ljava/lang/Enum;)Z
-        move-result v0
-        if-eqz v0, :friends_only_original_viewer
-        return-void
-    """.trimIndent(), ExternalLabel("friends_only_original_viewer", first))
+    // This product has no Reels destination. Block the shared full-screen Clips entry
+    // before it reads a config, regardless of source, account initialization or prefs.
+    // The inline feed, Stories and Direct players do not enter this launcher.
+    // Keep the original body intact for reproducible auditing; no touch interception.
+    method.addInstructions(0, "return-void")
+}
+
+/** These two modal routes do not delegate to the ordinary Clips launcher. */
+internal fun isModalReelsLaunchCandidate(method: Method, owner: ClassDef): Boolean {
+    if (owner.type != "LX/05b6;" || method.definingClass != owner.type || method.returnType != "V" ||
+        !AccessFlags.STATIC.isSet(method.accessFlags) ||
+        listOf(AccessFlags.SYNCHRONIZED, AccessFlags.DECLARED_SYNCHRONIZED, AccessFlags.NATIVE, AccessFlags.ABSTRACT)
+            .any { it.isSet(method.accessFlags) }) return false
+    val impl = method.implementation ?: return false
+    if (impl.registerCount != 14 || impl.tryBlocks.isNotEmpty()) return false
+    val params = method.parameterTypes.map { it.toString() }
+    val strings = impl.instructions.mapNotNull { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string }.toSet()
+    if ("clips_feed_viewer" !in strings) return false
+    return when (method.name) {
+        "A0D" -> params == listOf("Landroidx/fragment/app/Fragment;", CONFIG,
+            "Lcom/instagram/common/session/UserSession;", "I", "Z") &&
+            "android_purge_26_q2_ClipsPluginImpl_launchClipsViewerForResultFromFragment_2" in strings &&
+            impl.instructions.firstOrNull()?.opcode == Opcode.CONST_STRING_JUMBO
+        "A0E" -> params == listOf("Landroidx/fragment/app/FragmentActivity;", CONFIG,
+            "Lcom/instagram/common/session/UserSession;") &&
+            "android_purge_26_q2_ClipsPluginImpl_launchClipsViewerFromDirect" in strings &&
+            "launchClipsViewerModal" in strings && impl.instructions.firstOrNull()?.opcode == Opcode.CONST_4
+        else -> false
+    }
+}
+
+internal fun installModalReelsGuard(method: MutableMethod) {
+    check(method.instructions.first().opcode != Opcode.RETURN_VOID) { "Reels modal is already guarded." }
+    method.addInstructions(0, "return-void")
 }
 
 private object FeedViewerLaunch : Fingerprint(custom = ::isFeedViewerLaunchCandidate)
+private object ModalReelsLaunch : Fingerprint(custom = ::isModalReelsLaunchCandidate)
 
 @Suppress("unused")
 val feedVideoTaps = bytecodePatch(
     name = "Friends Only feed video taps",
-    description = "Keeps Home and personal-profile video taps out of the Reels viewer when enabled; leaves inline playback and other entry sources unchanged.",
+    description = "Permanently blocks the shared full-screen Reels launcher from every source; preserves inline feed, Stories and Direct playback.",
     default = true,
 ) {
     compatibleWith(INSTAGRAM)
@@ -92,7 +116,10 @@ val feedVideoTaps = bytecodePatch(
             "Unsupported native viewer source field; no APK produced."
         }
         val matches = FeedViewerLaunch.matchAll()
+        val modals = ModalReelsLaunch.matchAll()
         check(matches.size == 1) { "Unsupported native viewer launcher: expected one, found ${matches.size}. No APK produced." }
+        check(modals.size == 2) { "Unsupported native modal Reels launchers: expected two, found ${modals.size}. No APK produced." }
         installFeedViewerGuard(matches.single().method)
+        modals.forEach { installModalReelsGuard(it.method) }
     }
 }

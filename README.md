@@ -1,39 +1,57 @@
 # Friends Only
 
-**[Download the alpha.6 test APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982).** It corrects the identified theme
-resource-reference bug and passed the GitHub APK build plus its new mandatory
-compiled-theme guard. **Alpha.6 opening on the phone is still unverified.**
+The native Friends Only app uses Instagram's native posts, Stories and messages
+under our own name and icon. **The user confirms alpha.6 opens on their Galaxy
+S24+ / Android 17 / One UI 9.** Its Home swipe still reaches Reels; alpha.7
+addresses that navigation path and further simplifies the interface.
 
-Remove only the older **Friends Only** native app, which clears its local
-session/settings, then extract the ZIP and install `friends-only-personal.apk`
-through the normal file manager. These CI builds use different disposable keys.
-Do not remove official Instagram, reset the phone or use the old v2 diagnostic
-helper. Test opening before testing account/feed features.
+<!-- ALPHA7_DELIVERY_START -->
+**Alpha.7 is in preparation; no alpha.7 phone result is claimed.** The
+[alpha.6 baseline APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) remains available while the new build is being
+validated. Alpha.5 is withdrawn because it installed but immediately closed;
+do not reinstall artifact 55.
+<!-- ALPHA7_DELIVERY_END -->
 
-**Alpha.5 remains withdrawn:** it installed but immediately closed on the user's
-S24+ / Android 17. Do not reinstall artifact 55. The identified color contract
-bug is consistent with that crash; no actual phone stack trace proves it was
-the sole cause. Alpha.6's code/build checks passed 163 Python tests and all
-Java/Kotlin suites; those results do not establish phone startup success.
+Alpha.7's intended changes:
 
-[Alpha.3 remains the fallback known to open](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39019337357/artifacts/12095918541).
-Its screenshot shows logged-in Home/feed, a Stories tray and three-tab navigation;
-Story playback, sending messages, groups and the login/challenge flow were not
-separately verified. Alpha.4 is untested. Fallback installation can also require
-removing only Friends Only and signing in again.
+- Three native destinations only: **Friends, Chats, Me**. Reels, Explore and
+  Create pages are removed from the supported shared tab/pager factory, including
+  refreshed lists. Three supported central Reels launchers are also blocked.
+  No setting can re-enable them.
+- Friends Only settings from Home and the supported own-profile menu routes:
+  one optional **Only accounts I follow** filter, on by default, and a short
+  video-control hint. The former Instagram/Meta settings menu is not exposed
+  through that own-profile entry; other people's profile options remain native.
+- Hold a playing feed video for native **2× playback**; release/cancel uses the
+  existing native reset. Normal inline video posts remain eligible.
 
-The [native-patches project](native-patches/README.md) keeps Instagram's actual
-native post, Story and chat components under our own app identity. Its newest
-features are a strict Home metadata filter and a quiet Friends Only shell;
-their runtime behavior remains unverified. Missing following metadata can make
-Home short or empty, and in-feed Story units without a primary post are dropped
-too. Cached/alternate renderer coverage, top Stories-tray playback and a
-fully friends-only or chronological feed are not established. Other Instagram
-controls or branding can remain outside the verified surfaces. First confirm
-alpha.6 opens on the phone, then test these features.
+These are source changes awaiting alpha.7 build/device evidence, not a claim
+that every Instagram surface or mark has been removed. Login, account checks
+and required legal disclosures remain genuine Instagram screens; the backend,
+original networking and platform terms still apply. Other original chrome can
+remain in layouts outside the supported changes. We do not collect credentials
+or messages or add a backend.
 
-The WebView implementation below is retained as an earlier working approach
-and fallback. Its APK is a separate product from the native patch experiment.
+The strict Home filter requires explicit existing metadata that the post's
+author is followed. Missing metadata can make the feed short or empty; turn
+off **Only accounts I follow** and refresh if needed. Embedded Story cards
+without a primary post can also be dropped. Cache/alternate-renderer coverage,
+chronological ordering, top Stories-tray playback, Direct sending, groups and
+the login/challenge flow still need separate phone tests.
+
+For native APK installation, use the normal file manager: extract the workflow
+ZIP and open `friends-only-personal.apk`. CI currently uses disposable signing
+keys, so a new build requires removing only the older **Friends Only** native
+app first, clearing its local session/settings. Official Instagram can remain
+installed. Do not use the legacy v2 installation helper or reset the phone.
+See the [native project guide](native-patches/README.md),
+[actual evidence](native-patches/VERIFICATION.md) and
+[installation troubleshooting](docs/INSTALLATION_TROUBLESHOOTING.md).
+
+The native work remains on `feature/native-apk-patches` with draft
+[PR #3](https://github.com/fluffydisk/friends-only-instagram/pull/3); it has not
+been merged into `main`. The WebView implementation below is retained as an
+earlier working approach and builds a separate APK.
 
 ## Earlier WebView app · Android MVP 0.1.0
 

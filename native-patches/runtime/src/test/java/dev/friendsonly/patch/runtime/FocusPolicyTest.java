@@ -7,8 +7,6 @@ public final class FocusPolicyTest {
     private static int assertions;
 
     public static void main(String[] args) {
-        check(FocusPolicy.DEFAULT_HIDE_REELS && FocusPolicy.DEFAULT_HIDE_EXPLORE
-                && FocusPolicy.DEFAULT_HIDE_EXTRAS, "focus defaults");
         String[] blocked = {
                 "/api/v1/clips/home/", "/clips/home/", "/api/v1/clips/discover/", "/clips/discover/",
                 "/api/v1/discover/topical_explore/", "/discover/topical_explore/",
@@ -18,7 +16,6 @@ public final class FocusPolicyTest {
             check(block("https://i.instagram.com" + path), "known recommendation collection " + path);
             check(block("https://instagram.com" + path.substring(0, path.length() - 1)), "optional slash " + path);
             check(block("HTTPS://I.INSTAGRAM.COM" + path + "?rank_token=test#section"), "case-insensitive origin/query ignored");
-            check(!FocusPolicy.shouldBlock(URI.create("https://i.instagram.com" + path), false, false), "filters off " + path);
             check(!block("https://i.instagram.com" + path + "another/"), "unknown child fails open " + path);
             check(!block("https://i.instagram.com" + path.substring(0, path.length() - 1) + "ish/"), "path boundary " + path);
         }
@@ -44,53 +41,18 @@ public final class FocusPolicyTest {
                 "https://-a.instagram.com", "https://a-.instagram.com", "https://a_b.instagram.com"
         };
         for (String origin : otherOrigins) check(!block(origin + "/api/v1/clips/home/"), "untrusted/uncertain origin fails open " + origin);
-        check(!FocusPolicy.shouldBlock(null, true, true), "null request fails open");
+        check(!FocusPolicy.shouldBlock(null), "null request fails open");
         check(!block("/api/v1/clips/home/"), "relative request fails open");
         check(!block("https://instagram.com"), "empty path fails open");
-        check(FocusPolicy.shouldBlock(URI.create("https://instagram.com/clips/home/"), true, false), "Reels independent");
-        check(!FocusPolicy.shouldBlock(URI.create("https://instagram.com/clips/home/"), false, true), "Reels switch respected");
-        check(FocusPolicy.shouldBlock(URI.create("https://instagram.com/discover/explore/"), false, true), "Explore independent");
-        check(!FocusPolicy.shouldBlock(URI.create("https://instagram.com/discover/explore/"), true, false), "Explore switch respected");
-        check(FocusPolicy.shouldHideTab("clips_tab", true, false, false), "hide exact Reels tab");
-        check(FocusPolicy.shouldHideTab("search_tab", false, true, false), "hide exact Explore/Search tab");
-        check(FocusPolicy.shouldHideTab("creation_tab", false, false, true), "hide exact Create tab");
+        check(FocusPolicy.shouldHideTab("clips_tab"), "permanent exact Reels removal");
+        check(FocusPolicy.shouldHideTab("search_tab"), "permanent exact Explore removal");
+        check(FocusPolicy.shouldHideTab("creation_tab"), "permanent exact Create removal");
         String[] preservedTabs = {"feed_tab", "direct_tab", "profile_tab", "story_viewer", "reel_video", "cf_hub_recycler_view", "clips_tab_badge", "", null};
-        for (String tab : preservedTabs) check(!FocusPolicy.shouldHideTab(tab, true, true, true), "unrelated native view preserved " + tab);
-        check(!FocusPolicy.shouldHideTab("clips_tab", false, true, true), "Reels tab toggle");
-        check(!FocusPolicy.shouldHideTab("search_tab", true, false, true), "Explore tab toggle");
-        check(!FocusPolicy.shouldHideTab("creation_tab", true, true, false), "Create tab toggle");
-        check(FocusPolicy.DEFAULT_BLOCK_FEED_REELS_OPEN, "feed-to-Reels navigation blocked by default");
-        String[] feedViewerSources = {
-                "FEED_TIMELINE", "FEED_TIMELINE_POST_TAP", "FEED_TIMELINE_FOLLOWING",
-                "FEED_TIMELINE_FAVORITES", "FEED_TIMELINE_ALL", "FEED_TIMELINE_MIXED_UNCONNECTED"
-        };
-        for (String source : feedViewerSources) {
-            check(FocusPolicy.shouldBlockFeedReelsOpen(source, true), "known Home-feed viewer source blocked " + source);
-            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, false), "feed viewer toggle restores navigation " + source);
-        }
-        String[] profileViewerSources = {
-                "PROFILE", "SELF_PROFILE", "FEED_CONTEXTUAL_PROFILE", "FEED_CONTEXTUAL_SELF_PROFILE",
-                "OPAL_USER_PROFILE", "OPAL_USER_SELF_PROFILE", "PRIME_PROFILE", "PRIME_SELF_PROFILE"
-        };
-        for (String source : profileViewerSources) {
-            check(FocusPolicy.shouldBlockFeedReelsOpen(source, true), "known personal-profile viewer source blocked " + source);
-            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, false), "profile viewer toggle restores navigation " + source);
-        }
-        String[] preservedViewerSources = {
-                "FEED_TIMELINE_EXPLORE_STORY", "REEL_FEED_TIMELINE", "STORY", "STORIES",
-                "DIRECT", "DIRECT_THREAD", "PROFILE_GRID", "ADS", "EXPLORE",
-                "GROUP_PROFILE", "FEED_CONTEXTUAL_GROUP_PROFILE", "GROUP_PROFILE_PENDING_POSTS",
-                "feed_timeline", "FEED_TIMELINE_UNKNOWN", "FEED_TIMELINE_POST_TAP_EXTRA",
-                " FEED_TIMELINE", "FEED_TIMELINE ", "", null
-        };
-        for (String source : preservedViewerSources) {
-            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, true), "other/unknown viewer source preserved " + source);
-            check(!FocusPolicy.shouldBlockFeedReelsOpen(source, false), "disabled feed guard preserves other source " + source);
-        }
+        for (String tab : preservedTabs) check(!FocusPolicy.shouldHideTab(tab), "unrelated native view preserved " + tab);
         System.out.println("FocusPolicyTest: " + assertions + " assertions passed");
     }
 
-    private static boolean block(String uri) { return FocusPolicy.shouldBlock(URI.create(uri), true, true); }
+    private static boolean block(String uri) { return FocusPolicy.shouldBlock(URI.create(uri)); }
 
     private static void check(boolean condition, String description) {
         assertions++;

@@ -124,8 +124,9 @@ final class QuietChrome {
                     previous.remove();
                 }
             }
-            // Only the Home-owned toolbar is changed. Direct, groups, profiles, account/login,
-            // Story viewers and their back/search/edit controls never qualify by a generic ID.
+            // One bounded scan also removes two exact promotional controls.
+            // Content lists, account/login, Story viewers and generic back/edit controls stay out.
+            FrameLayout discoveredHeader = findMainChrome(tabBar);
             if (home == null || !selectedWithin(home) || !tabBar.isShown()) {
                 restoreHeader();
                 return;
@@ -133,7 +134,7 @@ final class QuietChrome {
             FrameLayout nativeHeader = header == null ? null : header.host.get();
             if (nativeHeader == null || !nativeHeader.isAttachedToWindow() || !nativeHeader.isShown()) {
                 restoreHeader();
-                nativeHeader = findHomeHeader(tabBar);
+                nativeHeader = discoveredHeader;
             }
             if (nativeHeader == null || !nativeHeader.isShown() || nativeHeader.getHeight() == 0) return;
             if (header == null) header = new HeaderDecoration(nativeHeader, settingsAction);
@@ -448,7 +449,7 @@ final class QuietChrome {
         }
     }
 
-    private static FrameLayout findHomeHeader(ViewGroup tabBar) {
+    private static FrameLayout findMainChrome(ViewGroup tabBar) {
         ViewGroup scope = null;
         View cursor = tabBar;
         for (int i = 0; i < 4; i++) {
@@ -462,12 +463,20 @@ final class QuietChrome {
         ArrayDeque<Node> pending = new ArrayDeque<>();
         pending.add(new Node(scope, 0));
         int visited = 0;
+        FrameLayout homeHeader = null;
         while (!pending.isEmpty() && visited++ < MAX_HEADER_VIEWS) {
             Node node = pending.removeFirst();
             View view = node.view;
             replaceStartupLogo(view);
+            String resource = nameOf(view);
+            // Exact promotional controls only; neither message content nor ordinary profile
+            // buttons qualify, and content RecyclerViews are never traversed.
+            if ("profile_header_barcelona_app_switcher_button".equals(resource)
+                    || "direct_composer_meta_ai_composer_upsell".equals(resource)) {
+                if (view.getVisibility() != View.GONE) view.setVisibility(View.GONE);
+            }
             if (view instanceof FrameLayout && QuietChromePolicy.isHomeHeaderClass(view.getClass().getName())) {
-                if (view.isShown()) return (FrameLayout) view;
+                if (view.isShown()) homeHeader = (FrameLayout) view;
                 continue;
             }
             if (node.depth >= MAX_HEADER_DEPTH || isContentList(view) || !(view instanceof ViewGroup)) continue;
@@ -476,7 +485,7 @@ final class QuietChrome {
                 pending.addLast(new Node(group.getChildAt(i), node.depth + 1));
             }
         }
-        return null;
+        return homeHeader;
     }
 
     private static void replaceStartupLogo(View view) {

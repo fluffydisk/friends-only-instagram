@@ -53,12 +53,7 @@ public final class FocusHooks {
             return;
         }
         try {
-            if (config == null) {
-                Context application = tabBar.getContext().getApplicationContext();
-                if (!(application instanceof Application)) return;
-                registerLifecycle((Application) application);
-                config = new FocusConfig(application);
-            }
+            if (!initialize(tabBar.getContext())) return;
             TabController existing = ROOTS.get(tabBar);
             if (existing != null) {
                 existing.schedule();
@@ -74,21 +69,22 @@ public final class FocusHooks {
     }
 
     /**
-     * Optional network hook: fail open until the native settings context exists. IOException uses
-     * Instagram's existing request error handling; no request or response body is read or altered.
+     * Only known discovery-list requests are blocked, including before settings initialize.
+     * IOException uses the existing error handling; no request/response body is read or altered.
      */
     public static void checkRequest(URI request) throws IOException {
-        FocusConfig current = config;
-        if (current != null && FocusPolicy.shouldBlock(request, current.hideReels(), current.hideExplore())) {
+        if (FocusPolicy.shouldBlock(request)) {
             throw new IOException("Friends Only focus filter");
         }
     }
 
-    /** Called at the supported Reels-viewer entry; no inline playback or click listener changes. */
-    public static boolean shouldBlockFeedReelsOpen(Enum<?> source) {
-        FocusConfig current = config;
-        return current != null && source != null
-                && FocusPolicy.shouldBlockFeedReelsOpen(source.name(), current.blockFeedReelsOpen());
+    private static boolean initialize(Context context) {
+        if (config != null) return true;
+        Context application = context.getApplicationContext();
+        if (!(application instanceof Application)) return false;
+        registerLifecycle((Application) application);
+        config = new FocusConfig(application);
+        return true;
     }
 
     static void refreshAll() {
@@ -142,10 +138,33 @@ public final class FocusHooks {
 
     private static void showSettings(TabController controller) {
         ViewGroup root = controller.root.get();
-        final FocusConfig current = config;
-        if (root == null || current == null) return;
-        final Activity activity = activityFor(root);
+        if (root == null) return;
+        Activity activity = activityFor(root);
+        openSettings(activity);
+        WeakReference<AlertDialog> reference = DIALOGS.get(activity);
+        if (reference != null) controller.dialog = reference;
+    }
+
+    /** Opens only our local settings; native login/challenge/account screens are untouched. */
+    public static void openSettings(final Activity activity) {
         if (activity == null || activity.isFinishing() || activity.isDestroyed()) return;
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            final WeakReference<Activity> owner = new WeakReference<>(activity);
+            MAIN.post(new Runnable() {
+                @Override public void run() { openSettings(owner.get()); }
+            });
+            return;
+        }
+        try {
+            if (!initialize(activity)) return;
+            showSettings(activity);
+        } catch (RuntimeException ignored) {
+            // Optional settings must not break a changed native Activity/window.
+        }
+    }
+
+    private static void showSettings(final Activity activity) {
+        final FocusConfig current = config;
         WeakReference<AlertDialog> previous = DIALOGS.get(activity);
         if (previous != null && previous.get() != null && previous.get().isShowing()) return;
         final boolean tr = "tr".equals(Locale.getDefault().getLanguage());
@@ -155,26 +174,18 @@ public final class FocusHooks {
         content.setPadding(padding, padding / 2, padding, 0);
         TextView intro = new TextView(activity);
         intro.setText(tr
-                ? "Akışını ve görünümünü seç."
-                : "Choose your feed and appearance.");
+                ? "Arkadaşlarına zaman ayır."
+                : "Make time for your friends.");
         content.addView(intro);
         addSwitch(content, current, FocusConfig.FOLLOWING_ONLY,
                 tr ? "Yalnızca takip ettiğim hesaplar" : "Only accounts I follow", current.followingOnly());
-        addSwitch(content, current, FocusConfig.QUIET_UI,
-                tr ? "Sade başlık ve gezinme" : "Minimal header and navigation", current.quietUi());
-        addSwitch(content, current, FocusConfig.REELS, tr ? "Reels sekmesini gizle" : "Hide Reels tab", current.hideReels());
-        addSwitch(content, current, FocusConfig.EXPLORE, tr ? "Keşfet / Arama sekmesini gizle" : "Hide Explore / Search tab", current.hideExplore());
-        addSwitch(content, current, FocusConfig.EXTRAS, tr ? "Oluştur kısayolunu gizle" : "Hide Create shortcut", current.hideExtras());
-        addSwitch(content, current, FocusConfig.BLOCK_FEED_REELS,
-                tr ? "Akış ve profilden Reels açılmasını engelle" : "Block Reels from feed and profile posts",
-                current.blockFeedReelsOpen());
         TextView note = new TextView(activity);
         note.setText(tr
-                ? "Takip filtresi açıkken reklamlar ve takip bilgisi doğrulanamayan gönderiler gizlenir; bu yüzden akış daha kısa veya boş olabilir. Filtreyi değiştirince akışı yenile. Akışın içindeki hikâye kutuları da gizlenir; sohbetler filtrelenmez. Videolar akışta kalır."
-                : "The follow filter hides ads and posts without confirmed following information, so the feed can be shorter or empty. Refresh the feed after changing it. Story sections inside the feed are also hidden; chats are not filtered. Videos stay in the feed.");
+                ? "Akış videolarına basılı tutarak 2× hızda izle. Bırakınca normal hıza döner.\n\nTakip filtresini değiştirince akışı yenile. Takip bilgisi doğrulanamayan gönderiler gizlenir; akış boşsa bu ayarı kapatabilirsin."
+                : "Hold a feed video to watch at 2× speed. Release to return to normal speed.\n\nRefresh the feed after changing the follow filter. Posts without confirmed following information are hidden; turn this setting off if your feed is empty.");
         note.setPadding(0, padding / 2, 0, padding / 2);
         content.addView(note);
-        boolean dark = QuietChrome.isDarkTheme(root);
+        boolean dark = QuietChrome.isDarkTheme(activity.getWindow().getDecorView());
         int textColor = Color.parseColor(dark ? "#F2F3EE" : "#242B27");
         for (int i = 0; i < content.getChildCount(); i++) {
             View child = content.getChildAt(i);
@@ -195,10 +206,7 @@ public final class FocusHooks {
         final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Friends Only")
                 .setView(scroll)
-                .setPositiveButton(tr ? "Tamam" : "Done", null)
-                .setNeutralButton(tr ? "Filtreleri kapat" : "Disable filters", new DialogInterface.OnClickListener() {
-                    @Override public void onClick(DialogInterface ignored, int which) { current.restoreAll(); }
-                }).create();
+                .setPositiveButton(tr ? "Tamam" : "Done", null).create();
         final WeakReference<Activity> owner = new WeakReference<>(activity);
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override public void onDismiss(DialogInterface ignored) {
@@ -210,7 +218,6 @@ public final class FocusHooks {
         try {
             dialog.show();
             DIALOGS.put(activity, new WeakReference<>(dialog));
-            controller.dialog = new WeakReference<>(dialog);
         } catch (RuntimeException ignored) {
             // The Activity can finish between validation and show().
         }
@@ -302,8 +309,7 @@ public final class FocusHooks {
             while (previous.hasNext()) {
                 Map.Entry<View, Integer> entry = previous.next();
                 View view = entry.getKey();
-                if (!FocusPolicy.shouldHideTab(nameOf(view), current.hideReels(),
-                        current.hideExplore(), current.hideExtras()) || !within(view, tabBar)) {
+                if (!FocusPolicy.shouldHideTab(nameOf(view)) || !within(view, tabBar)) {
                     restore(view, entry.getValue());
                     previous.remove();
                 }
@@ -315,7 +321,7 @@ public final class FocusHooks {
                 Node node = pending.removeFirst();
                 View view = node.view;
                 String name = nameOf(view);
-                if (FocusPolicy.shouldHideTab(name, current.hideReels(), current.hideExplore(), current.hideExtras())) {
+                if (FocusPolicy.shouldHideTab(name)) {
                     if (!hidden.containsKey(view) && view.getVisibility() != View.GONE) {
                         hidden.put(view, view.getVisibility());
                     }

@@ -3,14 +3,13 @@ package dev.friendsonly.patches
 
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.DexFileFactory
+import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.Opcode
-import com.android.tools.smali.dexlib2.builder.BuilderOffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
-import com.android.tools.smali.dexlib2.iface.reference.FieldReference
-import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableField
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
@@ -18,9 +17,11 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction10x
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction22c
+import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction11n
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction31c
 import com.android.tools.smali.dexlib2.immutable.reference.ImmutableFieldReference
 import com.android.tools.smali.dexlib2.immutable.reference.ImmutableStringReference
+import java.io.File
 
 /** Host checks for fail-closed fingerprinting and the actual emitted control-flow guard. */
 object FeedVideoTapPolicyTest {
@@ -76,6 +77,23 @@ object FeedVideoTapPolicyTest {
         ImmutableClassDef(type, AccessFlags.PUBLIC.value or AccessFlags.ENUM.value, superclass,
             emptyList(), null, emptyList(), emptyList(), emptyList())
 
+    private fun modal(direct: Boolean, registers: Int = 14, marker: String? = null): ImmutableMethod {
+        val types = if (direct) listOf("Landroidx/fragment/app/FragmentActivity;", CONFIG,
+            "Lcom/instagram/common/session/UserSession;") else listOf("Landroidx/fragment/app/Fragment;", CONFIG,
+            "Lcom/instagram/common/session/UserSession;", "I", "Z")
+        val text = marker ?: if (direct) "android_purge_26_q2_ClipsPluginImpl_launchClipsViewerFromDirect"
+            else "android_purge_26_q2_ClipsPluginImpl_launchClipsViewerForResultFromFragment_2"
+        val code = mutableListOf<Instruction>()
+        if (direct) code += ImmutableInstruction11n(Opcode.CONST_4, 4, 0)
+        code += ImmutableInstruction31c(Opcode.CONST_STRING_JUMBO, 0, ImmutableStringReference(text))
+        code += ImmutableInstruction31c(Opcode.CONST_STRING_JUMBO, 1, ImmutableStringReference("clips_feed_viewer"))
+        if (direct) code += ImmutableInstruction31c(Opcode.CONST_STRING_JUMBO, 0, ImmutableStringReference("launchClipsViewerModal"))
+        code += ImmutableInstruction10x(Opcode.RETURN_VOID)
+        return ImmutableMethod(OWNER, if (direct) "A0E" else "A0D", types.map { ImmutableMethodParameter(it, emptySet(), null) },
+            "V", AccessFlags.PUBLIC.value or AccessFlags.STATIC.value, emptySet(), emptySet(),
+            ImmutableMethodImplementation(registers, code, emptyList(), emptyList()))
+    }
+
     @JvmStatic
     fun main(args: Array<String>) {
         var assertions = 0
@@ -119,27 +137,34 @@ object FeedVideoTapPolicyTest {
         val originalRegisterCount = mutable.implementation!!.registerCount
         installFeedViewerGuard(mutable)
         val code = mutable.implementation!!.instructions
-        verify(code.take(6).map { it.opcode } == listOf(Opcode.IF_EQZ, Opcode.IGET_OBJECT, Opcode.INVOKE_STATIC,
-            Opcode.MOVE_RESULT, Opcode.IF_EQZ, Opcode.RETURN_VOID), "Guard must branch before touching unrelated navigation")
-        verify(code.drop(6).zip(original).all { (patched, old) -> patched === old } && code.size == original.size + 6,
+        verify(code.first().opcode == Opcode.RETURN_VOID, "Every source must return before entering the Reels viewer")
+        verify(code.drop(1).zip(original).all { (patched, old) -> patched === old } && code.size == original.size + 1,
             "Every original instruction must remain in order")
         verify(mutable.implementation!!.registerCount == originalRegisterCount, "Guard must not shift parameter registers")
-        verify((code[0] as OneRegisterInstruction).registerA == 12, "Null check must use config p2")
-        verify((code[0] as BuilderOffsetInstruction).target.location.instruction === original.first(), "Null config must rejoin original entry")
-        verify((code[4] as BuilderOffsetInstruction).target.location.instruction === original.first(), "Allowed source must rejoin original entry")
-        verify((code[1] as TwoRegisterInstruction).registerA == 0 && (code[1] as TwoRegisterInstruction).registerB == 12,
-            "Source read must use scratch v0 and config p2")
-        val field = (code[1] as ReferenceInstruction).reference as FieldReference
-        verify(field.definingClass == CONFIG && field.name == "A00" && field.type == SOURCE, "Guard must read only pinned source field")
-        val hook = (code[2] as ReferenceInstruction).reference as MethodReference
-        verify(hook.definingClass == "Ldev/friendsonly/patch/runtime/FocusHooks;" && hook.name == "shouldBlockFeedReelsOpen" &&
-            hook.parameterTypes.map { it.toString() } == listOf("Ljava/lang/Enum;") && hook.returnType == "Z",
-            "Guard must call only the narrowly scoped source policy")
-        verify((code[3] as OneRegisterInstruction).registerA == 0 && (code[4] as OneRegisterInstruction).registerA == 0,
-            "Policy result must control the early return")
+        verify(code.take(1).none { it is ReferenceInstruction }, "Permanent guard must not read config, preferences or account data")
         verify(!isFeedViewerLaunchCandidate(mutable, owner()), "Already patched methods cannot match a second time")
         verify(runCatching { installFeedViewerGuard(mutable) }.isFailure, "Repeated injection must fail closed")
         verify(runCatching { installFeedViewerGuard(MutableMethod(method(registers = 21))) }.isFailure, "Unsafe registers must also reject direct injection")
+        for (direct in listOf(false, true)) {
+            verify(isModalReelsLaunchCandidate(modal(direct), owner()), "Pinned modal route qualifies")
+            verify(!isModalReelsLaunchCandidate(modal(direct, registers = 15), owner()), "Changed modal registers fail closed")
+            verify(!isModalReelsLaunchCandidate(modal(direct, marker = "other"), owner()), "Modal launch marker is required")
+            val guarded = MutableMethod(modal(direct))
+            val before = guarded.implementation!!.instructions.toList()
+            installModalReelsGuard(guarded)
+            verify(guarded.implementation!!.instructions.first().opcode == Opcode.RETURN_VOID &&
+                guarded.implementation!!.instructions.drop(1).zip(before).all { (a, b) -> a === b },
+                "Modal viewer returns before touching account/config state and keeps original body")
+            verify(!isModalReelsLaunchCandidate(guarded, owner()), "Guarded modal cannot match again")
+        }
+        if (args.isNotEmpty()) {
+            val container = DexFileFactory.loadDexContainer(File(args[0]), Opcodes.forApi(35))
+            val classes = container.dexEntryNames.flatMap { container.getEntry(it)!!.dexFile.classes }
+            verify(classes.sumOf { c -> c.methods.count { isFeedViewerLaunchCandidate(it, c) } } == 1,
+                "Actual source has exactly one ordinary Reels launcher")
+            verify(classes.sumOf { c -> c.methods.count { isModalReelsLaunchCandidate(it, c) } } == 2,
+                "Actual source has exactly two modal Reels launchers")
+        }
         println("Feed video tap patch checks: $assertions assertions passed")
     }
 }

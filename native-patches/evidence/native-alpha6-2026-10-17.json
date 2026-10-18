@@ -47,7 +47,7 @@
     "new_output_validator_rejects_actual_alpha5": "passed_full_output_inspector_on_actual_signed_alpha5_apk",
     "full_local_apk": "passed_including_mandatory_compiled_theme_color_reference_validation",
     "full_github_apk": "passed_including_mandatory_compiled_theme_color_reference_validation",
-    "alpha6_phone_installation_opening_and_features": "not_tested",
+    "alpha6_phone_installation_opening_and_features": "user_reported_current_app_opens; Home_horizontal_swipe_still_reaches_Reels; other_feature_specific_tests_not_confirmed",
     "compiled_resource_final_local_audit": "passed_47_nonzero_references_14_own_colors_1097_original_ids_and_values_preserved",
     "ci_metrics_confirmed_from_actual_job_logs": true
   },
@@ -86,9 +86,9 @@
   "limits": [
     "No actual phone exception stacktrace has been captured.",
     "The resource-only preflight and output validation establish compiled resource contracts, not Android17 device startup.",
-    "Alpha.6 still needs normal installation/opening and feature-specific phone checks.",
     "Strict following metadata may hide legitimate posts; Home can be short or empty. In-feed Story units are filtered; top Stories tray/playback remains unverified.",
-    "Clean cloud APKs use disposable signers and can require removing only the prior Friends Only app, clearing that app local session and settings."
+    "Clean cloud APKs use disposable signers and can require removing only the prior Friends Only app, clearing that app local session and settings.",
+    "User reports the current app opens after alpha.6 delivery; the installed binary hash is not independently verified. Feature-specific checks remain unconfirmed, and Home swipe still exposes Reels in that version."
   ],
   "github_actions": {
     "run_id": 39064660107,
@@ -389,5 +389,13 @@
     "Friends Only following feed",
     "Friends Only quiet visual theme"
   ],
-  "new_diagnostics_subsystem_added": false
+  "new_diagnostics_subsystem_added": false,
+  "user_followup": {
+    "reported_at_utc": "2026-10-17",
+    "device": "Samsung Galaxy S24+ SM-S926B Android17/SDK37 (previous user report)",
+    "current_app_opening": "user_confirmed",
+    "remaining_defect": "Horizontal swipe from Home can still reach the native Reels page despite a hidden tab. Addressed in alpha.7 source.",
+    "installed_binary_hash": "not_independently_verified",
+    "stories_playback_dm_sending_groups_and_following_filter": "not_individually_confirmed"
+  }
 }

@@ -1,5 +1,11 @@
 # Screenshot-led native design · 0.4.0-alpha.2
 
+[Download APK · artifact 81](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444) · [successful GitHub build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593)
+
+Local and CI builds passed **170 Python tests and 951 Java/Kotlin assertions**,
+all 12 patches and signed-output guards. **Phone rendering and interaction tests
+remain unverified.**
+
 The first user screenshot is a visual reference, not a request for its Search,
 Explore, Notifications or Create destinations. The supported navigation remains
 **Friends / Chats / Me**; existing posts, Stories, Direct and account behavior stay

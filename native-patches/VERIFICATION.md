@@ -1,5 +1,42 @@
 # Native patch evidence · updated 2026-10-18
 
+<!-- REFERENCE_ALPHA2_DELIVERY_START -->
+**Latest native design: [download 0.4.0-alpha.2 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444)**
+(code **385806744**, personal-test artifact **81**). Sign into GitHub, extract the
+ZIP and install `friends-only-personal.apk` through Files. Retained for 7 days.
+The CI signing key changed: remove only the previous **Friends Only** first;
+this clears its local session/settings. Official Instagram can remain installed.
+Do not use the old fixed-package installation helper.
+
+Screenshot-led charcoal styling, spaced Friends Only title, rounded feed surfaces
+and navigation, supported square Story photos and own native wordmark resources.
+Existing destinations, account service and native features remain.
+Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593) passed **12 patches, 170 Python tests and 951 Java/Kotlin assertions**,
+signatures/identity/alignment and theme/font/wordmark output guards.
+**Phone installation, appearance, login and interactions are unverified.**
+Unsupported native/server-rendered screens can retain original branding; genuine
+account authentication and required provider/legal notices remain.
+<!-- REFERENCE_ALPHA2_DELIVERY_END -->
+
+## Current screenshot-led design · 0.4.0-alpha.2
+
+The standalone assertions and patch/output checks above passed locally and in
+CI; the following broader comparison was executed on the **local APK only**.
+The independent audit compared **861,788** native methods against local alpha.1:
+only the six intended presentation methods differ after resolving string-width,
+branch-address and untargeted data-payload padding changes. All **3,168** baseline
+assets and **18** native libraries match. The existing following/account/parser,
+player, message and Reels-blocking behavior code was retained. Both original and
+emitted visual contracts passed **58** assertions (including reused fixtures),
+and prior design contracts passed **70**. AAPT2 independently confirmed all four
+wordmark configurations at the original resource ID.
+
+These are static checks, not ART/phone/UI tests. Supported avatar rendering and
+unknown toolbar fallback limits are documented in the [current implementation](../docs/REFERENCE_DESIGN.md).
+Exact hashes, the CI artifact ZIP digest, counts and unverified device features
+are in [the evidence record](../docs/evidence/native-reference-2026-10-18.json).
+The sections below are historical results for earlier APKs.
+
 **The user now confirms alpha.6 opens on the Galaxy S24+ / Android 17 / One UI
 9.** They also report that a horizontal Home swipe still reaches Reels. Alpha.7
 addresses the native pager and central viewer paths, reduces Settings to our

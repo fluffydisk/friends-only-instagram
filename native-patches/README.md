@@ -1,5 +1,23 @@
 # Friends Only · native app prototype
 
+<!-- REFERENCE_ALPHA2_DELIVERY_START -->
+**Latest native design: [download 0.4.0-alpha.2 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444)**
+(code **385806744**, personal-test artifact **81**). Sign into GitHub, extract the
+ZIP and install `friends-only-personal.apk` through Files. Retained for 7 days.
+The CI signing key changed: remove only the previous **Friends Only** first;
+this clears its local session/settings. Official Instagram can remain installed.
+Do not use the old fixed-package installation helper.
+
+Screenshot-led charcoal styling, spaced Friends Only title, rounded feed surfaces
+and navigation, supported square Story photos and own native wordmark resources.
+Existing destinations, account service and native features remain.
+Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593) passed **12 patches, 170 Python tests and 951 Java/Kotlin assertions**,
+signatures/identity/alignment and theme/font/wordmark output guards.
+**Phone installation, appearance, login and interactions are unverified.**
+Unsupported native/server-rendered screens can retain original branding; genuine
+account authentication and required provider/legal notices remain.
+<!-- REFERENCE_ALPHA2_DELIVERY_END -->
+
 <!-- DESIGN_ALPHA1_DELIVERY_START -->
 **Previous native test build: [download design 0.4.0-alpha.1 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996)**
 (code **385806743**). Sign into GitHub, download/extract the ZIP, then open

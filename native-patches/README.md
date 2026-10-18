@@ -12,11 +12,16 @@ is user-reported evidence, not a separate verification of Stories, messages,
 login/challenges or following-only filtering.
 
 <!-- ALPHA7_DELIVERY_START -->
-**Alpha.7 source work is being validated. No alpha.7 installation or runtime
-success is claimed yet.** Until its build is complete, the
-[alpha.6 baseline, artifact 62](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) remains available. Extract its ZIP and
-install `friends-only-personal.apk` using the normal file manager. Alpha.6's
-package is `dev.friendsonly.instagram`, version code **385806740**.
+**[Download alpha.7: `friends-only-personal-test-apk-67`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)**. Extract the
+ZIP and install `friends-only-personal.apk` through the normal file manager.
+Its package is **`dev.friendsonly.instagram`**, version code **385806741**.
+
+Local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all **nine patches**, **163 Python
+tests**, **155 Java + 403 Kotlin assertions**, signatures/identity, 16 KiB
+alignment and the mandatory **7/47/14** compiled-theme guard. **Alpha.7 phone
+installation, opening and new behavior remain unverified.** The
+[alpha.6 fallback, artifact 62](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) is known to open, with the Home-swipe
+Reels defect still present.
 <!-- ALPHA7_DELIVERY_END -->
 
 CI builds currently use disposable signing keys. Remove only the older
@@ -287,7 +292,7 @@ current integration cannot configure GitHub secrets automatically.
 | Alpha.4 | Local/GitHub APK build passed; phone untested |
 | Alpha.5 | Local/GitHub static checks passed, but phone startup failed; withdrawn |
 | Alpha.6 | Local/GitHub APK and mandatory 7/47/14 theme guard passed; user confirms opening, reports Home swipe reaches Reels |
-| Alpha.7 | Source changes under validation; no phone runtime evidence yet |
+| Alpha.7 | Local/GitHub signed APK and nine-patch checks passed: Python 163, Java 155, Kotlin 403; independent emitted DEX/resource audits and 149 static method analyses passed locally; phone untested |
 | Stories playback, Direct sending/groups, login/challenges | Not separately verified |
 | Hosted API 37 install checks | Emulator graphics/services failed; no PackageManager verdict |
 
@@ -311,7 +316,9 @@ must follow observed behavior, not guesses about obfuscated code.
   profilindeki takip/şikâyet/engelleme menüsü değiştirilmez.
 - Akışta oynayan videoya basılı tutarken 2× hız hedeflenir; bırakma/iptal/satırın
   yeniden kullanılması mevcut native sıfırlama yolunu korur. Bu davranış
-  alpha.7 için henüz telefonda doğrulanmış değildir.
+  alpha.7 için henüz telefonda doğrulanmış değildir. Yerel APK derlemesi,
+  163 Python testi ve 558 Java/Kotlin kontrolü hem yerel hem GitHub derlemesinde
+  geçti. Üstteki alpha.7 bağlantısından APK ZIP'ini indir.
 - Akış boş veya eksikse takip filtresini kapatıp yenile. Eksik takip bilgisi
   nedeniyle gerçek arkadaş gönderileri de gizlenebilir; gömülü hikâye kartları
   da elenebilir. Üst hikâye sırasının oynatılması, mesaj gönderme ve grup

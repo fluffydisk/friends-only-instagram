@@ -8,9 +8,12 @@ Alpha.5 remains withdrawn after its confirmed phone startup failure; alpha.4
 remains phone-untested. Alpha.3 is an older known-to-open fallback.
 
 <!-- ALPHA7_DELIVERY_START -->
-**Alpha.7 build/audit evidence is pending.** Source changes and intended
-behavior below do not establish installation, startup or feature success. The
-[alpha.6 baseline](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) remains the latest delivered build known to open.
+**[Alpha.7's APK is available, artifact 67](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829).** Both the full local build
+and the [GitHub APK run](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all nine patches, **163 Python tests and
+558 Java/Kotlin assertions**, rebuilding/signing and mandatory output checks.
+The new APK's version code is **385806741**. **No alpha.7 installation, opening
+or feature success on a phone is claimed.** The [alpha.6 fallback](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982)
+is known to open but still permits the reported Home-to-Reels swipe.
 <!-- ALPHA7_DELIVERY_END -->
 
 All patches target the verified original Instagram `451.0.0.20.80`; output
@@ -59,6 +62,88 @@ renderer or removal of every original mark. Genuine Instagram authentication,
 necessary legal text, service/networking, terms and original platform checks
 remain. The extension adds no new private API client, scraping, backend,
 credential/message collection, permissions or authentication bypass.
+
+## Alpha.7 local build evidence
+
+Source **`20d2bffbf0a0761d2ff14cc8c69975514f92f41b`**, output version
+**0.3.0-alpha.7 / 385806741**, passed the complete local
+`python3 native-patches/scripts/build.py --check` and full application to the
+verified original APKM. The actual engine loaded and applied all **nine patches**.
+
+| Standard build suite | Passed |
+| --- | --- |
+| Python | 163 tests |
+| Java Focus / Feed / Chrome | 97 / 32 / 26 assertions; 155 total |
+| Kotlin Identity / Tap / Following / Theme | 26 / 46 / 35 / 145 assertions |
+| Kotlin Navigation / Settings / Feed speed | 32 / 63 / 56 assertions |
+| Kotlin total | 403 assertions |
+| Java + Kotlin total | 558 assertions |
+
+Separate probes of the actual original source passed **5 navigation**, **2
+viewer** and **5 speed** assertions and found exactly **two supported native
+settings candidates**. These source probes are additional evidence, not part of
+the standard CI suite counts above. They do not exercise live Android gestures.
+
+The final signed local APK is
+`native-patches/private/friends-only-native-0.3.0-alpha.7.apk`, **252,810,488
+bytes**, package **`dev.friendsonly.instagram`**, version code **385806741**.
+It passed signatures, package/identity, extension presence, 16 KiB ZIP alignment
+and mandatory emitted-theme validation: **7 semantic style families / 47
+nonzero color references / 14 exact palette values**. Its SHA-256 is:
+
+```text
+97cc5aafd613fc14c18993d9bfb19079f4a9ccb4528ed37e12211e9252d8f227
+```
+
+The local personal signing certificate SHA-256 is
+`38557b644c06dc2d5cae087bc65244bcd575daba4ba5405c51a38c60be01a6a7`.
+The patch bundle is **155,247 bytes**, SHA-256
+`c924c70f00ba8e5cba924076c42edd827a9d0e83b2ed60f29384b86f5e2e48bf`.
+A separate binary resource audit of that exact local APK confirmed all **47
+semantic references / 14 palette colors** and preservation of all **1,097
+original color IDs and values**.
+
+An independent audit of that same final local APK's emitted DEX passed: **10
+native classes**, **11 planned modified methods**, and **99 other native methods
+unchanged**, with **zero issues**. Static Dexlib method analysis also passed
+**12 critical native methods** plus **137 injected-runtime/Home-parser methods**
+(**149 total, zero failures**). This is bytecode/resource evidence, not ART
+execution, a physical-device test, or a live gesture/video check. The public
+[alpha.7 evidence record](evidence/native-alpha7-2026-10-18.json) records its exact
+scope and local output metadata.
+
+## Alpha.7 GitHub APK evidence
+
+The [full GitHub APK run](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229), number **67**, source
+**`20d2bffbf0a0761d2ff14cc8c69975514f92f41b`**, **succeeded**. Its completed job
+logs confirm the same **163 Python tests**, **155 Java assertions** and **403
+Kotlin assertions** listed above. Downloaded actual build/application reports
+confirm all **nine patches**, verified original input, merge/rebuild, personal
+signing, identity/package/version, 16 KiB alignment and the mandatory emitted
+theme guard: **7 semantic style families / 47 nonzero references / 14 exact
+palette values**.
+
+Download [`friends-only-personal-test-apk-67`](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829) and extract
+`friends-only-personal.apk`. The CI APK is **253,171,054 bytes**, package
+**`dev.friendsonly.instagram`**, version code **385806741**, SHA-256:
+
+```text
+8957cf3641da10dbb9a22dbff7e9465017a86b173327f883018e6f783e8f4093
+```
+
+Its disposable personal certificate SHA-256 is
+`37d3c01deba9d16d7f604cdcf23a71c5e0b66ad1d020f02cefd92c558a57deb3`.
+The [reports artifact](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12118789205) records the actual CI output metadata.
+The [CI patch bundle](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119021797) is **155,247 bytes**, SHA-256
+`c924c70f00ba8e5cba924076c42edd827a9d0e83b2ed60f29384b86f5e2e48bf`, identical to
+the locally audited bundle.
+
+Independent emitted-DEX, 149-method static-analysis and full original-color
+preservation audits apply **only to the exact local APK** above. The CI APK
+passed its own workflow signature/identity/alignment/theme checks; its full
+bytes were not independently downloaded for those additional local audits.
+**Neither build establishes alpha.7 phone opening, gesture behavior, Stories,
+Direct or authentication.** Record those results separately.
 
 ## Alpha.3 full build checks actually run in cloud
 

@@ -7,9 +7,13 @@ its phone behavior is not yet verified. Opening is separate from Story
 playback, Direct/groups, login/challenges and following-filter success.
 
 <!-- ALPHA7_DELIVERY_START -->
-Alpha.7 build evidence and its download are pending. The
-[alpha.6 baseline, artifact 62](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) is the latest delivered build known
-to open; its version code is **385806740**.
+**[Download alpha.7, artifact 67](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)**, then extract
+`friends-only-personal.apk`. Version code: **385806741**. Both local and
+[GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all **nine patches**, **163 Python tests and 558
+Java/Kotlin assertions**, signatures/identity, 16 KiB alignment and the
+mandatory **7/47/14** emitted-theme guard. **Alpha.7 phone results are pending.**
+The [alpha.6 fallback, artifact 62](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) is known to open, but retains the
+reported Home-to-Reels swipe.
 <!-- ALPHA7_DELIVERY_END -->
 
 **Alpha.5 is withdrawn. Do not reinstall artifact 55.** Normal installation
@@ -23,7 +27,7 @@ local-only. Alpha.6's later opening report is user evidence.
 
 ## Install a new-key Friends Only build
 
-1. Sign into GitHub, download the selected verified APK artifact and extract
+1. Sign into GitHub, download [alpha.7 artifact 67](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829) and extract
    `friends-only-personal.apk` from the ZIP.
 2. Remove only the older **Friends Only** native app when updating between
    these disposable-signature builds. This clears its local session/settings;
@@ -100,7 +104,7 @@ There is no speed setting, fullscreen requirement or Reels transition.
 | Alpha.4 | Combined Home/profile local and GitHub APK checks passed; user explicitly has not phone-tested it |
 | Alpha.5 | Normal installation succeeded after old Friends Only removal; opening closes immediately; withdrawn despite passing static builds/audits |
 | Alpha.6 | Local/GitHub APK and mandatory theme guard passed; user confirms opening, but Home swipe still reaches Reels |
-| Alpha.7 | Native navigation/settings/speed changes under validation; phone results pending |
+| Alpha.7 | Local/GitHub signed APK and nine-patch suites passed: Python 163, Java 155, Kotlin 403; phone tests pending |
 
 Alpha.2 raised the output version code to **385806736**, retaining strict source
 validation at **385709029**. The v2 test used the exact alpha.2 CI APK:

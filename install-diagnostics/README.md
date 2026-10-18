@@ -5,13 +5,18 @@ It supports only old `com.instagram.android` builds; alpha.3 and later use
 `dev.friendsonly.instagram`. The helper's legacy -2 package-hint mismatch does
 not diagnose normal installation or startup.
 
-**The user confirms alpha.6 opens on their Galaxy S24+ / Android 17 / One UI
-9**, while a Home swipe still reaches Reels. Alpha.7 addresses navigation,
-own settings and in-feed hold-to-2× behavior; its phone result is pending.
-The [alpha.6 baseline APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) remains the delivered known-to-open build
-while alpha.7 is being validated. Alpha.5 is withdrawn after successful normal
+**[Download the current alpha.7 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)** and extract
+`friends-only-personal.apk`. Both its local and GitHub builds passed nine
+patches, **163 Python tests and 558 Java/Kotlin assertions**, signatures,
+identity, alignment and the mandatory emitted-theme guard. Version code:
+**385806741**. **Alpha.7 phone behavior is unverified.** Use Files to install
+it; this legacy helper is incompatible with its package.
+
+The user confirms alpha.6 opens on their Galaxy S24+ / Android 17 / One UI 9,
+while a Home swipe still reaches Reels. Alpha.7 addresses navigation, own
+settings and in-feed hold-to-2× behavior. The [alpha.6 fallback APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982)
+remains historical known-to-open evidence. Alpha.5 is withdrawn after normal
 installation followed by immediate closing; do not reinstall artifact 55.
-The mandatory emitted-color guard now rejects that known resource defect.
 
 For a new-key native build, remove only the older **Friends Only** app first,
 clearing its local session/settings, then extract/install the APK from Files.

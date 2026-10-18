@@ -6,13 +6,20 @@ S24+ / Android 17 / One UI 9.** Its Home swipe still reaches Reels; alpha.7
 addresses that navigation path and further simplifies the interface.
 
 <!-- ALPHA7_DELIVERY_START -->
-**Alpha.7 is in preparation; no alpha.7 phone result is claimed.** The
-[alpha.6 baseline APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) remains available while the new build is being
-validated. Alpha.5 is withdrawn because it installed but immediately closed;
-do not reinstall artifact 55.
+**[Download the alpha.7 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)** — extract the ZIP and install
+`friends-only-personal.apk`. The local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all
+nine patches, **163 Python tests and 558 Java/Kotlin assertions**, including
+signature/identity, 16 KiB alignment and compiled-theme checks. Version code:
+**385806741**. **Alpha.7 has not been tested on the phone.**
+
+Remove only the older **Friends Only** native app first because the CI signing
+key changed; this clears its local session/settings. Official Instagram can
+remain installed. Do not use the old v2 installer helper. The
+[alpha.6 fallback](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) is known to open but retains the reported Reels
+swipe defect. Alpha.5 is withdrawn; do not reinstall artifact 55.
 <!-- ALPHA7_DELIVERY_END -->
 
-Alpha.7's intended changes:
+Implemented in alpha.7; phone validation pending:
 
 - Three native destinations only: **Friends, Chats, Me**. Reels, Explore and
   Create pages are removed from the supported shared tab/pager factory, including
@@ -25,8 +32,8 @@ Alpha.7's intended changes:
 - Hold a playing feed video for native **2× playback**; release/cancel uses the
   existing native reset. Normal inline video posts remain eligible.
 
-These are source changes awaiting alpha.7 build/device evidence, not a claim
-that every Instagram surface or mark has been removed. Login, account checks
+The local build verifies compilation and selected output contracts. It does
+not establish phone behavior or removal of every Instagram surface or mark. Login, account checks
 and required legal disclosures remain genuine Instagram screens; the backend,
 original networking and platform terms still apply. Other original chrome can
 remain in layouts outside the supported changes. We do not collect credentials

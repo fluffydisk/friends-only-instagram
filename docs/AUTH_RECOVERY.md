@@ -1,5 +1,10 @@
 # Sign-in appearance and crash correction · 0.4.0-alpha.3
 
+[Download APK · package 86](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972/artifacts/12141631238) · [successful CI run](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972)
+
+Local and CI builds passed **173 Python tests and 996 Java/Kotlin assertions**,
+all 12 patches and mandatory signed-output checks. Phone tests are pending.
+
 The user confirmed installing personal-test artifact **81** (0.4.0-alpha.2) on
 Galaxy S24+ / Android 17. The genuine login still had the colored Instagram logo,
 blue controls and blue-gray canvas. After submitting their credentials, the app

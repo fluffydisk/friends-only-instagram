@@ -1,5 +1,26 @@
 # Friends Only · native app prototype
 
+<!-- AUTH_RECOVERY_ALPHA3_DELIVERY_START -->
+**Latest APK: [download 0.4.0-alpha.3 · package 86](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972/artifacts/12141631238)**
+(version code **385806745**). **Do not reinstall package 81**: it has a confirmed
+invalid avatar-draw branch and user-reported closing after credential submission.
+
+This build corrects that branch, styles supported genuine sign-in widgets with a
+neutral palette/own login mark, and adds private local crash-report copying.
+Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972) passed **173 Python tests, 996 Java/Kotlin assertions**, all
+**12 patches**, signatures/identity/alignment, theme/font/logo guards and the new
+mandatory final-bytecode check. **Phone login, post-login opening, appearance and
+recovery interaction remain unverified.** Genuine authentication/2FA and required
+provider/legal notices remain; unsupported sign-in variants may keep native UI.
+
+Sign into GitHub, download/extract the ZIP and open `friends-only-personal.apk`
+through Files. Remove only previous Friends Only first because the CI signing key
+changed; this clears its local session/settings. Official Instagram may stay.
+If a later crash occurs, reopen the launcher and use **Copy technical report** if
+shown; paste that text in this chat. No report is sent automatically. Do not use
+the old fixed-package installer helper. The artifact is retained for 7 days.
+<!-- AUTH_RECOVERY_ALPHA3_DELIVERY_END -->
+
 <!-- REFERENCE_ALPHA2_DELIVERY_START -->
 User-confirmed repeated closing after credential submission; a malformed avatar
 draw branch was subsequently found. Do not install this version.
@@ -16,7 +37,8 @@ and navigation, supported square Story photos and own native wordmark resources.
 Existing destinations, account service and native features remain.
 Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593) passed **12 patches, 170 Python tests and 951 Java/Kotlin assertions**,
 signatures/identity/alignment and theme/font/wordmark output guards.
-**Phone installation, appearance, login and interactions are unverified.**
+Installation and the post-submit crash are user-reported. Successful login/Home
+rendering and interactions remain unverified.
 Unsupported native/server-rendered screens can retain original branding; genuine
 account authentication and required provider/legal notices remain.
 <!-- REFERENCE_ALPHA2_DELIVERY_END -->
@@ -37,11 +59,12 @@ not the legacy fixed-package helper.
 <!-- DESIGN_ALPHA1_DELIVERY_END -->
 
 
-**Native design 0.4.0-alpha.2 (code 385806744):** neutral charcoal palette,
+**Native design 0.4.0-alpha.3 (code 385806745):** neutral charcoal palette,
 rounded feed cards/navigation, supported square Story avatars and four native
-Friends Only wordmark variants. Existing native features/authentication remain.
-Read the [current implementation and phone checklist](../docs/REFERENCE_DESIGN.md).
-Twelve selected patches retain the mandatory theme resource-ID guard.
+Friends Only wordmark variants, own login mark and corrected avatar draw branch.
+Existing native features/authentication remain.
+Read the [current sign-in/recovery checklist](../docs/AUTH_RECOVERY.md).
+Twelve selected patches retain the theme guard and add mandatory final-DEX analysis.
 Compilation/static checks do not establish phone appearance or login success.
 
 

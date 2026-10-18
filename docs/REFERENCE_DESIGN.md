@@ -1,6 +1,7 @@
 # Screenshot-led native design · 0.4.0-alpha.2 (withdrawn)
 
-**Withdrawn:** see [the sign-in/crash correction](AUTH_RECOVERY.md).
+**Withdrawn:** the user confirms installation of artifact 81, original-looking
+login chrome and repeated closing after credential submission. See [the sign-in/crash correction](AUTH_RECOVERY.md).
 
 [Historical artifact 81](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444) · [successful GitHub build](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593)
 

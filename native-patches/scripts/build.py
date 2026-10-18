@@ -13,7 +13,8 @@ from common import BUILD, REPORTS, ROOT, VERSIONS, android_paths, bootstrap, jav
 
 PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking", "Friends Only app identity",
                "Friends Only feed video taps", "Friends Only following feed", "Friends Only quiet visual theme",
-               "Friends Only Reels navigation", "Friends Only local settings", "Friends Only feed hold speed"]
+               "Friends Only Reels navigation", "Friends Only local settings", "Friends Only feed hold speed",
+               "Friends Only feed video loop"]
 
 
 def main() -> None:
@@ -103,14 +104,14 @@ def main() -> None:
              "dev.friendsonly.patches.FollowingFeedPolicyTest"])
         run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
              "dev.friendsonly.patches.QuietThemePolicyTest"])
-        for test in ("ReelsNavigationPolicyTest", "SettingsRoutesPolicyTest", "FeedSpeedPolicyTest"):
+        for test in ("ReelsNavigationPolicyTest", "SettingsRoutesPolicyTest", "FeedSpeedPolicyTest", "FeedLoopPolicyTest"):
             run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
                  "dev.friendsonly.patches." + test])
         run([sys.executable, "-m", "unittest", "discover", "-s", ROOT / "tests", "-v"])
         checks += ["pure Java policy assertions", "Kotlin application identity policy assertions",
                    "Kotlin feed viewer fingerprint and guard assertions", "Java strict Home feed and native chrome policy checks",
                    "Kotlin Home response filter and quiet theme checks",
-                   "Kotlin permanent pager, local settings and feed hold speed contracts", "Python tooling unit tests"]
+                   "Kotlin permanent pager, local settings, feed hold speed and loop contracts", "Python tooling unit tests"]
     final_bundle = BUILD / "friends-only.mpp"
     bundle.replace(final_bundle)
     bundle = final_bundle

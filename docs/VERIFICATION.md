@@ -86,3 +86,54 @@ toolchain instructions or the complete GitHub Actions workflow.
 | GitHub Actions workflow execution | Initial local delivery did not run Actions; see the repository Actions page for current status |
 
 See [DEVICE_TESTING.md](DEVICE_TESTING.md) for the next verification step.
+
+## Native design 0.4.0-alpha.1 — 18 October 2026
+
+Source: `d21cbf68ce53ac27e2e33e28ba62f6cfa0192e5b` on
+`feature/native-apk-patches`. The [implementation scope and device checklist](REDESIGN_IMPLEMENTATION.md)
+distinguish our own welcome/settings screens from scoped presentation of the
+original native feed/Direct/profile components. This is not the full planned
+Stories list/profile/chat layout replacement.
+
+Local checks passed: **167 Python tests, 389 Java and 508 Kotlin assertions
+(897 total)**. The additional audit of the actual original and emitted APK
+passed **70 assertions including the reused policy fixtures**. All 11 selected
+patches applied, the APK signed/aligned successfully, and the existing mandatory
+7-style / 47-reference / 14-color theme guard passed. Both offline font/license
+assets passed pinned final-output digest checks. Welcome/settings classes exist
+in the emitted DEX; the output manifest has a declared, enabled launcher target.
+
+The independent `native-patches/scripts/DesignDexAudit.java` compared **861,788
+native methods** against the **local alpha.8 APK**. Only the expected two
+resource-ID inflaters and one feed-action-holder constructor changed. All **3,166
+original assets and 18 native libraries** from that baseline were preserved.
+This is an instruction/metadata and bundled-file comparison, not an ART or phone
+rendering test. Audit with the pinned Morphe CLI on the Java classpath:
+
+```sh
+javac -cp native-patches/.tools/morphe-desktop-1.18.1-all.jar \
+  -d /tmp/friends-only-design-audit native-patches/scripts/DesignDexAudit.java
+java -Xmx3g -cp /tmp/friends-only-design-audit:native-patches/.tools/morphe-desktop-1.18.1-all.jar \
+  DesignDexAudit /path/to/local-alpha8.apk /path/to/design-alpha1.apk
+```
+
+Local output SHA-256: `58741552bd80184c19389a5588c0b59b0648ebe324cbec9eaddba2c6728c27aa`;
+size **252,892,566 bytes**. This local signature is separate from the CI signature.
+Machine-readable evidence: [native-design-2026-10-18.json](evidence/native-design-2026-10-18.json).
+
+**No phone test has been run for 0.4.0-alpha.1.** Opening, welcome handoff,
+authentication, actual appearance/coverage, Story reply, individual/group Direct,
+following-only coverage, video gestures/loop and accessibility remain unverified.
+Historical success opening alpha.6 does not verify this changed launcher/design.
+
+GitHub [run 78](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766) succeeded on the same source revision, with the same
+**167 Python tests / 897 Java+Kotlin assertions / 11 applied patches** confirmed
+from its completed logs. [APK artifact 12133549996](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996) is
+`friends-only-personal-test-apk-78`, containing `friends-only-personal.apk`. Its
+**ZIP artifact digest**, reported by GitHub, is
+`sha256:1a8541166a6bde36f1602d867a8d478fc3ed1b4915bc735b9f1cdbbb5fe8351d`
+(228,139,589 ZIP bytes); this is not the contained APK's SHA-256. The report
+artifact was published too, but its download redirect returned HTTP 403 from
+this execution environment, so no CI APK file hash or signer was copied from it.
+The local APK hash above is explicitly separate. No emulator or physical-phone
+check ran in this workflow.

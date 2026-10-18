@@ -1,0 +1,210 @@
+name: Native patches
+
+on:
+  push:
+    branches: [main, feature/native-apk-patches]
+    paths:
+      - 'native-patches/**'
+      - '.github/workflows/native-patches.yml'
+  pull_request:
+    paths:
+      - 'native-patches/**'
+      - '.github/workflows/native-patches.yml'
+  workflow_dispatch:
+    inputs:
+      base_apk_url:
+        description: 'Optional original APK or APKM HTTPS URL (public input; no tokens)'
+        required: false
+        type: string
+      base_sha256:
+        description: 'Original APK/APKM file SHA-256 (required when URL is given)'
+        required: false
+        type: string
+      base_signer_sha256:
+        description: 'Independently trusted original certificate SHA-256'
+        required: false
+        type: string
+      run_install_smoke:
+        description: 'Also try an API 35 emulator install (no launch; infrastructure failure fails the job)'
+        required: false
+        type: boolean
+        default: false
+      existing_native_smoke:
+        description: 'Test a selected existing APK on API 37 instead of building a new bundle or APK'
+        required: false
+        type: boolean
+        default: false
+      existing_native_source_run_id:
+        description: 'Run ID containing the existing native APK artifact (used only for existing APK check)'
+        required: false
+        type: string
+        default: '38968571288'
+      existing_native_artifact_name:
+        description: 'Exact existing personal APK artifact name (used only for existing APK check)'
+        required: false
+        type: string
+        default: 'friends-only-personal-test-apk-17'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-patches-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    if: github.event_name != 'workflow_dispatch' || inputs.existing_native_smoke != true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Install pinned Android tools
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build native bundle and run checks
+        run: python3 native-patches/scripts/build.py --check
+      - name: Upload patch bundle (not an APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: friends-only-native-patches-${{ github.run_number }}
+          path: native-patches/build/friends-only.mpp
+          if-no-files-found: error
+          retention-days: 30
+      - name: Validate optional manual inputs
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          BASE_APK_URL: ${{ inputs.base_apk_url }}
+          BASE_SHA256: ${{ inputs.base_sha256 }}
+          BASE_SIGNER_SHA256: ${{ inputs.base_signer_sha256 }}
+        shell: python
+        run: |
+          import os, re, urllib.parse
+          fields = [os.environ[name] for name in ('BASE_APK_URL', 'BASE_SHA256', 'BASE_SIGNER_SHA256')]
+          if any(fields):
+              if not all(fields):
+                  raise SystemExit('Supply all three APK/APKM inputs or leave all empty.')
+              url = urllib.parse.urlsplit(fields[0])
+              if url.scheme != 'https' or not url.hostname or url.username or url.password or url.fragment:
+                  raise SystemExit('Use a credential-free HTTPS URL without a fragment.')
+              for value in fields[1:]:
+                  if not re.fullmatch(r'[0-9A-Fa-f]{64}', value):
+                      raise SystemExit('Expected SHA-256 inputs: 64 hexadecimal digits.')
+      - name: Download manually supplied original APK or APKM
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        env:
+          BASE_APK_URL: ${{ inputs.base_apk_url }}
+          BASE_APK_PATH: ${{ runner.temp }}/friends-only-input/original.apk
+        run: python3 native-patches/scripts/download.py --url "$BASE_APK_URL" --output "$BASE_APK_PATH"
+      - name: Prepare optional stable personal signing key
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        env:
+          KEYSTORE_B64: ${{ secrets.FRIENDS_ONLY_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.FRIENDS_ONLY_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.FRIENDS_ONLY_KEY_ALIAS }}
+        shell: python
+        run: |
+          import base64, os, pathlib
+          values = [os.environ[name] for name in ('KEYSTORE_B64', 'KEYSTORE_PASSWORD', 'KEY_ALIAS')]
+          if any(values):
+              if not all(values):
+                  raise SystemExit('Set all three signing secrets or none.')
+              path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'friends-only-signing.p12'
+              path.write_bytes(base64.b64decode(values[0], validate=True))
+              path.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'], 'a') as target:
+                  target.write('FRIENDS_ONLY_KEYSTORE_PATH=' + str(path) + '\n')
+      - name: Validate input, merge if needed, apply and sign personal APK
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        env:
+          BASE_APK_PATH: ${{ runner.temp }}/friends-only-input/original.apk
+          BASE_SHA256: ${{ inputs.base_sha256 }}
+          BASE_SIGNER_SHA256: ${{ inputs.base_signer_sha256 }}
+          FRIENDS_ONLY_KEYSTORE_PASSWORD: ${{ secrets.FRIENDS_ONLY_KEYSTORE_PASSWORD }}
+          FRIENDS_ONLY_KEY_ALIAS: ${{ secrets.FRIENDS_ONLY_KEY_ALIAS }}
+        run: >-
+          python3 native-patches/scripts/apply.py
+          --apk "$BASE_APK_PATH" --sha256 "$BASE_SHA256" --signer-sha256 "$BASE_SIGNER_SHA256"
+          --patch-bundle native-patches/build/friends-only.mpp
+          --output native-patches/build/friends-only-personal.apk
+          --report native-patches/reports/apply-report.json
+      - name: Upload statically validated personal test APK
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.base_apk_url != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: friends-only-personal-test-apk-${{ github.run_number }}
+          path: native-patches/build/friends-only-personal.apk
+          if-no-files-found: error
+          retention-days: 7
+      - name: Prepare optional emulator image (one download retry)
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != '' && inputs.run_install_smoke == true
+        shell: bash
+        run: |
+          mkdir -p native-patches/reports
+          df -h / | tee native-patches/reports/emulator-disk-before.txt
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android/sdk/ndk
+          df -h / | tee native-patches/reports/emulator-disk-after.txt
+          if ! sdkmanager 'system-images;android-35;google_apis;x86_64' 2>&1 | tee native-patches/reports/emulator-image-download.txt; then
+            sdkmanager 'system-images;android-35;google_apis;x86_64' 2>&1 | tee native-patches/reports/emulator-image-retry.txt
+          fi
+      - name: Enable KVM for the optional installation check
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != '' && inputs.run_install_smoke == true
+        run: sudo chmod a+rw /dev/kvm
+      - name: Install-only smoke check (API 35 emulator; no app launch)
+        if: github.event_name == 'workflow_dispatch' && inputs.base_apk_url != '' && inputs.run_install_smoke == true
+        timeout-minutes: 15
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 2
+          ram-size: 2048M
+          disable-linux-hw-accel: false
+          disable-animations: true
+          emulator-boot-timeout: 420
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: |
+            mkdir -p native-patches/reports
+            adb shell getprop ro.build.version.sdk > native-patches/reports/emulator-sdk.txt
+            adb shell getprop ro.build.version.release > native-patches/reports/emulator-android-release.txt
+            adb shell getprop ro.product.cpu.abilist > native-patches/reports/emulator-abis.txt
+            python3 -c "from pathlib import Path; assert Path('native-patches/reports/emulator-sdk.txt').read_text().strip() == '35', 'Expected an API 35 emulator'; assert 'arm64-v8a' in Path('native-patches/reports/emulator-abis.txt').read_text().strip().split(','), 'System image does not advertise arm64-v8a support; install result would not test this APK'"
+            bash -euo pipefail -c 'adb install --no-streaming native-patches/build/friends-only-personal.apk 2>&1 | tee native-patches/reports/emulator-install.txt'
+      - name: Upload check reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-patch-reports-${{ github.run_number }}
+          path: native-patches/reports/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Remove original input and personal signing material
+        if: always()
+        shell: python
+        run: |
+          import os, pathlib, shutil
+          temporary = pathlib.Path(os.environ['RUNNER_TEMP'])
+          shutil.rmtree(temporary / 'friends-only-input', ignore_errors=True)
+          (temporary / 'friends-only-signing.p12').unlink(missing_ok=True)
+  install-existing-native:
+    if: github.event_name == 'workflow_dispatch' && inputs.existing_native_smoke == true
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/native-install-smoke.yml
+    with:
+      source_run_id: ${{ inputs.existing_native_source_run_id }}
+      artifact_name: ${{ inputs.existing_native_artifact_name }}
+      android_api: '37.0'

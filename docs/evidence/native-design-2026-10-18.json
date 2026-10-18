@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "version": "0.4.0-alpha.1",
+  "source_commit": "d21cbf68ce53ac27e2e33e28ba62f6cfa0192e5b",
+  "implementation_scope": "First design iteration; welcome/settings are own screens, feed/Direct/profile are scoped styling over native components.",
+  "unit_checks": {
+    "python_tests": 167,
+    "java_assertions": 389,
+    "kotlin_assertions": 508,
+    "total_java_kotlin_assertions": 897,
+    "status": "passed"
+  },
+  "original_and_emitted_design_contract_audit": {
+    "status": "passed",
+    "assertions_including_reused_fixtures": 70,
+    "is_android_runtime_test": false
+  },
+  "native_method_diff": {
+    "status": "passed",
+    "baseline": "local 0.3.0-alpha.8 APK",
+    "baseline_sha256": "0cb7f7b9ba7fe19db98b7c9a6ac0e454e46381e51f85730b22aa6d0d5f23df6c",
+    "native_methods_compared": 861788,
+    "changed_methods": [
+      "LX/01Mq;->inflate(ILandroid/view/ViewGroup;Z)Landroid/view/View;",
+      "LX/0A3y;->inflate(ILandroid/view/ViewGroup;Z)Landroid/view/View;",
+      "LX/07bY;-><init>(Landroid/view/View;)V"
+    ],
+    "original_assets_preserved": 3166,
+    "native_libraries_preserved": 18
+  },
+  "bundle": {
+    "file": "friends-only.mpp",
+    "sha256": "22edf3abab9347107a9cd367dbc2a0a2ff6c3c88e841bcf4827b3ec8d0dfc3ea",
+    "size_bytes": 270545
+  },
+  "patches": [
+    "Friends Only native controls",
+    "Friends Only discovery blocking",
+    "Friends Only app identity",
+    "Friends Only feed video taps",
+    "Friends Only following feed",
+    "Friends Only quiet visual theme",
+    "Friends Only Reels navigation",
+    "Friends Only local settings",
+    "Friends Only feed hold speed",
+    "Friends Only feed video loop",
+    "Friends Only native design"
+  ],
+  "local_apk": {
+    "sha256": "58741552bd80184c19389a5588c0b59b0648ebe324cbec9eaddba2c6728c27aa",
+    "size_bytes": 252892566,
+    "signer_sha256": "87451907e0cb787f8a16c914673ed8566686ef6d1b5b0a5539d7dceb3b5f7f71",
+    "design_assets": {
+      "font": "Manrope",
+      "license": "SIL Open Font License 1.1",
+      "verified_assets": 2,
+      "asset_hashes_verified": true,
+      "rendered_ui_test": "not_run"
+    },
+    "theme_color_resources": {
+      "status": "passed",
+      "semantic_style_count": 7,
+      "semantic_attribute_reference_count": 47,
+      "palette_color_resource_count": 14,
+      "palette_colors": {
+        "friends_only_dark_button": {
+          "resource_id": "0x7f0604ce",
+          "argb": "0xff375a49"
+        },
+        "friends_only_dark_canvas": {
+          "resource_id": "0x7f0604c8",
+          "argb": "0xff151a17"
+        },
+        "friends_only_dark_elevated": {
+          "resource_id": "0x7f0604ca",
+          "argb": "0xff29312b"
+        },
+        "friends_only_dark_link": {
+          "resource_id": "0x7f0604cd",
+          "argb": "0xffc0cfc4"
+        },
+        "friends_only_dark_secondary_text": {
+          "resource_id": "0x7f0604cc",
+          "argb": "0xffb3bdb5"
+        },
+        "friends_only_dark_surface": {
+          "resource_id": "0x7f0604c9",
+          "argb": "0xff202722"
+        },
+        "friends_only_dark_text": {
+          "resource_id": "0x7f0604cb",
+          "argb": "0xfff2f3ee"
+        },
+        "friends_only_light_button": {
+          "resource_id": "0x7f0604c7",
+          "argb": "0xff344d43"
+        },
+        "friends_only_light_canvas": {
+          "resource_id": "0x7f0604c1",
+          "argb": "0xfff8f7f4"
+        },
+        "friends_only_light_elevated": {
+          "resource_id": "0x7f0604c3",
+          "argb": "0xffffffff"
+        },
+        "friends_only_light_link": {
+          "resource_id": "0x7f0604c6",
+          "argb": "0xff344d43"
+        },
+        "friends_only_light_secondary_text": {
+          "resource_id": "0x7f0604c5",
+          "argb": "0xff626b65"
+        },
+        "friends_only_light_surface": {
+          "resource_id": "0x7f0604c2",
+          "argb": "0xffedeee9"
+        },
+        "friends_only_light_text": {
+          "resource_id": "0x7f0604c4",
+          "argb": "0xff242b27"
+        }
+      },
+      "compiled_color_reference_contract": "TYPE_REFERENCE to nonzero own color resource IDs"
+    }
+  },
+  "package": "dev.friendsonly.instagram",
+  "version_code": 385806743,
+  "github": {
+    "run_id": 39120305766,
+    "run_number": 78,
+    "status": "success",
+    "source_commit": "d21cbf68ce53ac27e2e33e28ba62f6cfa0192e5b",
+    "run_url": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766",
+    "apk_artifact_id": 12133549996,
+    "apk_artifact_name": "friends-only-personal-test-apk-78",
+    "apk_download": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996",
+    "apk_zip_size_bytes": 228139589,
+    "apk_zip_digest": "sha256:1a8541166a6bde36f1602d867a8d478fc3ed1b4915bc735b9f1cdbbb5fe8351d",
+    "report_artifact_id": 12133589855,
+    "bundle_artifact_id": 12133768408,
+    "tests_confirmed_from_completed_logs": true,
+    "python_tests": 167,
+    "java_kotlin_assertions": 897,
+    "patch_count": 11,
+    "ci_apk_file_sha256": null,
+    "ci_report_download": "Artifact published; downloading its redirect from this environment returned HTTP 403. CI success and counts were confirmed through GitHub run metadata/logs. The local APK hash is not presented as the CI APK file hash."
+  },
+  "phone_tests": {
+    "opening": "not_run",
+    "rendering": "not_run",
+    "authentication": "not_run",
+    "stories": "not_run",
+    "direct_send_and_groups": "not_run",
+    "following_coverage": "not_run",
+    "video_controls": "not_run",
+    "accessibility": "not_run"
+  },
+  "not_implemented": [
+    "Separate vertical Stories list and Posts/Stories switch",
+    "Complete profile grid replacement",
+    "Completely redrawn chat/Story/group-detail/composer layouts",
+    "Square avatars across all native variants",
+    "Global theme selector and native session logout in own settings"
+  ],
+  "signing": "Local and CI disposable keys differ; upgrading from another key requires removing only old Friends Only, clearing its local session/settings."
+}

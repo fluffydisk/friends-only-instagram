@@ -1,0 +1,38 @@
+{
+  "wordmark-xhdpi.webp": {
+    "size": 1326,
+    "sha256": "eb5f9f8c09b942b9ead31275cd3690996f10f5ce99a2b10d7cf36cde26713cf6",
+    "crc32": 2258827097,
+    "dimensions": [
+      233,
+      66
+    ]
+  },
+  "wordmark-night-xhdpi.webp": {
+    "size": 1326,
+    "sha256": "e33fc27e96b54eed60acd24af088f34f163a1a104bec7c8de8007d0ffbb36cab",
+    "crc32": 2996063434,
+    "dimensions": [
+      233,
+      66
+    ]
+  },
+  "wordmark-xxhdpi.webp": {
+    "size": 2030,
+    "sha256": "291daa7e722499fb4d83aa3e5e4881602a324851379f2fcbad2d6579b0e14461",
+    "crc32": 4205957069,
+    "dimensions": [
+      349,
+      99
+    ]
+  },
+  "wordmark-night-xxhdpi.webp": {
+    "size": 2030,
+    "sha256": "f6e6076f8197326665788f6ff6fdac791a15a9ffa5e6856ecfe30358609c1789",
+    "crc32": 3019413105,
+    "dimensions": [
+      349,
+      99
+    ]
+  }
+}

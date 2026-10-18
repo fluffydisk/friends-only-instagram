@@ -1,0 +1,57 @@
+name: Install diagnostics APK
+
+on:
+  push:
+    branches: [main, feature/native-apk-patches]
+    paths:
+      - 'install-diagnostics/**'
+      - 'settings.gradle.kts'
+      - '.github/workflows/install-diagnostics.yml'
+  pull_request:
+    paths:
+      - 'install-diagnostics/**'
+      - 'settings.gradle.kts'
+      - '.github/workflows/install-diagnostics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: install-diagnostics-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Install Android build tools
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Test, lint and build diagnostics APK
+        run: ./gradlew --no-daemon :install-diagnostics:testDebugUnitTest :install-diagnostics:lintDebug :install-diagnostics:assembleDebug
+      - name: Upload diagnostics APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: friends-only-install-diagnostics-${{ github.run_number }}
+          path: install-diagnostics/build/outputs/apk/debug/install-diagnostics-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload check reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-diagnostics-reports-${{ github.run_number }}
+          path: install-diagnostics/build/reports/
+          if-no-files-found: ignore
+          retention-days: 14

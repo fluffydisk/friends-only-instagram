@@ -1,0 +1,973 @@
+{
+  "schema_version": 1,
+  "version": "0.3.0-alpha.7",
+  "date_utc": "2026-10-18",
+  "source_commit": "20d2bffbf0a0761d2ff14cc8c69975514f92f41b",
+  "application": {
+    "version": "0.3.0-alpha.7",
+    "package_name": "dev.friendsonly.instagram",
+    "application_label": "Friends Only",
+    "output_version_code": 385806741
+  },
+  "trigger": "User confirms current app opens, but horizontal Home swipe still reaches Reels. Requests permanent Reels removal, minimal Friends Only settings/chrome and in-place feed-video hold-to-2x.",
+  "changes": {
+    "navigation": "Shared native tab factory returns FEED/DIRECT/PROFILE at startup and refresh; default FEED; two selection entry points normalize other destinations to Home. Horizontal touch dispatch and carousel handling unchanged.",
+    "viewer": "All three supported central Reels launchers return immediately for every source, including modal-from-Direct and result-returning variants. Reels links in chats cannot open the immersive viewer.",
+    "settings": "Exact native own-profile overflow A2V branch and native Settings action open own local dialog. Other-person profile report/follow/block paths preserved. No generic profile_menu view listener replacement.",
+    "local_preferences": "Only following_only remains, default on. Legacy discovery/appearance/filter-disable preferences cannot restore Reels/Explore/Create or original chrome.",
+    "appearance": "Retains own alpha6 name/icon/Home shell/neutral light-dark palette. Existing bounded chrome scan also hides two exact promotional control IDs when encountered; no content-list traversal or blanket string replacement.",
+    "speed": "Enables existing dedicated feed-speed gate plus three local 2x result values and center holds; live-playing/matching-media checks and native 1x release/cancel/recycle/background reset preserved.",
+    "no_new_backend_permissions_credential_forms_scraping_or_account_data_collection": true
+  },
+  "checks": {
+    "bundle_build": "passed",
+    "python_tests": 163,
+    "java_assertions": {
+      "focus": 97,
+      "feed": 32,
+      "chrome": 26
+    },
+    "kotlin_assertions": {
+      "identity": 26,
+      "tap": 46,
+      "following": 35,
+      "theme": 145,
+      "navigation": 32,
+      "settings": 63,
+      "speed": 56
+    },
+    "actual_source_additional_assertions": {
+      "navigation": 5,
+      "viewer": 2,
+      "speed": 5
+    },
+    "actual_source_settings_unique_matches": 2,
+    "final_apk_static_dex_analysis": {
+      "critical_native_methods": 12,
+      "injected_runtime_and_home_parser_methods": 137,
+      "failures": 0,
+      "runtime_test": false
+    },
+    "full_local_apk": "passed_including_mandatory_identity_signature_alignment_and_theme_output_checks",
+    "physical_alpha7_install_startup_swipe_settings_speed_stories_dm_and_following": "not_tested",
+    "prior_alpha6_current_app_opening": "user_reported; exact installed binary hash not independently verified",
+    "full_github_apk": "passed",
+    "ci_metrics_confirmed_from_actual_completed_job_logs": true
+  },
+  "patch_bundle": {
+    "file": "friends-only.mpp",
+    "sha256": "c924c70f00ba8e5cba924076c42edd827a9d0e83b2ed60f29384b86f5e2e48bf",
+    "size_bytes": 155247
+  },
+  "applied_patches": [
+    "Friends Only native controls",
+    "Friends Only discovery blocking",
+    "Friends Only app identity",
+    "Friends Only feed video taps",
+    "Friends Only following feed",
+    "Friends Only quiet visual theme",
+    "Friends Only Reels navigation",
+    "Friends Only local settings",
+    "Friends Only feed hold speed"
+  ],
+  "local_output": {
+    "manifest": {
+      "package": "dev.friendsonly.instagram",
+      "version_name": "451.0.0.20.80",
+      "version_code": "385806741",
+      "native_abis": [
+        "arm64-v8a"
+      ]
+    },
+    "sha256": "97cc5aafd613fc14c18993d9bfb19079f4a9ccb4528ed37e12211e9252d8f227",
+    "size_bytes": 252810488,
+    "signer_sha256": "38557b644c06dc2d5cae087bc65244bcd575daba4ba5405c51a38c60be01a6a7",
+    "extension_present": true,
+    "manifest_namespace_order": "valid",
+    "application_identity": {
+      "package": "dev.friendsonly.instagram",
+      "application_label": "Friends Only",
+      "launcher_and_localized_labels_checked": 102,
+      "manifest_launchers": [
+        "com.instagram.android.activity.MainTabActivity"
+      ],
+      "own_provider_authorities": [
+        "dev.friendsonly.instagram.androidx-startup",
+        "dev.friendsonly.instagram.baselcontext",
+        "dev.friendsonly.instagram.contentprovider.users.loggedinusers",
+        "dev.friendsonly.instagram.hatch.chat.files",
+        "dev.friendsonly.instagram.hatch.files",
+        "dev.friendsonly.instagram.provider.AccessLibraryContentProvider",
+        "dev.friendsonly.instagram.provider.phoneid",
+        "dev.friendsonly.instagram.provider.phoneid_lite",
+        "dev.friendsonly.instagram.securefileprovider",
+        "dev.friendsonly.instagram_com.instagram.barcelona.feed.crossapp.contentprovider.ThreadsContentProvider",
+        "dev.friendsonly.instagram_com.instagram.barcelonaig.deferreddeeplink.TixuDeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.barcelonaig.tixu.directtransfer.TixuDirectTransferProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredCurrentUserProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.FamilyAppsUserValuesProvider",
+        "dev.friendsonly.instagram_com.instagram.contentprovider.InstallReferrerProvider",
+        "dev.friendsonly.instagram_com.instagram.creation.drafts.contentprovider.ClipsDraftProvider",
+        "dev.friendsonly.instagram_com.instagram.fileprovider",
+        "dev.friendsonly.instagram_com.instagram.foabackuptoken.FoaBackupTokenProvider",
+        "dev.friendsonly.instagram_com.instagram.growth.xav.fifudeferreddeeplink.FifuDeferredDeeplinkProvider",
+        "dev.friendsonly.instagram_com.instagram.liteprovider.FirstPartyUserValuesLiteProviderV2",
+        "dev.friendsonly.instagram_com.instagram.liteprovider.usdid.UsdidValuesProvider",
+        "dev.friendsonly.instagram_com.instagram.quicksnap.seenstate"
+      ],
+      "own_permission_definitions": [
+        "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+        "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+        "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+      ],
+      "own_permission_references": [
+        "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+        "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+        "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+      ]
+    },
+    "theme_color_resources": {
+      "status": "passed",
+      "semantic_style_count": 7,
+      "semantic_attribute_reference_count": 47,
+      "palette_color_resource_count": 14,
+      "palette_colors": {
+        "friends_only_dark_button": {
+          "resource_id": "0x7f0604ce",
+          "argb": "0xff375a49"
+        },
+        "friends_only_dark_canvas": {
+          "resource_id": "0x7f0604c8",
+          "argb": "0xff151a17"
+        },
+        "friends_only_dark_elevated": {
+          "resource_id": "0x7f0604ca",
+          "argb": "0xff29312b"
+        },
+        "friends_only_dark_link": {
+          "resource_id": "0x7f0604cd",
+          "argb": "0xffc0cfc4"
+        },
+        "friends_only_dark_secondary_text": {
+          "resource_id": "0x7f0604cc",
+          "argb": "0xffb3bdb5"
+        },
+        "friends_only_dark_surface": {
+          "resource_id": "0x7f0604c9",
+          "argb": "0xff202722"
+        },
+        "friends_only_dark_text": {
+          "resource_id": "0x7f0604cb",
+          "argb": "0xfff2f3ee"
+        },
+        "friends_only_light_button": {
+          "resource_id": "0x7f0604c7",
+          "argb": "0xff344d43"
+        },
+        "friends_only_light_canvas": {
+          "resource_id": "0x7f0604c1",
+          "argb": "0xfff8f7f4"
+        },
+        "friends_only_light_elevated": {
+          "resource_id": "0x7f0604c3",
+          "argb": "0xffffffff"
+        },
+        "friends_only_light_link": {
+          "resource_id": "0x7f0604c6",
+          "argb": "0xff344d43"
+        },
+        "friends_only_light_secondary_text": {
+          "resource_id": "0x7f0604c5",
+          "argb": "0xff626b65"
+        },
+        "friends_only_light_surface": {
+          "resource_id": "0x7f0604c2",
+          "argb": "0xffedeee9"
+        },
+        "friends_only_light_text": {
+          "resource_id": "0x7f0604c4",
+          "argb": "0xff242b27"
+        }
+      },
+      "compiled_color_reference_contract": "TYPE_REFERENCE to nonzero own color resource IDs"
+    }
+  },
+  "final_local_compiled_resource_audit": {
+    "schema_version": 1,
+    "status": "passed",
+    "scope": "Read-only compiled ARSC color-resource contract audit, not device startup test",
+    "apk": "native-patches/private/friends-only-native-0.3.0-alpha.7.apk",
+    "sha256": "97cc5aafd613fc14c18993d9bfb19079f4a9ccb4528ed37e12211e9252d8f227",
+    "semantic_reference_count": 47,
+    "own_allocated_color_count": 14,
+    "source_color_ids_and_values_preserved": 1097,
+    "own_palette_ids": {
+      "friends_only_light_canvas": "0x7f0604c1",
+      "friends_only_light_surface": "0x7f0604c2",
+      "friends_only_light_elevated": "0x7f0604c3",
+      "friends_only_light_text": "0x7f0604c4",
+      "friends_only_light_secondary_text": "0x7f0604c5",
+      "friends_only_light_link": "0x7f0604c6",
+      "friends_only_light_button": "0x7f0604c7",
+      "friends_only_dark_canvas": "0x7f0604c8",
+      "friends_only_dark_surface": "0x7f0604c9",
+      "friends_only_dark_elevated": "0x7f0604ca",
+      "friends_only_dark_text": "0x7f0604cb",
+      "friends_only_dark_secondary_text": "0x7f0604cc",
+      "friends_only_dark_link": "0x7f0604cd",
+      "friends_only_dark_button": "0x7f0604ce"
+    },
+    "references": [
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604cd",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsDark",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604ce",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c1",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c2",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604c3",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604c4",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604c5",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604c6",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "BDSSemanticColorsLight",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604c7",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismGrayOverridesDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604cd",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentDark",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604ce",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c1",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c2",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604c3",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604c4",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604c5",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604c6",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsPrismSemanticColorsExperimentLight",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604c7",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c8",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c9",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604ca",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604cb",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604cc",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604cd",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsDark",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604ce",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_primary_background",
+        "resource_id": "0x7f0604c1",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_secondary_background",
+        "resource_id": "0x7f0604c2",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_elevated_background",
+        "resource_id": "0x7f0604c3",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_primary_text",
+        "resource_id": "0x7f0604c4",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_secondary_text",
+        "resource_id": "0x7f0604c5",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_link",
+        "resource_id": "0x7f0604c6",
+        "typed_value": "TYPE_REFERENCE"
+      },
+      {
+        "style": "IgdsSemanticColorsLight",
+        "attribute": "igds_color_primary_button",
+        "resource_id": "0x7f0604c7",
+        "typed_value": "TYPE_REFERENCE"
+      }
+    ],
+    "native_contract": "LX/00RQ.A0b(Context,I) returns TypedValue.resourceId; InstagramMainActivity.A1y passes it to Context.getColor(I)",
+    "device_startup": "not_tested"
+  },
+  "final_local_native_dex_audit": {
+    "audit": "Independent alpha.7 final-APK native navigation, launcher, settings and speed audit",
+    "apk_sha256": "97cc5aafd613fc14c18993d9bfb19079f4a9ccb4528ed37e12211e9252d8f227",
+    "compared_native_classes": [
+      "LX/06b1;",
+      "LX/00PT;",
+      "LX/00QI;",
+      "LX/07Z1;",
+      "LX/05b6;",
+      "LX/07JA;",
+      "LX/0AU6;",
+      "LX/01zY;",
+      "LX/00PU;",
+      "LX/00QJ;"
+    ],
+    "modified_native_methods": {
+      "LX/06b1;->A06": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 0,
+        "inserted_output_indices": [],
+        "output_register_count": 33,
+        "replaced_instruction_indices": [
+          110,
+          727,
+          92,
+          708
+        ],
+        "source_register_count": 33
+      },
+      "LX/00PT;->A05": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 7,
+        "inserted_output_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "output_register_count": 15,
+        "replaced_instruction_indices": [],
+        "source_register_count": 15
+      },
+      "LX/07Z1;->A02": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 4,
+        "inserted_output_indices": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "output_register_count": 12,
+        "replaced_instruction_indices": [],
+        "source_register_count": 12
+      },
+      "LX/05b6;->A0C": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 1,
+        "inserted_output_indices": [
+          0
+        ],
+        "output_register_count": 17,
+        "replaced_instruction_indices": [],
+        "source_register_count": 17
+      },
+      "LX/05b6;->A0D": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 1,
+        "inserted_output_indices": [
+          0
+        ],
+        "output_register_count": 14,
+        "replaced_instruction_indices": [],
+        "source_register_count": 14
+      },
+      "LX/05b6;->A0E": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 1,
+        "inserted_output_indices": [
+          0
+        ],
+        "output_register_count": 14,
+        "replaced_instruction_indices": [],
+        "source_register_count": 14
+      },
+      "LX/07JA;->A00": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 0,
+        "inserted_output_indices": [],
+        "output_register_count": 3,
+        "replaced_instruction_indices": [
+          7
+        ],
+        "source_register_count": 3
+      },
+      "LX/0AU6;->A02": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 5,
+        "inserted_output_indices": [
+          7,
+          3,
+          4,
+          5,
+          6
+        ],
+        "output_register_count": 47,
+        "replaced_instruction_indices": [],
+        "source_register_count": 47
+      },
+      "LX/00PU;->A01": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 2,
+        "inserted_output_indices": [
+          0,
+          1
+        ],
+        "output_register_count": 3,
+        "replaced_instruction_indices": [],
+        "source_register_count": 3
+      },
+      "LX/00PU;->A03": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 8,
+        "inserted_output_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "output_register_count": 7,
+        "replaced_instruction_indices": [],
+        "source_register_count": 7
+      },
+      "LX/00QJ;->A0B": {
+        "native_body_and_exception_controlflow_preserved": true,
+        "inserted_instruction_count": 7,
+        "inserted_output_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "output_register_count": 14,
+        "replaced_instruction_indices": [],
+        "source_register_count": 14
+      }
+    },
+    "other_native_methods_compared_unchanged": 99,
+    "dex_analyzer_differential": {
+      "LX/00PU;->A03": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/00PU;->A01": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/00PT;->A05": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/00QJ;->A0B": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/05b6;->A0C": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/05b6;->A0D": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/05b6;->A0E": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/07Z1;->A02": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/0AU6;->A02": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/06b1;->A06": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/07JA;->A00": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      },
+      "LX/01zY;->A01": {
+        "source": "passed",
+        "output": "passed",
+        "no_new_analysis_failure": true
+      }
+    },
+    "runtime_test": false,
+    "issues": [],
+    "status": "passed"
+  },
+  "feed_speed_source_contract": {
+    "schema_version": 1,
+    "status": "source_verified_host_tests_passed",
+    "source_version": "451.0.0.20.80",
+    "source_base_apk_sha256": "b217f08e3639a3a7b68e95720f1e580643518aa0f91ace8f76671b90f09963e5",
+    "feature": "native in-place feed-video hold 2x; release restores native 1x",
+    "patch_name": "Friends Only feed hold speed",
+    "handler": {
+      "method": "LX/06b1;->A06(Landroid/view/View;Lcom/instagram/feed/media/Media;LX/0A0J;LX/04cG;)V",
+      "registers": 33,
+      "source_instructions": 980,
+      "modified_instructions": 4,
+      "feature_gate_results": [
+        92,
+        110,
+        708
+      ],
+      "whole_surface_center_rejection": 727,
+      "feature_values_true": true,
+      "other_976_instructions_retained_in_order": true,
+      "native_2x_call": "LX/09bL;->A0M(F)V",
+      "native_2x_float_bits": "0x40000000",
+      "live_playing_media_identity_checks_preserved": true,
+      "native_exception_handler_preserved": true
+    },
+    "dedicated_feed_master": {
+      "method": "LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+      "experiment_key": 36326953648804544,
+      "modified_result_index": 7,
+      "source_instructions": 9,
+      "modified_instructions": 1,
+      "reason": "Enable existing feed gesture binding/state rendering and lifecycle reset consistently with native hold start",
+      "actual_call_sites": 11,
+      "additional_preload_class_refs": 1,
+      "calls": [
+        "classes2.dex LX/00CZ;->A0o(LX/04pF;)LX/04V5; index=791 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes2.dex LX/06b1;->A06(Landroid/view/View;Lcom/instagram/feed/media/Media;LX/0A0J;LX/04cG;)V index=72 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes2.dex LX/07Ah;->A07(LX/0AVy;LX/02V8;LX/0FaK;LX/06Fz;LX/07bX;I)V index=132 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes2.dex LX/07Ah;->A07(LX/0AVy;LX/02V8;LX/0FaK;LX/06Fz;LX/07bX;I)V index=163 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes2.dex LX/08xx;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; index=48 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes2.dex LX/09oi;->A0F(Ljava/lang/Object;)V index=17 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes2.dex LX/09rl;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; index=127 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes2.dex LX/09ye;->invoke(Ljava/lang/Object;)Ljava/lang/Object; index=67 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes4.dex LX/09SG;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; index=91 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes13.dex LX/0cml;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; index=123 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z",
+        "classes5.dex LX/0A9Z;->Fm2(LX/04cG;I)V index=88 LX/07JA;->A00(Lcom/instagram/common/session/UserSession;)Z"
+      ],
+      "shared_mobileconfig_getters_unchanged": true
+    },
+    "unchanged_native_reset": {
+      "method": "LX/01zY;->A01(LX/01zY;Z)Z",
+      "float_bits": "0x3f800000",
+      "native_1x_call": "LX/09bL;->A0M(F)V",
+      "atomic_active_state_cleared": true,
+      "held_media_and_view_refs_cleared": true,
+      "parent_intercept_released": true,
+      "release_path": "LX/07LA;->FUx(MotionEvent) [ACTION_UP=1/ACTION_CANCEL=3] -> FjN -> LX/06b1;->A09 -> LX/01zY;->A01",
+      "cancel_path": "LX/06Zv;->FjO -> LX/06b1;->A0A -> LX/01zY;->A01",
+      "recycle_path": "LX/02Af;->invoke [same media state identity] -> LX/01zY;->A01",
+      "lifecycle_path": "LX/09oi;->A0F -> enabled dedicated feed master -> LX/01zY;->A01"
+    },
+    "tests": {
+      "kotlin_compile": "passed",
+      "synthetic_policy_assertions": 56,
+      "actual_source_additional_assertions": 5,
+      "total_actual_source_assertions": 61,
+      "actual_source_handler_match": "passed",
+      "actual_source_reset_match": "passed",
+      "actual_source_master_match": "passed",
+      "only_planned_instructions_changed": "passed"
+    },
+    "no_new_runtime_touch_listener": true,
+    "no_new_network_requests": true,
+    "no_speed_hooks_added_to_stories_direct_or_reels": true,
+    "device_test": "not_run",
+    "known_limits": [
+      "Existing native eligibility checks and live-player requirement remain; a paused/loading/unsupported video may not engage 2x.",
+      "Native reset returns to 1x; no separate feed speed menu or persistent playback rate added.",
+      "Physical touch scrolling/carousel/lifecycle behavior unverified on the Samsung device."
+    ],
+    "source_inspection_files": [
+      "alpha7-feed-video-actions.txt",
+      "alpha7-feedspeed-controller.txt",
+      "alpha7-feed-speed-masterrefs.txt",
+      "alpha7-feed-speed-othermasterrefs.txt",
+      "alpha7-master-caller-bodies.txt",
+      "alpha7-speed-touch-release.txt",
+      "alpha7-speed-touch-end.txt",
+      "alpha7-feed-recycle-reset.txt",
+      "alpha7-speed-lifecycle.txt"
+    ]
+  },
+  "limits": [
+    "Static contracts and successful APK builds do not prove Android17/Samsung touch or player behavior. No alpha7 phone test has been reported.",
+    "Original Instagram native service, networking, authentication/challenges/legal screens, permissions, tracking and platform terms remain. This is not an independent backend or a complete removal of every original surface/mark.",
+    "Strict following metadata can hide legitimate posts; the feed can be empty. Alternate/cache coverage and chronology are not established. Embedded non-post Story units may be filtered; top Stories playback/Direct sending/groups require separate device checks.",
+    "2x requires an eligible live-playing feed video; paused/loading/unsupported video may not engage. Native release restores1x.",
+    "Cloud clean builds use disposable signing keys until stable secrets are configured, requiring removal of only an older Friends Only install and clearing that local session/settings.",
+    "Legacy v2 installation diagnostic hardcodes com.instagram.android and is incompatible with the own-package build; use normal Android file-manager installation."
+  ],
+  "github_actions": {
+    "run_id": 39081645229,
+    "run_number": 67,
+    "source_commit": "20d2bffbf0a0761d2ff14cc8c69975514f92f41b",
+    "status": "success",
+    "apk_artifact_id": 12119595829,
+    "apk_artifact_name": "friends-only-personal-test-apk-67",
+    "apk_filename": "friends-only-personal.apk",
+    "apk_download": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829",
+    "report_artifact_id": 12118789205,
+    "patch_bundle_artifact_id": 12119021797,
+    "output": {
+      "manifest": {
+        "package": "dev.friendsonly.instagram",
+        "version_name": "451.0.0.20.80",
+        "version_code": "385806741",
+        "native_abis": [
+          "arm64-v8a"
+        ]
+      },
+      "sha256": "8957cf3641da10dbb9a22dbff7e9465017a86b173327f883018e6f783e8f4093",
+      "size_bytes": 253171054,
+      "signer_sha256": "37d3c01deba9d16d7f604cdcf23a71c5e0b66ad1d020f02cefd92c558a57deb3",
+      "extension_present": true,
+      "manifest_namespace_order": "valid",
+      "application_identity": {
+        "package": "dev.friendsonly.instagram",
+        "application_label": "Friends Only",
+        "launcher_and_localized_labels_checked": 102,
+        "manifest_launchers": [
+          "com.instagram.android.activity.MainTabActivity"
+        ],
+        "own_provider_authorities": [
+          "dev.friendsonly.instagram.androidx-startup",
+          "dev.friendsonly.instagram.baselcontext",
+          "dev.friendsonly.instagram.contentprovider.users.loggedinusers",
+          "dev.friendsonly.instagram.hatch.chat.files",
+          "dev.friendsonly.instagram.hatch.files",
+          "dev.friendsonly.instagram.provider.AccessLibraryContentProvider",
+          "dev.friendsonly.instagram.provider.phoneid",
+          "dev.friendsonly.instagram.provider.phoneid_lite",
+          "dev.friendsonly.instagram.securefileprovider",
+          "dev.friendsonly.instagram_com.instagram.barcelona.feed.crossapp.contentprovider.ThreadsContentProvider",
+          "dev.friendsonly.instagram_com.instagram.barcelonaig.deferreddeeplink.TixuDeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.barcelonaig.tixu.directtransfer.TixuDirectTransferProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredCurrentUserProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.DeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.FamilyAppsUserValuesProvider",
+          "dev.friendsonly.instagram_com.instagram.contentprovider.InstallReferrerProvider",
+          "dev.friendsonly.instagram_com.instagram.creation.drafts.contentprovider.ClipsDraftProvider",
+          "dev.friendsonly.instagram_com.instagram.fileprovider",
+          "dev.friendsonly.instagram_com.instagram.foabackuptoken.FoaBackupTokenProvider",
+          "dev.friendsonly.instagram_com.instagram.growth.xav.fifudeferreddeeplink.FifuDeferredDeeplinkProvider",
+          "dev.friendsonly.instagram_com.instagram.liteprovider.FirstPartyUserValuesLiteProviderV2",
+          "dev.friendsonly.instagram_com.instagram.liteprovider.usdid.UsdidValuesProvider",
+          "dev.friendsonly.instagram_com.instagram.quicksnap.seenstate"
+        ],
+        "own_permission_definitions": [
+          "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+          "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+          "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+        ],
+        "own_permission_references": [
+          "dev.friendsonly.instagram.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "dev.friendsonly.instagram.permission.CROSS_PROCESS_BROADCAST_MANAGER",
+          "dev.friendsonly.instagram.permission.RECEIVE_ADM_MESSAGE",
+          "dev.friendsonly.instagram.permission.SYSTEM_ONLY"
+        ]
+      },
+      "theme_color_resources": {
+        "status": "passed",
+        "semantic_style_count": 7,
+        "semantic_attribute_reference_count": 47,
+        "palette_color_resource_count": 14,
+        "palette_colors": {
+          "friends_only_dark_button": {
+            "resource_id": "0x7f0604ce",
+            "argb": "0xff375a49"
+          },
+          "friends_only_dark_canvas": {
+            "resource_id": "0x7f0604c8",
+            "argb": "0xff151a17"
+          },
+          "friends_only_dark_elevated": {
+            "resource_id": "0x7f0604ca",
+            "argb": "0xff29312b"
+          },
+          "friends_only_dark_link": {
+            "resource_id": "0x7f0604cd",
+            "argb": "0xffc0cfc4"
+          },
+          "friends_only_dark_secondary_text": {
+            "resource_id": "0x7f0604cc",
+            "argb": "0xffb3bdb5"
+          },
+          "friends_only_dark_surface": {
+            "resource_id": "0x7f0604c9",
+            "argb": "0xff202722"
+          },
+          "friends_only_dark_text": {
+            "resource_id": "0x7f0604cb",
+            "argb": "0xfff2f3ee"
+          },
+          "friends_only_light_button": {
+            "resource_id": "0x7f0604c7",
+            "argb": "0xff344d43"
+          },
+          "friends_only_light_canvas": {
+            "resource_id": "0x7f0604c1",
+            "argb": "0xfff8f7f4"
+          },
+          "friends_only_light_elevated": {
+            "resource_id": "0x7f0604c3",
+            "argb": "0xffffffff"
+          },
+          "friends_only_light_link": {
+            "resource_id": "0x7f0604c6",
+            "argb": "0xff344d43"
+          },
+          "friends_only_light_secondary_text": {
+            "resource_id": "0x7f0604c5",
+            "argb": "0xff626b65"
+          },
+          "friends_only_light_surface": {
+            "resource_id": "0x7f0604c2",
+            "argb": "0xffedeee9"
+          },
+          "friends_only_light_text": {
+            "resource_id": "0x7f0604c4",
+            "argb": "0xff242b27"
+          }
+        },
+        "compiled_color_reference_contract": "TYPE_REFERENCE to nonzero own color resource IDs"
+      }
+    },
+    "patch_bundle_matches_local": true,
+    "binary_audit_scope": "Cloud pipeline independently ran mandatory output identity/signature/alignment/7-style47-reference14-palette guard. Full native comparison and preservation of1097 original colors were audited on local APK; full cloud APK bytes not downloaded here."
+  }
+}

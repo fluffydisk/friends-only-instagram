@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Friends Only Install Test</string>
+    <string name="explanation">Select the Friends Only Instagram APK you downloaded. This tool passes it locally to Android’s normal installer and records the exact installation result. Android will ask you to confirm installation. It does not access your account or connect to the Internet.</string>
+    <string name="choose_apk">Choose APK</string>
+    <string name="install_apk">Test installation</string>
+    <string name="allow_source">Allow installation from this tool</string>
+    <string name="source_explanation">Android must allow this app to request installations. Enable “Allow from this source” for this tool only, then return here. Other security settings do not need to change.</string>
+    <string name="confirm_installation">Continue Android confirmation</string>
+    <string name="cancel_installation">Cancel current test</string>
+    <string name="cancelling">Cancelling this tool’s current installation session…</string>
+    <string name="pending_recovery">This test is still awaiting Android confirmation. If the confirmation screen is unavailable, cancel this test before starting another.</string>
+    <string name="copy_result">Copy result</string>
+    <string name="share_result">Share result</string>
+    <string name="share_title">Share installation diagnostic</string>
+    <string name="copied">Diagnostic copied</string>
+    <string name="no_file">No APK selected</string>
+    <string name="file_details">%1$s · %2$s</string>
+    <string name="size_unknown">size unknown</string>
+    <string name="size_bytes">%1$d bytes</string>
+    <string name="no_result">No installation attempted yet. After the attempt, the diagnostic appears here. Nothing is sent automatically. Use Copy or Share to send it yourself.</string>
+    <string name="working">Copying APK to Android installer… %1$d MiB</string>
+    <string name="waiting">Waiting for Android’s installation result…</string>
+    <string name="pending">Android requires your confirmation. This is not an installation success.</string>
+    <string name="selected_invalid">Choose a single .apk file, not an .apkm, .apks or ZIP archive.</string>
+    <string name="file_too_large">APK must be between 1 byte and 1 GiB.</string>
+    <string name="file_unavailable">The selected file could not be read. Please choose it again.</string>
+    <string name="permission_unavailable">Android could not open the installation permission screen.</string>
+    <string name="confirmation_unavailable">Android’s confirmation screen could not open. Cancel the current test before starting another.</string>
+    <string name="local_error">The request could not reach Android’s installer. See the local diagnostic below.</string>
+    <string name="select_again">Select the downloaded APK to begin.</string>
+    <string name="privacy">The result includes device version, installer details, copied byte count and the APK’s SHA-256 fingerprint. File locations, passwords, chats, session cookies and account data are not read into the diagnostic.</string>
+</resources>

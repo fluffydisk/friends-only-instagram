@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "FriendsOnly"
 include(":app")
+include(":install-diagnostics")

@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Friends Only Kurulum Testi</string>
+    <string name="explanation">İndirdiğin Friends Only Instagram APK’sını seç. Bu araç dosyayı yalnızca telefonda Android’in standart yükleyicisine iletir ve tam kurulum sonucunu gösterir. Android kurulum için onayını ister. Araç hesabına erişmez ve internete bağlanmaz.</string>
+    <string name="choose_apk">APK seç</string>
+    <string name="install_apk">Kurulumu test et</string>
+    <string name="allow_source">Bu araçtan yüklemeye izin ver</string>
+    <string name="source_explanation">Android, bu uygulamanın kurulum istemesine izin verilmesini istiyor. Yalnızca bu araç için “Bu kaynaktan izin ver” seçeneğini açıp buraya dön. Diğer güvenlik ayarlarını değiştirmen gerekmez.</string>
+    <string name="confirm_installation">Android onayına devam et</string>
+    <string name="cancel_installation">Geçerli testi iptal et</string>
+    <string name="cancelling">Bu aracın geçerli kurulum oturumu iptal ediliyor…</string>
+    <string name="pending_recovery">Bu test hâlâ Android onayını bekliyor. Onay ekranına ulaşılamıyorsa yeni testten önce bu testi iptal et.</string>
+    <string name="copy_result">Sonucu kopyala</string>
+    <string name="share_result">Sonucu paylaş</string>
+    <string name="share_title">Kurulum tanısını paylaş</string>
+    <string name="copied">Tanı kopyalandı</string>
+    <string name="no_file">APK seçilmedi</string>
+    <string name="file_details">%1$s · %2$s</string>
+    <string name="size_unknown">boyut bilinmiyor</string>
+    <string name="size_bytes">%1$d bayt</string>
+    <string name="no_result">Henüz kurulum denenmedi. Denemeden sonra tanı burada görünür. Hiçbir veri otomatik gönderilmez. Göndermek için Kopyala veya Paylaş düğmesini kullan.</string>
+    <string name="working">APK, Android yükleyicisine kopyalanıyor… %1$d MiB</string>
+    <string name="waiting">Android’in kurulum sonucu bekleniyor…</string>
+    <string name="pending">Android onayını bekliyor. Bu durum kurulumun başarılı olduğu anlamına gelmez.</string>
+    <string name="selected_invalid">Tek bir .apk dosyası seç; .apkm, .apks veya ZIP arşivi seçme.</string>
+    <string name="file_too_large">APK boyutu 1 bayt ile 1 GiB arasında olmalı.</string>
+    <string name="file_unavailable">Seçilen dosya okunamadı. Lütfen yeniden seç.</string>
+    <string name="permission_unavailable">Android kurulum izni ekranını açamadı.</string>
+    <string name="confirmation_unavailable">Android onay ekranı açılamadı. Yeni bir test başlatmadan önce geçerli testi iptal et.</string>
+    <string name="local_error">İstek Android yükleyicisine ulaşamadı. Aşağıdaki yerel tanıya bak.</string>
+    <string name="select_again">Başlamak için indirdiğin APK’yı seç.</string>
+    <string name="privacy">Sonuç; cihaz sürümünü, yükleyici ayrıntılarını, kopyalanan bayt sayısını ve APK’nın SHA-256 parmak izini içerir. Dosya konumu, şifre, mesaj, oturum çerezi veya hesap verisi tanıya alınmaz.</string>
+</resources>

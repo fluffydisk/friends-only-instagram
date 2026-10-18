@@ -1,11 +1,160 @@
-# Friends Only · Android MVP 0.1.0
+# Friends Only
+
+<!-- AUTH_RECOVERY_ALPHA3_DELIVERY_START -->
+**Latest APK: [download 0.4.0-alpha.3 · package 86](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972/artifacts/12141631238)**
+(version code **385806745**). **Do not reinstall package 81**: it has a confirmed
+invalid avatar-draw branch and user-reported closing after credential submission.
+
+This build corrects that branch, styles supported genuine sign-in widgets with a
+neutral palette/own login mark, and adds private local crash-report copying.
+Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972) passed **173 Python tests, 996 Java/Kotlin assertions**, all
+**12 patches**, signatures/identity/alignment, theme/font/logo guards and the new
+mandatory final-bytecode check. **Phone login, post-login opening, appearance and
+recovery interaction remain unverified.** Genuine authentication/2FA and required
+provider/legal notices remain; unsupported sign-in variants may keep native UI.
+
+Sign into GitHub, download/extract the ZIP and open `friends-only-personal.apk`
+through Files. Remove only previous Friends Only first because the CI signing key
+changed; this clears its local session/settings. Official Instagram may stay.
+If a later crash occurs, reopen the launcher and use **Copy technical report** if
+shown; paste that text in this chat. No report is sent automatically. Do not use
+the old fixed-package installer helper. The artifact is retained for 7 days.
+<!-- AUTH_RECOVERY_ALPHA3_DELIVERY_END -->
+
+<!-- REFERENCE_ALPHA2_DELIVERY_START -->
+User-confirmed repeated closing after credential submission; a malformed avatar
+draw branch was subsequently found. Do not install this version.
+
+**WITHDRAWN · 0.4.0-alpha.2: [historical artifact 81](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444)**
+(code **385806744**, personal-test artifact **81**). Sign into GitHub, extract the
+ZIP and install `friends-only-personal.apk` through Files. Retained for 7 days.
+The CI signing key changed: remove only the previous **Friends Only** first;
+this clears its local session/settings. Official Instagram can remain installed.
+Do not use the old fixed-package installation helper.
+
+Screenshot-led charcoal styling, spaced Friends Only title, rounded feed surfaces
+and navigation, supported square Story photos and own native wordmark resources.
+Existing destinations, account service and native features remain.
+Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593) passed **12 patches, 170 Python tests and 951 Java/Kotlin assertions**,
+signatures/identity/alignment and theme/font/wordmark output guards.
+Installation and the post-submit crash are user-reported. Successful login/Home
+rendering and interactions remain unverified.
+Unsupported native/server-rendered screens can retain original branding; genuine
+account authentication and required provider/legal notices remain.
+<!-- REFERENCE_ALPHA2_DELIVERY_END -->
+
+<!-- DESIGN_ALPHA1_DELIVERY_START -->
+**Previous native test build: [download design 0.4.0-alpha.1 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996)**
+(code **385806743**). Sign into GitHub, download/extract the ZIP, then open
+`friends-only-personal.apk` through Files. The artifact is retained for 7 days.
+
+Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766) passed **11 patches, 167 Python tests and
+897 Java/Kotlin assertions**, signatures/identity, alignment, the theme resource
+contract and offline font/license validation. **Phone opening and appearance
+are unverified.** This is a first design iteration, not the finished replacement
+of every Story/chat/profile layout. Remove only the older Friends Only if the
+new CI key causes a signature conflict; removing it clears its local session
+and settings. Official Instagram can remain installed. Use the normal installer,
+not the legacy fixed-package helper.
+<!-- DESIGN_ALPHA1_DELIVERY_END -->
+
+
+**Native redesign: 0.4.0-alpha.3** — screenshot-led charcoal styling, rounded
+feed surfaces and navigation, supported square Story avatars and native Friends
+Only wordmark resources, corrected avatar drawing and local crash recovery.
+Features stay native. See the [current sign-in/recovery checklist](docs/AUTH_RECOVERY.md) and [design plan](docs/FRIENDS_ONLY_REDESIGN_PLAN.md).
+This is a compatibility prototype; unsupported native/server-rendered surfaces
+can retain their original appearance. The genuine account service remains
+Instagram, including required authentication and legal disclosures.
+
+
+The native Friends Only app uses Instagram's native posts, Stories and messages
+under our own name and icon. **The user confirms alpha.6 opens on their Galaxy
+S24+ / Android 17 / One UI 9.** Its Home swipe still reaches Reels; alpha.7
+addresses that navigation path and further simplifies the interface.
+
+<!-- ALPHA8_DELIVERY_START -->
+**Previous build: [download alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041)** — extract the ZIP and open
+`friends-only-personal.apk` with the normal file manager. Version code:
+**385806742**. Feed videos now use the existing inline loop instead of opening
+**View in Reels / Watch again** end cards. No fullscreen viewer, timer or
+synthetic replay tap is added.
+
+Local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905) passed all **ten patches**, **163 Python
+tests and 615 Java/Kotlin assertions**, signatures/identity, 16 KiB alignment
+and the emitted-theme guard. **Phone playback is still unverified.** Remove
+only the older **Friends Only** app for this new CI signing key; its local
+session/settings are cleared. Official Instagram may stay installed. Do not
+use the legacy v2 installation helper.
+<!-- ALPHA8_DELIVERY_END -->
+
+The latest issue report describes those two end-card actions but does not
+identify an APK/run, so it is not recorded as alpha.7 phone verification.
+
+<!-- ALPHA7_DELIVERY_START -->
+**Previous version: [alpha.7 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229/artifacts/12119595829)** — extract the ZIP and install
+`friends-only-personal.apk`. The local and [GitHub APK builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39081645229) passed all
+nine patches, **163 Python tests and 558 Java/Kotlin assertions**, including
+signature/identity, 16 KiB alignment and compiled-theme checks. Version code:
+**385806741**. **Alpha.7 has not been tested on the phone.**
+
+Remove only the older **Friends Only** native app first because the CI signing
+key changed; this clears its local session/settings. Official Instagram can
+remain installed. Do not use the old v2 installer helper. The
+[alpha.6 fallback](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39064660107/artifacts/12112951982) is known to open but retains the reported Reels
+swipe defect. Alpha.5 is withdrawn; do not reinstall artifact 55.
+<!-- ALPHA7_DELIVERY_END -->
+
+Implemented in alpha.7; phone validation pending:
+
+- Three native destinations only: **Friends, Chats, Me**. Reels, Explore and
+  Create pages are removed from the supported shared tab/pager factory, including
+  refreshed lists. Three supported central Reels launchers are also blocked.
+  No setting can re-enable them.
+- Friends Only settings from Home and the supported own-profile menu routes:
+  one optional **Only accounts I follow** filter, on by default, and a short
+  video-control hint. The former Instagram/Meta settings menu is not exposed
+  through that own-profile entry; other people's profile options remain native.
+- Hold a playing feed video for native **2× playback**; release/cancel uses the
+  existing native reset. Normal inline video posts remain eligible.
+
+The local build verifies compilation and selected output contracts. It does
+not establish phone behavior or removal of every Instagram surface or mark. Login, account checks
+and required legal disclosures remain genuine Instagram screens; the backend,
+original networking and platform terms still apply. Other original chrome can
+remain in layouts outside the supported changes. We do not collect credentials
+or messages or add a backend.
+
+The strict Home filter requires explicit existing metadata that the post's
+author is followed. Missing metadata can make the feed short or empty; turn
+off **Only accounts I follow** and refresh if needed. Embedded Story cards
+without a primary post can also be dropped. Cache/alternate-renderer coverage,
+chronological ordering, top Stories-tray playback, Direct sending, groups and
+the login/challenge flow still need separate phone tests.
+
+For native APK installation, use the normal file manager: extract the workflow
+ZIP and open `friends-only-personal.apk`. CI currently uses disposable signing
+keys, so a new build requires removing only the older **Friends Only** native
+app first, clearing its local session/settings. Official Instagram can remain
+installed. Do not use the legacy v2 installation helper or reset the phone.
+See the [native project guide](native-patches/README.md),
+[actual evidence](native-patches/VERIFICATION.md) and
+[installation troubleshooting](docs/INSTALLATION_TROUBLESHOOTING.md).
+
+The native work remains on `feature/native-apk-patches` with draft
+[PR #3](https://github.com/fluffydisk/friends-only-instagram/pull/3); it has not
+been merged into `main`. The WebView implementation below is retained as an
+earlier working approach and builds a separate APK.
+
+## Earlier WebView app · Android MVP 0.1.0
 
 A small native Android shell around Instagram’s own website, with Home and
 Messages navigation and conservative local interface filters. No backend, paid
 service, recreated feed, dummy conversations, or private Instagram API.
 
-**An APK has been compiled in Codex Cloud. Instagram account functionality has
-not been tested on Android.** This is an installable MVP for compatibility
+**An APK has been compiled in Codex Cloud, and the user reported that this earlier
+WebView app works on their phone.** Account behavior has not been independently
+tested in cloud. This is an installable MVP for compatibility
 testing, not a promise that Instagram permits WebView login or that the feed
 contains only followed accounts. See [verification](docs/VERIFICATION.md) for
 the exact evidence and [phone checklist](docs/DEVICE_TESTING.md) before relying

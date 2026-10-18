@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "version": "0.4.0-alpha.2",
+  "source_commit": "1e423ecb80c7274ff504aebe66c39817468f5824",
+  "implementation_scope": "Screenshot-led styling of existing native controls; no new destinations, credential form, backend, media processing or account/message parser.",
+  "unit_checks": {
+    "status": "passed",
+    "python_tests": 170,
+    "java_assertions": 405,
+    "kotlin_assertions": 546,
+    "total_java_kotlin_assertions": 951
+  },
+  "original_and_emitted_contract_checks": {
+    "status": "passed",
+    "reference_assertions_including_fixtures": 58,
+    "prior_design_assertions_including_fixtures": 70,
+    "is_android_runtime_test": false
+  },
+  "native_method_diff": {
+    "status": "passed",
+    "baseline": "local 0.4.0-alpha.1 APK",
+    "baseline_sha256": "58741552bd80184c19389a5588c0b59b0648ebe324cbec9eaddba2c6728c27aa",
+    "native_methods_compared": 861788,
+    "changed_methods": [
+      "LX/00gJ;->A07(Landroid/view/LayoutInflater;Landroid/view/ViewGroup$LayoutParams;Landroid/view/ViewGroup;I)Landroid/view/View;",
+      "LX/06hD;-><init>(Landroid/content/Context;)V",
+      "LX/07Ah;->A05(Landroid/content/Context;Landroid/view/ViewGroup;)Landroid/view/View;",
+      "Lcom/instagram/common/ui/widget/imageview/CircularImageView;->onDraw(Landroid/graphics/Canvas;)V",
+      "Lcom/instagram/ui/widget/gradientspinner/GradientSpinner;->onDraw(Landroid/graphics/Canvas;)V",
+      "Linstagram/features/feed/mainfeed/actionbar/MainFeedActionBar;-><init>(Landroid/content/Context;Landroid/util/AttributeSet;I)V"
+    ],
+    "original_assets_preserved": 3168,
+    "native_libraries_preserved": 18,
+    "comparison": "Resolved references and instruction-target control flow; const-string jumbo width and untargeted odd-address alignment NOPs before payloads normalized. Unresolvable original addresses compared raw. Registers, literals, payload contents and handlers remain compared.",
+    "raw_initial_different_methods": 14,
+    "additional_reencoding_only_methods": 8
+  },
+  "bundle": {
+    "file": "friends-only.mpp",
+    "sha256": "8a76afaa8b1ee70c5374c997ce9f4352e3c1e703d37ea78bf1223dda249cdbd7",
+    "size_bytes": 301175
+  },
+  "patches": [
+    "Friends Only native controls",
+    "Friends Only discovery blocking",
+    "Friends Only app identity",
+    "Friends Only feed video taps",
+    "Friends Only following feed",
+    "Friends Only quiet visual theme",
+    "Friends Only Reels navigation",
+    "Friends Only local settings",
+    "Friends Only feed hold speed",
+    "Friends Only feed video loop",
+    "Friends Only native design",
+    "Friends Only reference appearance"
+  ],
+  "package": "dev.friendsonly.instagram",
+  "version_code": 385806744,
+  "local_apk": {
+    "sha256": "f71ba1b8a090fb667eb8ff517dcf336a2316d1c0419664701857605ad73ec9c1",
+    "size_bytes": 252896662,
+    "signer_sha256": "a389dce487584e547464b8161c7d2bf0e7e8da92341c2ecc3eed0244f73ea9a0",
+    "theme_color_resources": {
+      "status": "passed",
+      "semantic_style_count": 7,
+      "semantic_attribute_reference_count": 47,
+      "palette_color_resource_count": 14,
+      "palette_colors": {
+        "friends_only_dark_button": {
+          "resource_id": "0x7f0604ce",
+          "argb": "0xff3e4045"
+        },
+        "friends_only_dark_canvas": {
+          "resource_id": "0x7f0604c8",
+          "argb": "0xff0d0e10"
+        },
+        "friends_only_dark_elevated": {
+          "resource_id": "0x7f0604ca",
+          "argb": "0xff1d1e21"
+        },
+        "friends_only_dark_link": {
+          "resource_id": "0x7f0604cd",
+          "argb": "0xffd4d5d8"
+        },
+        "friends_only_dark_secondary_text": {
+          "resource_id": "0x7f0604cc",
+          "argb": "0xffa5a6aa"
+        },
+        "friends_only_dark_surface": {
+          "resource_id": "0x7f0604c9",
+          "argb": "0xff151618"
+        },
+        "friends_only_dark_text": {
+          "resource_id": "0x7f0604cb",
+          "argb": "0xffededef"
+        },
+        "friends_only_light_button": {
+          "resource_id": "0x7f0604c7",
+          "argb": "0xff424449"
+        },
+        "friends_only_light_canvas": {
+          "resource_id": "0x7f0604c1",
+          "argb": "0xfff8f7f4"
+        },
+        "friends_only_light_elevated": {
+          "resource_id": "0x7f0604c3",
+          "argb": "0xffffffff"
+        },
+        "friends_only_light_link": {
+          "resource_id": "0x7f0604c6",
+          "argb": "0xff424449"
+        },
+        "friends_only_light_secondary_text": {
+          "resource_id": "0x7f0604c5",
+          "argb": "0xff68696d"
+        },
+        "friends_only_light_surface": {
+          "resource_id": "0x7f0604c2",
+          "argb": "0xffedeee9"
+        },
+        "friends_only_light_text": {
+          "resource_id": "0x7f0604c4",
+          "argb": "0xff28292c"
+        }
+      },
+      "compiled_color_reference_contract": "TYPE_REFERENCE to nonzero own color resource IDs"
+    },
+    "design_assets": {
+      "font": "Manrope",
+      "license": "SIL Open Font License 1.1",
+      "verified_assets": 2,
+      "asset_hashes_verified": true,
+      "rendered_ui_test": "not_run"
+    },
+    "reference_wordmarks": {
+      "status": "passed",
+      "density_night_variants": 4,
+      "resource_paths": [
+        "res/pq2.webp",
+        "res/kvb.webp",
+        "res/uep.webp",
+        "res/k38.webp"
+      ],
+      "original_intrinsic_dimensions_preserved": true,
+      "rendered_ui_test": "not_run"
+    }
+  },
+  "native_wordmark_resource": {
+    "id": "0x7f082a13",
+    "aapt2_table_mapping_verified": true,
+    "qualifiers": [
+      "xhdpi",
+      "night-xhdpi",
+      "xxhdpi",
+      "night-xxhdpi"
+    ]
+  },
+  "github": {
+    "run_id": 39133513593,
+    "run_number": 81,
+    "status": "success",
+    "run_url": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593",
+    "source_commit": "1e423ecb80c7274ff504aebe66c39817468f5824",
+    "apk_artifact_id": 12139515444,
+    "apk_artifact_name": "friends-only-personal-test-apk-81",
+    "apk_download": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39133513593/artifacts/12139515444",
+    "apk_zip_size_bytes": 228143393,
+    "apk_zip_digest": "sha256:cc94fc89c7d90ad07bc62d44a90728bb79e496f0922c16551df97febf672837b",
+    "report_artifact_id": 12139405963,
+    "bundle_artifact_id": 12138712043,
+    "tests_confirmed_from_completed_logs": true,
+    "python_tests": 170,
+    "java_kotlin_assertions": 951,
+    "patch_count": 12,
+    "ci_apk_file_sha256": null,
+    "ci_report_download": "Not independently downloaded in this environment; run success, patch application, checks and artifact publication confirmed through completed job logs and GitHub metadata. ZIP digest is not the contained APK digest; local APK hash is not presented as the CI APK hash."
+  },
+  "phone_tests": {
+    "installation": "user_confirmed",
+    "opening": "user_reports_repeated_closing_after_credential_submission",
+    "rendering": "not_run",
+    "authentication": "not_run",
+    "stories": "not_run",
+    "direct_send_and_groups": "not_run",
+    "following_coverage": "not_run",
+    "video_controls": "not_run",
+    "accessibility": "not_run"
+  },
+  "known_limits": [
+    "Only pinned native layouts and bitmap-backed Story avatars covered; unsupported renderers retain native appearance.",
+    "Native Story ring geometry and progress preserved; shader colors neutralized.",
+    "Toolbar falls back to genuine controls for unknown or unlabelled variants.",
+    "Instagram remains the underlying account/network service; genuine auth/2FA/challenges and required provider/legal notices retained.",
+    "Server-rendered/Bloks or unsupported screens can still show Instagram branding; all-provider-reference removal not claimed.",
+    "Screenshot reference is visual only; existing Friends/Chats/Me destinations remain."
+  ],
+  "signing": "Disposable local and CI keys differ. If an update conflicts, removing only old Friends Only clears its local session/settings; official Instagram may stay installed.",
+  "subsequent_user_report": {
+    "installed_artifact": 81,
+    "device": "Samsung SM-S926B / Android 17 / One UI 9",
+    "installation": "user_confirmed",
+    "signed_out_screen": "user_screenshot_original_colored_logo_and_blue_gray_UI",
+    "after_credential_submission": "user_reports_closing_and_repeated_crash_dialog",
+    "authentication_success": "unverified",
+    "phone_exception_trace": "not_available",
+    "distribution_status": "withdrawn",
+    "confirmed_local_defect": "CircularImageView.onDraw branch at code address 18 targets address 10 inside a native instruction; new static final-APK guard rejects it."
+  }
+}

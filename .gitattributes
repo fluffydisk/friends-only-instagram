@@ -1,0 +1,2 @@
+# Keep the vendored font license byte-for-byte identical to the pinned upstream asset.
+native-patches/design/OFL-Manrope.txt -whitespace

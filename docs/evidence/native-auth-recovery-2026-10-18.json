@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "version": "0.4.0-alpha.3",
+  "source_commit": "7085b5c9de5e5ae6fd5c46796e40e312ca15d45f",
+  "version_code": 385806745,
+  "package": "dev.friendsonly.instagram",
+  "trigger": {
+    "user_confirmed_artifact": 81,
+    "installation": "user_confirmed",
+    "after_credential_submission": "user_reports_closing_and_repeated_crash_dialog",
+    "authentication_success": "unverified",
+    "phone_exception_trace": "not_available"
+  },
+  "confirmed_defect": {
+    "method": "Lcom/instagram/common/ui/widget/imageview/CircularImageView;->onDraw(Landroid/graphics/Canvas;)V",
+    "alpha2_branch_address": 18,
+    "alpha2_invalid_target": 10,
+    "alpha3_valid_target": 27,
+    "new_guard_rejects_alpha2": true,
+    "phone_cause_confirmed_by_stack_trace": false
+  },
+  "unit_checks": {
+    "status": "passed",
+    "python_tests": 173,
+    "java_assertions": 449,
+    "kotlin_assertions": 547,
+    "java_kotlin_assertions": 996
+  },
+  "emitted_reference_contract": {
+    "status": "passed",
+    "assertions_including_fixtures": 61
+  },
+  "native_diff": {
+    "status": "passed",
+    "baseline": "local 0.4.0-alpha.2 APK",
+    "baseline_sha256": "f71ba1b8a090fb667eb8ff517dcf336a2316d1c0419664701857605ad73ec9c1",
+    "native_methods_compared": 861788,
+    "changed_native_methods": [
+      "Lcom/instagram/common/ui/widget/imageview/CircularImageView;->onDraw(Landroid/graphics/Canvas;)V"
+    ],
+    "original_assets_preserved": 3168,
+    "native_libraries_preserved": 18,
+    "scope": "local APK only; encoding-width/control-flow target normalization as documented by DesignDexAudit"
+  },
+  "local_apk": {
+    "sha256": "93252907ce4e8c150f23c8e1e6f63e0781a568fe91c225c09bac98bafcc73b0b",
+    "size_bytes": 252892566,
+    "signer_sha256": "a00950d80020c34050adbba5fd1086351f080b07021190c0c8101b427ced7bb9",
+    "visual_bytecode": {
+      "status": "passed",
+      "guarded_native_classes": 6,
+      "analyzed_methods": 429,
+      "android_runtime_test": false
+    },
+    "theme_color_resources": {
+      "status": "passed",
+      "semantic_style_count": 7,
+      "semantic_attribute_reference_count": 47,
+      "palette_color_resource_count": 14,
+      "palette_colors": {
+        "friends_only_dark_button": {
+          "resource_id": "0x7f0604ce",
+          "argb": "0xff3e4045"
+        },
+        "friends_only_dark_canvas": {
+          "resource_id": "0x7f0604c8",
+          "argb": "0xff0d0e10"
+        },
+        "friends_only_dark_elevated": {
+          "resource_id": "0x7f0604ca",
+          "argb": "0xff1d1e21"
+        },
+        "friends_only_dark_link": {
+          "resource_id": "0x7f0604cd",
+          "argb": "0xffd4d5d8"
+        },
+        "friends_only_dark_secondary_text": {
+          "resource_id": "0x7f0604cc",
+          "argb": "0xffa5a6aa"
+        },
+        "friends_only_dark_surface": {
+          "resource_id": "0x7f0604c9",
+          "argb": "0xff151618"
+        },
+        "friends_only_dark_text": {
+          "resource_id": "0x7f0604cb",
+          "argb": "0xffededef"
+        },
+        "friends_only_light_button": {
+          "resource_id": "0x7f0604c7",
+          "argb": "0xff424449"
+        },
+        "friends_only_light_canvas": {
+          "resource_id": "0x7f0604c1",
+          "argb": "0xfff8f7f4"
+        },
+        "friends_only_light_elevated": {
+          "resource_id": "0x7f0604c3",
+          "argb": "0xffffffff"
+        },
+        "friends_only_light_link": {
+          "resource_id": "0x7f0604c6",
+          "argb": "0xff424449"
+        },
+        "friends_only_light_secondary_text": {
+          "resource_id": "0x7f0604c5",
+          "argb": "0xff68696d"
+        },
+        "friends_only_light_surface": {
+          "resource_id": "0x7f0604c2",
+          "argb": "0xffedeee9"
+        },
+        "friends_only_light_text": {
+          "resource_id": "0x7f0604c4",
+          "argb": "0xff28292c"
+        }
+      },
+      "compiled_color_reference_contract": "TYPE_REFERENCE to nonzero own color resource IDs"
+    },
+    "design_assets": {
+      "font": "Manrope",
+      "license": "SIL Open Font License 1.1",
+      "verified_assets": 2,
+      "asset_hashes_verified": true,
+      "rendered_ui_test": "not_run"
+    },
+    "reference_wordmarks": {
+      "status": "passed",
+      "density_night_variants": 4,
+      "resource_paths": [
+        "res/pq2.webp",
+        "res/kvb.webp",
+        "res/uep.webp",
+        "res/k38.webp"
+      ],
+      "original_intrinsic_dimensions_preserved": true,
+      "rendered_ui_test": "not_run"
+    },
+    "login_brand_resources": {
+      "status": "passed",
+      "density_variants": 2,
+      "resource_id": "0x7f0820ec",
+      "rendered_login_test": "not_run"
+    }
+  },
+  "patches": [
+    "Friends Only native controls",
+    "Friends Only discovery blocking",
+    "Friends Only app identity",
+    "Friends Only feed video taps",
+    "Friends Only following feed",
+    "Friends Only quiet visual theme",
+    "Friends Only Reels navigation",
+    "Friends Only local settings",
+    "Friends Only feed hold speed",
+    "Friends Only feed video loop",
+    "Friends Only native design",
+    "Friends Only reference appearance"
+  ],
+  "bundle": {
+    "file": "friends-only.mpp",
+    "sha256": "1b349f39a22040d49240fd13e3a3e135b0c04929aa20bdb24459d4b9d22167b8",
+    "size_bytes": 313345
+  },
+  "github": {
+    "run_id": 39139968972,
+    "run_number": 86,
+    "status": "success",
+    "run_url": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972",
+    "source_commit": "7085b5c9de5e5ae6fd5c46796e40e312ca15d45f",
+    "apk_artifact_id": 12141631238,
+    "apk_artifact_name": "friends-only-personal-test-apk-86",
+    "apk_download": "https://github.com/fluffydisk/friends-only-instagram/actions/runs/39139968972/artifacts/12141631238",
+    "apk_zip_size_bytes": 228137781,
+    "apk_zip_digest": "sha256:ac99e15057dbe037d73af7d181ffbc2724dd4cd0604bde2738814c5fac87451b",
+    "bundle_artifact_id": 12141550497,
+    "report_artifact_id": 12141267558,
+    "python_tests": 173,
+    "java_kotlin_assertions": 996,
+    "tests_confirmed_from_completed_logs": true,
+    "patch_count": 12,
+    "required_visual_bytecode_guard": "passed in mandatory signed-output verification",
+    "ci_apk_file_sha256": null,
+    "ci_report_download": "Not independently downloaded; run, check counts, required output verification and published artifacts confirmed from completed job logs and metadata. ZIP digest is not the APK file digest; local APK hash is not the CI APK hash."
+  },
+  "privacy": {
+    "report_uploads": false,
+    "report_copy": "explicit user action only",
+    "included": [
+      "app version",
+      "Android SDK",
+      "exception type",
+      "bounded class/method/line frames"
+    ],
+    "excluded": [
+      "exception messages",
+      "filenames/paths",
+      "passwords",
+      "usernames",
+      "private messages",
+      "cookies",
+      "logs",
+      "intent payloads"
+    ],
+    "crash_report_tests": "sensitive-message/path exclusion, identifier filtering and bounds passed"
+  },
+  "phone_tests": {
+    "installation": "not_run",
+    "sign_in_rendering": "not_run",
+    "authentication_success": "not_run",
+    "post_login_opening": "not_run",
+    "reopen": "not_run",
+    "stories": "not_run",
+    "direct_send_and_groups": "not_run",
+    "video_controls": "not_run",
+    "recovery_UI_and_clipboard": "not_run"
+  },
+  "limits": [
+    "Genuine authentication, 2FA, challenges, provider/legal notices and Instagram account/networking remain.",
+    "Presentation limited to four exact signed-out native Activity classes; unknown/server-rendered widgets may retain original appearance.",
+    "Local Java crash capture starts in own launcher; no retrospective capture, native signal capture or guaranteed pre-launch/cold-deeplink coverage.",
+    "Native bytecode analysis is static, not ART or physical device execution.",
+    "Disposable CI signing keys require uninstalling only old Friends Only, clearing its local session/settings."
+  ]
+}

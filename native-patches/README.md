@@ -1,5 +1,21 @@
 # Friends Only · native app prototype
 
+<!-- DESIGN_ALPHA1_DELIVERY_START -->
+**Latest native test build: [download design 0.4.0-alpha.1 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996)**
+(code **385806743**). Sign into GitHub, download/extract the ZIP, then open
+`friends-only-personal.apk` through Files. The artifact is retained for 7 days.
+
+Local and [GitHub builds](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766) passed **11 patches, 167 Python tests and
+897 Java/Kotlin assertions**, signatures/identity, alignment, the theme resource
+contract and offline font/license validation. **Phone opening and appearance
+are unverified.** This is a first design iteration, not the finished replacement
+of every Story/chat/profile layout. Remove only the older Friends Only if the
+new CI key causes a signature conflict; removing it clears its local session
+and settings. Official Instagram can remain installed. Use the normal installer,
+not the legacy fixed-package helper.
+<!-- DESIGN_ALPHA1_DELIVERY_END -->
+
+
 **Native design 0.4.0-alpha.1 (code 385806743):** own first-run welcome/full-page
 settings, bundled Manrope, flat text navigation and scoped feed/Direct/profile
 styling. Read the [implementation and remaining design work](../docs/REDESIGN_IMPLEMENTATION.md).
@@ -20,7 +36,7 @@ is user-reported evidence, not a separate verification of Stories, messages,
 login/challenges or following-only filtering.
 
 <!-- ALPHA8_DELIVERY_START -->
-**[Download alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041)** — extract the ZIP and open
+**Previous build: [download alpha.8 APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39114270905/artifacts/12132185041)** — extract the ZIP and open
 `friends-only-personal.apk` with the normal file manager. Version code:
 **385806742**. Feed videos now use the existing inline loop instead of opening
 **View in Reels / Watch again** end cards. No fullscreen viewer, timer or

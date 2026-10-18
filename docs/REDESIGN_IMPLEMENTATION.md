@@ -1,5 +1,12 @@
 # Friends Only native design — 0.4.0-alpha.1
 
+[Download the built APK](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766/artifacts/12133549996) · [successful GitHub run 78](https://github.com/fluffydisk/friends-only-instagram/actions/runs/39120305766)
+
+Local and CI checks passed: **167 Python tests and 897 Java/Kotlin assertions**.
+Both builds produced signed APKs and passed output guards. **No phone opening,
+rendering, authentication or interaction test has been performed for this version.**
+
+
 This is the first implementation of the [redesign plan](FRIENDS_ONLY_REDESIGN_PLAN.md),
 not a claim that every planned screen has been replaced. It retains the supported
 Instagram 451 native account, media and Direct implementation.
@@ -101,5 +108,5 @@ On the Galaxy S24+ / Android 17 / One UI 9, check:
    background/resume. Report which build/code you installed and the exact steps.
 
 Automated checks/builds establish source/output contracts, not successful login,
-rendering, accessibility or phone interactions. Delivery evidence and exact APK
-links are recorded separately after the builds complete.
+rendering, accessibility or phone interactions. Delivery evidence is recorded in
+[evidence/native-design-2026-10-18.json](evidence/native-design-2026-10-18.json).

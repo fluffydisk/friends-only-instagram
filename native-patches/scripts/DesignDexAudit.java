@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 import com.android.tools.smali.dexlib2.Opcodes;
+import com.android.tools.smali.dexlib2.Opcode;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
 import com.android.tools.smali.dexlib2.iface.Method;
 import com.android.tools.smali.dexlib2.iface.instruction.*;
@@ -26,6 +27,11 @@ public final class DesignDexAudit {
     static void update(MessageDigest digest, Object value) {
         digest.update(String.valueOf(value).getBytes(StandardCharsets.UTF_8)); digest.update((byte) 0);
     }
+    static String target(Map<Integer, Integer> indexes, int address) {
+        // Preserve an unresolvable original address exactly; never drop a branch.
+        Integer index = indexes.get(address);
+        return index == null ? "raw-address:" + address : "instruction:" + index;
+    }
     static Map<String, byte[]> methods(Path apk) throws Exception {
         Map<String, byte[]> result = new HashMap<>();
         try (ZipFile zip = new ZipFile(apk.toFile())) {
@@ -46,12 +52,55 @@ public final class DesignDexAudit {
                         var body = method.getImplementation();
                         if (body != null) {
                             update(digest, body.getRegisterCount());
-                            for (var instruction : body.getInstructions()) {
-                                update(digest, instruction.getOpcode());
+                            // String-pool growth can widen CONST_STRING to JUMBO and move
+                            // branch/try/payload byte addresses without changing instructions.
+                            // Compare resolved references and control-flow instruction targets.
+                            var code = new ArrayList<Instruction>();
+                            body.getInstructions().forEach(code::add);
+                            Map<Integer, Integer> indexes = new HashMap<>();
+                            Map<Integer, Integer> switchOrigins = new HashMap<>();
+                            Set<Integer> branchTargets = new HashSet<>();
+                            Set<Integer> padding = new HashSet<>();
+                            int address = 0;
+                            for (var instruction : code) {
+                                if (instruction instanceof OffsetInstruction r) branchTargets.add(address + r.getCodeOffset());
+                                if (instruction.getOpcode() == Opcode.PACKED_SWITCH || instruction.getOpcode() == Opcode.SPARSE_SWITCH)
+                                    switchOrigins.put(address + ((OffsetInstruction) instruction).getCodeOffset(), address);
+                                address += instruction.getCodeUnits();
+                            }
+                            address = 0;
+                            for (var instruction : code) {
+                                if (instruction instanceof SwitchPayload payload && switchOrigins.containsKey(address))
+                                    for (var element : payload.getSwitchElements()) branchTargets.add(switchOrigins.get(address) + element.getOffset());
+                                address += instruction.getCodeUnits();
+                            }
+                            for (var block : body.getTryBlocks()) {
+                                branchTargets.add(block.getStartCodeAddress());
+                                branchTargets.add(block.getStartCodeAddress() + block.getCodeUnitCount());
+                                for (var handler : block.getExceptionHandlers()) branchTargets.add(handler.getHandlerCodeAddress());
+                            }
+                            address = 0;
+                            int logical = 0;
+                            for (int i = 0; i < code.size(); i++) {
+                                var instruction = code.get(i);
+                                boolean alignment = instruction.getOpcode() == Opcode.NOP && (address & 1) == 1
+                                    && i + 1 < code.size() && (code.get(i + 1) instanceof SwitchPayload ||
+                                        code.get(i + 1) instanceof com.android.tools.smali.dexlib2.iface.instruction.formats.ArrayPayload)
+                                    && !branchTargets.contains(address);
+                                if (alignment) padding.add(i);
+                                else indexes.put(address, logical++);
+                                address += instruction.getCodeUnits();
+                            }
+                            indexes.put(address, logical);
+                            address = 0;
+                            for (int i = 0; i < code.size(); i++) {
+                                var instruction = code.get(i);
+                                if (padding.contains(i)) { address += instruction.getCodeUnits(); continue; }
+                                update(digest, instruction.getOpcode() == Opcode.CONST_STRING_JUMBO ? Opcode.CONST_STRING : instruction.getOpcode());
                                 if (instruction instanceof FiveRegisterInstruction r) {
                                     update(digest, r.getRegisterCount());
                                     int[] registers = {r.getRegisterC(), r.getRegisterD(), r.getRegisterE(), r.getRegisterF(), r.getRegisterG()};
-                                    for (int i = 0; i < r.getRegisterCount(); i++) update(digest, registers[i]);
+                                    for (int register = 0; register < r.getRegisterCount(); register++) update(digest, registers[register]);
                                 } else if (instruction instanceof RegisterRangeInstruction r) {
                                     update(digest, r.getStartRegister()); update(digest, r.getRegisterCount());
                                 } else {
@@ -60,20 +109,23 @@ public final class DesignDexAudit {
                                     if (instruction instanceof ThreeRegisterInstruction r) update(digest, r.getRegisterC());
                                 }
                                 if (instruction instanceof WideLiteralInstruction r) update(digest, r.getWideLiteral());
-                                if (instruction instanceof OffsetInstruction r) update(digest, r.getCodeOffset());
+                                if (instruction instanceof OffsetInstruction r) update(digest, target(indexes, address + r.getCodeOffset()));
                                 if (instruction instanceof ReferenceInstruction r) update(digest, r.getReference());
                                 if (instruction instanceof DualReferenceInstruction r) update(digest, r.getReference2());
                                 if (instruction instanceof SwitchPayload p) for (var element : p.getSwitchElements()) {
-                                    update(digest, element.getKey()); update(digest, element.getOffset());
+                                    update(digest, element.getKey());
+                                    update(digest, switchOrigins.containsKey(address) ? target(indexes, switchOrigins.get(address) + element.getOffset()) : "raw-offset:" + element.getOffset());
                                 }
                                 if (instruction instanceof com.android.tools.smali.dexlib2.iface.instruction.formats.ArrayPayload p) {
                                     update(digest, p.getElementWidth()); update(digest, p.getArrayElements());
                                 }
+                                address += instruction.getCodeUnits();
                             }
                             for (var block : body.getTryBlocks()) {
-                                update(digest, block.getStartCodeAddress()); update(digest, block.getCodeUnitCount());
+                                update(digest, target(indexes, block.getStartCodeAddress()));
+                                update(digest, target(indexes, block.getStartCodeAddress() + block.getCodeUnitCount()));
                                 for (var handler : block.getExceptionHandlers()) {
-                                    update(digest, handler.getExceptionType()); update(digest, handler.getHandlerCodeAddress());
+                                    update(digest, handler.getExceptionType()); update(digest, target(indexes, handler.getHandlerCodeAddress()));
                                 }
                             }
                         }

@@ -14,7 +14,7 @@ from common import BUILD, REPORTS, ROOT, VERSIONS, android_paths, bootstrap, jav
 PATCH_NAMES = ["Friends Only native controls", "Friends Only discovery blocking", "Friends Only app identity",
                "Friends Only feed video taps", "Friends Only following feed", "Friends Only quiet visual theme",
                "Friends Only Reels navigation", "Friends Only local settings", "Friends Only feed hold speed",
-               "Friends Only feed video loop"]
+               "Friends Only feed video loop", "Friends Only native design"]
 
 
 def main() -> None:
@@ -65,6 +65,8 @@ def main() -> None:
             if path.is_file():
                 add(path.relative_to(patches).as_posix(), path.read_bytes())
         add("extensions/extension.mpe", (dex / "classes.dex").read_bytes())
+        for asset in ("Manrope.ttf", "OFL-Manrope.txt"):
+            add("design/" + asset, (ROOT / "design" / asset).read_bytes())
         add("LICENSE", (ROOT / "LICENSE").read_bytes())
         add("NOTICE.md", (ROOT / "NOTICE.md").read_bytes())
     print("Checking bundle discovery with the pinned patch engine...", flush=True)
@@ -87,6 +89,8 @@ def main() -> None:
              "dev.friendsonly.patch.runtime.FeedPolicyTest"])
         run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))),
              "dev.friendsonly.patch.runtime.QuietChromePolicyTest"])
+        run([java, "-cp", os.pathsep.join(map(str, (classes, test_classes))),
+             "dev.friendsonly.patch.runtime.ScreenDesignPolicyTest"])
         patch_test_sources = sorted((ROOT / "patches/src/test/kotlin").rglob("*.kt"))
         if not patch_test_sources:
             raise RuntimeError("Missing app identity policy tests.")
@@ -104,7 +108,7 @@ def main() -> None:
              "dev.friendsonly.patches.FollowingFeedPolicyTest"])
         run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
              "dev.friendsonly.patches.QuietThemePolicyTest"])
-        for test in ("ReelsNavigationPolicyTest", "SettingsRoutesPolicyTest", "FeedSpeedPolicyTest", "FeedLoopPolicyTest"):
+        for test in ("ReelsNavigationPolicyTest", "SettingsRoutesPolicyTest", "FeedSpeedPolicyTest", "FeedLoopPolicyTest", "FriendsDesignPolicyTest"):
             run([java, "-cp", os.pathsep.join(map(str, (patch_test_classes, cli))),
                  "dev.friendsonly.patches." + test])
         run([sys.executable, "-m", "unittest", "discover", "-s", ROOT / "tests", "-v"])

@@ -1,5 +1,13 @@
 # Friends Only · native app prototype
 
+**Native design 0.4.0-alpha.1 (code 385806743):** own first-run welcome/full-page
+settings, bundled Manrope, flat text navigation and scoped feed/Direct/profile
+styling. Read the [implementation and remaining design work](../docs/REDESIGN_IMPLEMENTATION.md).
+This iteration adds an eleventh selected patch and keeps the existing theme
+resource-ID guard. Compilation/static checks do not establish phone rendering,
+login or interaction success.
+
+
 Friends Only keeps Instagram's native post, Story and chat components beneath
 our own app identity and selected local interface changes. It targets the
 verified original **Instagram 451.0.0.20.80** Android input. The earlier WebView

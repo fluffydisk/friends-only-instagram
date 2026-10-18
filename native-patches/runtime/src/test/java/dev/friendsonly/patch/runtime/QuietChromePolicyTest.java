@@ -15,7 +15,7 @@ public final class QuietChromePolicyTest {
         check("Arkadaşlar".equals(QuietChromePolicy.tabLabel("feed_tab", "tr")));
         check("Sohbetler".equals(QuietChromePolicy.tabLabel("direct_tab", "tr")));
         check("Ben".equals(QuietChromePolicy.tabLabel("profile_tab", "tr")));
-        check("Friends".equals(QuietChromePolicy.tabLabel("feed_tab", "de")));
+        check("Freunde".equals(QuietChromePolicy.tabLabel("feed_tab", "de")));
         check("Chats".equals(QuietChromePolicy.tabLabel("direct_tab", "en")));
         check("Me".equals(QuietChromePolicy.tabLabel("profile_tab", null)));
         for (String unknown : new String[] {null, "", "search_tab", "clips_tab", "creation_tab",

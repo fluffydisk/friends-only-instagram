@@ -2,10 +2,10 @@
   "schema_version": 1,
   "jdk_major": 21,
   "friends_only": {
-    "version": "0.3.0-alpha.8",
+    "version": "0.4.0-alpha.1",
     "package_name": "dev.friendsonly.instagram",
     "application_label": "Friends Only",
-    "output_version_code": 385806742
+    "output_version_code": 385806743
   },
   "android": {
     "compile_sdk": 35,

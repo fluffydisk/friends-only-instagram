@@ -1,5 +1,13 @@
 # Friends Only
 
+**Native redesign: 0.4.0-alpha.1** — source implements our own welcome and full-page
+settings, offline Manrope typography, flat text navigation and scoped native
+feed/chat/profile styling. See the [design plan](docs/FRIENDS_ONLY_REDESIGN_PLAN.md)
+and [implementation/device checklist](docs/REDESIGN_IMPLEMENTATION.md). This is
+the first design iteration; a separate Stories list and fully replaced profile/chat
+layouts are not implemented, and phone rendering/interaction tests are pending.
+
+
 The native Friends Only app uses Instagram's native posts, Stories and messages
 under our own name and icon. **The user confirms alpha.6 opens on their Galaxy
 S24+ / Android 17 / One UI 9.** Its Home swipe still reaches Reels; alpha.7

@@ -1,0 +1,24 @@
+"""Guard the independent design assets in the final APK; not a rendered UI test."""
+from __future__ import annotations
+import hashlib
+from pathlib import Path
+import zipfile
+from validate_apk import ValidationError
+
+ASSETS = {
+    "assets/friends_only/Manrope.ttf": (164700, "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6"),
+    "assets/friends_only/OFL-Manrope.txt": (4387, "58172e0c0fac2cda8a37b348164bb55e44b0e69051e557e92b1d3f6910141f7b"),
+}
+
+
+def inspect_design_assets(apk: Path) -> dict:
+    with zipfile.ZipFile(apk) as source:
+        names = source.namelist()
+        for name, (size, digest) in ASSETS.items():
+            if names.count(name) != 1:
+                raise ValidationError("Missing or duplicate independent design asset.")
+            info = source.getinfo(name)
+            if info.file_size != size or hashlib.sha256(source.read(info)).hexdigest() != digest:
+                raise ValidationError("Independent font or license digest changed.")
+    return {"font": "Manrope", "license": "SIL Open Font License 1.1", "verified_assets": 2,
+            "asset_hashes_verified": True, "rendered_ui_test": "not_run"}

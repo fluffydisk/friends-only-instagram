@@ -6,9 +6,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,10 +13,6 @@ import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Switch;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -27,7 +20,6 @@ import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -167,46 +159,7 @@ public final class FocusHooks {
         final FocusConfig current = config;
         WeakReference<AlertDialog> previous = DIALOGS.get(activity);
         if (previous != null && previous.get() != null && previous.get().isShowing()) return;
-        final boolean tr = "tr".equals(Locale.getDefault().getLanguage());
-        LinearLayout content = new LinearLayout(activity);
-        content.setOrientation(LinearLayout.VERTICAL);
-        int padding = Math.round(20 * activity.getResources().getDisplayMetrics().density);
-        content.setPadding(padding, padding / 2, padding, 0);
-        TextView intro = new TextView(activity);
-        intro.setText(tr
-                ? "Arkadaşlarına zaman ayır."
-                : "Make time for your friends.");
-        content.addView(intro);
-        addSwitch(content, current, FocusConfig.FOLLOWING_ONLY,
-                tr ? "Yalnızca takip ettiğim hesaplar" : "Only accounts I follow", current.followingOnly());
-        TextView note = new TextView(activity);
-        note.setText(tr
-                ? "Akış videolarına basılı tutarak 2× hızda izle. Bırakınca normal hıza döner.\n\nTakip filtresini değiştirince akışı yenile. Takip bilgisi doğrulanamayan gönderiler gizlenir; akış boşsa bu ayarı kapatabilirsin."
-                : "Hold a feed video to watch at 2× speed. Release to return to normal speed.\n\nRefresh the feed after changing the follow filter. Posts without confirmed following information are hidden; turn this setting off if your feed is empty.");
-        note.setPadding(0, padding / 2, 0, padding / 2);
-        content.addView(note);
-        boolean dark = QuietChrome.isDarkTheme(activity.getWindow().getDecorView());
-        int textColor = Color.parseColor(dark ? "#F2F3EE" : "#242B27");
-        for (int i = 0; i < content.getChildCount(); i++) {
-            View child = content.getChildAt(i);
-            if (child instanceof TextView) {
-                TextView text = (TextView) child;
-                text.setTextColor(textColor);
-                text.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-                text.setTextSize(child == note ? 13 : 15);
-            }
-        }
-        ScrollView scroll = new ScrollView(activity);
-        scroll.setFillViewport(false);
-        scroll.addView(content);
-        GradientDrawable panel = new GradientDrawable();
-        panel.setColor(Color.parseColor(dark ? "#151A17" : "#F8F7F4"));
-        panel.setCornerRadius(padding);
-        scroll.setBackground(panel);
-        final AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Friends Only")
-                .setView(scroll)
-                .setPositiveButton(tr ? "Tamam" : "Done", null).create();
+        final AlertDialog dialog = FocusSettings.create(activity, current);
         final WeakReference<Activity> owner = new WeakReference<>(activity);
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override public void onDismiss(DialogInterface ignored) {
@@ -217,21 +170,11 @@ public final class FocusHooks {
         });
         try {
             dialog.show();
+            FocusSettings.onShown(dialog, activity);
             DIALOGS.put(activity, new WeakReference<>(dialog));
         } catch (RuntimeException ignored) {
             // The Activity can finish between validation and show().
         }
-    }
-
-    private static void addSwitch(LinearLayout parent, final FocusConfig current, final String key,
-            String label, boolean checked) {
-        Switch toggle = new Switch(parent.getContext());
-        toggle.setText(label);
-        toggle.setChecked(checked);
-        toggle.setPadding(0, 16, 0, 16);
-        toggle.setOnCheckedChangeListener((button, enabled) -> current.set(key, enabled));
-        parent.addView(toggle, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     private static final class TabController implements View.OnAttachStateChangeListener,

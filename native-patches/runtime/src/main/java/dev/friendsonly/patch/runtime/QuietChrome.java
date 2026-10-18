@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -107,7 +106,7 @@ final class QuietChrome {
 
         void apply(ViewGroup tabBar, Runnable settingsAction) {
             Palette palette = new Palette(tabBar);
-            String language = Locale.getDefault().getLanguage();
+            String language = DesignSystem.language(tabBar.getContext());
             View home = null;
             for (String resource : TAB_NAMES) {
                 View tab = findNamed(tabBar, resource, MAX_TABS, MAX_TAB_DEPTH, false);
@@ -252,9 +251,9 @@ final class QuietChrome {
             shell.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
 
             TextView brand = new TextView(nativeHeader.getContext());
-            brand.setText("Friends Only");
-            brand.setTextSize(19);
-            brand.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            brand.setText(QuietChromePolicy.tabLabel("feed_tab", DesignSystem.language(nativeHeader.getContext())));
+            brand.setTextSize(24);
+            brand.setTypeface(DesignSystem.font(nativeHeader.getContext(), true));
             brand.setGravity(Gravity.CENTER_VERTICAL);
             brand.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
             if (Build.VERSION.SDK_INT >= 28) brand.setAccessibilityHeading(true);
@@ -266,11 +265,10 @@ final class QuietChrome {
             shell.addView(brand, brandParams);
 
             TextView preferences = new TextView(nativeHeader.getContext());
-            boolean tr = "tr".equals(Locale.getDefault().getLanguage());
-            preferences.setText(tr ? "Ayarlar" : "Settings");
-            preferences.setContentDescription(tr ? "Friends Only ayarları" : "Friends Only settings");
-            preferences.setTextSize(12);
-            preferences.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            preferences.setText(DesignSystem.text(nativeHeader.getContext(), "Ayarlar", "Settings", "Optionen"));
+            preferences.setContentDescription(DesignSystem.text(nativeHeader.getContext(), "Friends Only ayarları", "Friends Only settings", "Friends Only Einstellungen"));
+            preferences.setTextSize(14);
+            preferences.setTypeface(DesignSystem.font(nativeHeader.getContext(), true));
             preferences.setGravity(Gravity.CENTER);
             preferences.setFocusable(true);
             preferences.setClickable(true);
@@ -373,7 +371,6 @@ final class QuietChrome {
 
     private static final class TabLabelDrawable extends Drawable {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final RectF pill = new RectF();
         private final float density;
         private final float textSize;
         private String text = "";
@@ -384,7 +381,7 @@ final class QuietChrome {
             density = view.getResources().getDisplayMetrics().density;
             textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12.5f,
                     view.getResources().getDisplayMetrics());
-            paint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            paint.setTypeface(DesignSystem.font(view.getContext(), true));
             paint.setTextAlign(Paint.Align.CENTER);
         }
 
@@ -405,14 +402,12 @@ final class QuietChrome {
             canvas.drawRect(getBounds(), paint);
             float centerX = getBounds().exactCenterX();
             float centerY = getBounds().exactCenterY();
+            // Flat text navigation with one quiet underline, no selected pill.
             if (selected) {
-                float halfWidth = Math.min(52 * density, getBounds().width() / 2f - 6 * density);
-                float halfHeight = Math.min(20 * density, getBounds().height() / 2f - 4 * density);
-                if (halfWidth > 0 && halfHeight > 0) {
-                    pill.set(centerX - halfWidth, centerY - halfHeight, centerX + halfWidth, centerY + halfHeight);
-                    paint.setColor(palette.selected);
-                    canvas.drawRoundRect(pill, 12 * density, 12 * density, paint);
-                }
+                paint.setColor(palette.text);
+                float halfWidth = Math.min(18 * density, getBounds().width() / 4f);
+                canvas.drawRect(centerX - halfWidth, getBounds().bottom - 4 * density,
+                        centerX + halfWidth, getBounds().bottom - 2 * density, paint);
             }
             paint.setTextSize(textSize);
             float availableWidth = Math.max(0, getBounds().width() - 16 * density);

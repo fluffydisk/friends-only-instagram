@@ -12,9 +12,10 @@ public final class QuietChromePolicy {
     /** Unknown and future tabs keep their original UI rather than receiving a misleading label. */
     public static String tabLabel(String resourceName, String language) {
         boolean tr = "tr".equals(language);
-        if ("feed_tab".equals(resourceName)) return tr ? "Arkadaşlar" : "Friends";
+        boolean de = "de".equals(language);
+        if ("feed_tab".equals(resourceName)) return tr ? "Arkadaşlar" : de ? "Freunde" : "Friends";
         if ("direct_tab".equals(resourceName)) return tr ? "Sohbetler" : "Chats";
-        if ("profile_tab".equals(resourceName)) return tr ? "Ben" : "Me";
+        if ("profile_tab".equals(resourceName)) return tr ? "Ben" : de ? "Ich" : "Me";
         return null;
     }
 }
